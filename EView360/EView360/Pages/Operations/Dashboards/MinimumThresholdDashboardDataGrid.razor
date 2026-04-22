@@ -1,0 +1,115 @@
+﻿@page "/MinimumThresholdDashboardDataGrid"
+@page "/MinimumThresholdDashboardDataGrid/{IsRegion:bool}/{FilterValues}"
+
+@layout EmptyLayout
+@using EView360.Common;
+@using EView360.Services;
+@using EView360.Services.Operations.DashBoard;
+@using EView360Models.Core;
+@using EView360Models.RequestModel;
+@using EView360Models.ViewModels;
+@using global::Common.ViewModel;
+@using static EView360.Common.Constants;
+@inject MinimumThresholdService service
+@inject ATMTreeViewRepository treeService
+@inject ILogger<MinimumThresholdDashboardDataGrid> logger
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject CommonServices commonService;
+@implements IDisposable;
+@inject IJSRuntime jsRuntime;
+
+<html>
+<head>
+    <!-- 'title' tag with content of 'Home' -->
+    <title>Minimum Threshold Dashboard - Total No. of Records = @minimumThresholdDashboard?.Count  -  Data Generated At: @refreshCurrentTime - Next Refresh Countdown: @counter</title>
+</head>
+
+<body>
+    <div class="row content">
+        @if (showSpinner)
+        {
+            <div class="spinner" style="z-index:4"></div>
+        }
+        <div class="col-sm-12 text-left">
+
+            @if (showGrid)
+            {
+                <DataGrid @ref="@dataGridRef"
+                      TItem="MinimumThresholdViewModel"
+                      ReadData="@OnReadData"
+                      Data="@_minimumThresholdDashboard"
+                      TotalItems="@minimumThresholdDashboard.Count"   
+                          SortChanged="SortData"
+                                    Editable
+                      Responsive="true"
+                      ShowPager="false"
+                                    Bordered
+                                    FixedHeader
+                      Narrow="true"
+                                    Sortable  SortMode="DataGridSortMode.Single"
+                                    Resizable
+                      HeaderThemeContrast="@ThemeContrast.Light"
+                                    Virtualize
+                      VirtualizeOptions="@(new() { DataGridMaxHeight = "735px", DataGridHeight="735px"})">
+
+                <DataGridColumn Field="@nameof(MinimumThresholdViewModel.ATM)" Caption="ATM" />
+                <DataGridColumn Field="@nameof(MinimumThresholdViewModel.IpAddress)" Caption="Ip Address" />
+                <DataGridColumn Field="@nameof(MinimumThresholdViewModel.Location)" Caption="Location" />
+                <DataGridColumn Field="@nameof(MinimumThresholdViewModel.NoteSetTypeName)" Caption="Note Set Type" />
+                <DataGridColumn Field="@nameof(MinimumThresholdViewModel.MinimumThresholdBalance)" Caption="Minimum Operating Balance" />
+                <DataGridColumn Field="@nameof(MinimumThresholdViewModel.RemainingAmount)" Caption="Remaining Amount" />
+                </DataGrid>
+            }
+        </div>
+    </div>
+</body>
+</html>
+<style>
+
+    .col, .col-1, .col-10, .col-11, .col-12, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-auto, .col-lg, .col-lg-1, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-auto, .col-md, .col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-auto, .col-sm, .col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-auto, .col-xl, .col-xl-1, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-auto {
+        padding-right: 0px;
+        padding-left: 0px;
+        margin: 0 0 0 0;
+    }
+
+    *, ::after, ::before {
+        box-sizing: content-box;
+    }
+
+    .table-primary .showAnimation {
+        animation: spin 1200ms linear infinite;
+    }
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        width: 170px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+
+</style>
+

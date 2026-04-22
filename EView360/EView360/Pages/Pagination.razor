@@ -1,0 +1,134 @@
+﻿@page "/Pagination"
+
+@inject IConfiguration _configuration
+
+@if (totalRecords <= 0)
+{
+    pageNo = 1;
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <nav aria-label="...">
+                <ul class="pagination">
+                    <li class="page-item @((pageNo ==1) ? "disabled" : "" )">
+                        <a class="page-link" @onclick="(() => GetDataByPageNo(1))" style="width:100px">First Page</a>
+                    </li>
+                    <li class="page-item Previous @((pageNo == 1 || totalRecords == 0) ? "disabled" : "" )">
+                        <a class="page-link" @onclick="(() => GetDataByPageNo(pageNo - 1))" tabindex="-1">Previous</a>
+                    </li>
+
+                    @foreach (int n in pages)
+                    {
+                        var tempint = n;
+
+                        <li class="page-item @(pageNo == n ? "active" : "" )">
+                            <a class="page-link" @onclick="(() => GetDataByPageNo(tempint))">@n</a>
+                        </li>
+                    }
+
+                    @*@for (int n = 1; n <= maxPageNo; n++)
+                    {
+                    var tempint = n;
+
+                    <li class="page-item @(pageNo == n ? "active" : "" )">
+                    <a class="page-link" @onclick="(() => GetDataByPageNo(tempint))">@n</a>
+                    </li>
+                    }*@
+
+                    <li class="page-item Next @((pageNo == maxPageNo || totalRecords == 0) ? "disabled" : "" )">
+                        <a class="page-link" @onclick="(() => GetDataByPageNo(pageNo + 1))">Next</a>
+                    </li>
+                    <li class="page-item @((pageNo < LastPageNo) ? "" : "disabled" )">
+                        <a class="page-link" @onclick="(() => GetDataByPageNo(LastPageNo))" style="width:100px" >Last Page</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        @if (totalRecords > 0)
+        {
+            <div class="col text-right">
+                <div class="form-group my-auto ml-2 d-none d-md-inline-block">@(startIndex + 1) - @(endIndex + 1) of @totalRecords items</div>
+            </div>
+        }
+    </div>
+</div>
+
+
+
+
+@code {
+
+    [Parameter] public int pageNo { get; set; }
+    [Parameter] public int maxPageNo { get; set; }
+    [Parameter] public int totalRecords { get; set; }
+    [Parameter] public EventCallback<int> OnSubmitCallback { get; set; }
+
+    public int filterMaxPage { get; set; }
+    public int StartPage { get; set; }
+    public int EndPage { get; set; }
+    public int LastPageNo { get; set; }
+    int maxPages = 5;
+    List<int> pages = new();
+
+    int startIndex, endIndex = 0;
+
+    protected override void OnInitialized()
+    {
+        if (pageNo < 1)
+        {
+            pageNo = 1;
+        }
+        else if (pageNo > maxPageNo)
+        {
+            pageNo = maxPageNo;
+        }
+
+        int startPage, endPage;
+        if (maxPageNo <= maxPages)
+        {
+            // total pages less than max so show all pages
+            startPage = 1;
+            endPage = maxPageNo;
+        }
+        else
+        {
+            // total pages more than max so calculate start and end pages
+            var maxPagesBeforeCurrentPage = (int)Math.Floor((decimal)maxPages / (decimal)2);
+            var maxPagesAfterCurrentPage = (int)Math.Ceiling((decimal)maxPages / (decimal)2) - 1;
+            if (pageNo <= maxPagesBeforeCurrentPage)
+            {
+                // current page near the start
+                startPage = 1;
+                endPage = maxPages;
+            }
+            else if (pageNo + maxPagesAfterCurrentPage >= maxPageNo)
+            {
+                // current page near the end
+                startPage = maxPageNo - maxPages + 1;
+                endPage = maxPageNo;
+            }
+            else
+            {
+                // current page somewhere in the middle
+                startPage = pageNo - maxPagesBeforeCurrentPage;
+                endPage = pageNo + maxPagesAfterCurrentPage;
+            }
+
+            LastPageNo = ((totalRecords + _configuration.GetValue<int>("RecordPerPage") - 1) / _configuration.GetValue<int>("RecordPerPage"));
+        }
+
+        // calculate start and end item indexes
+        startIndex = (pageNo - 1) * _configuration.GetValue<int>("RecordPerPage");
+        endIndex = Math.Min(startIndex + _configuration.GetValue<int>("RecordPerPage") - 1, totalRecords - 1);
+
+        // create an array of pages that can be looped over
+        pages = Enumerable.Range(startPage, (endPage + 1) - startPage).ToList();
+    }
+
+    private async Task GetDataByPageNo(int thisPageNo)
+    {
+        await OnSubmitCallback.InvokeAsync(thisPageNo);
+    }
+}

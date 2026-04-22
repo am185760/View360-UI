@@ -1,0 +1,43 @@
+{
+  "DBServers": [
+    {
+      "ServerName": "server 1",
+      "ServerConnection": "SwTm+/I9ZtLXVFfSp64K2wE2AwQwb1JiHAZZHTjs4uOoQVJYgD6+8pjcOV4178RG",
+      "ServerCredentials": "zbc78vwtXeyOTUhOOd/JTgZGxRAWoxGG8IBI5NBqy4X1bwkGwyNB3DnxdHYL59uxlLTciwSPHJnwjSU1Zmm3Hg==",
+      "CashDataStoreCredentials": "zbc78vwtXeyOTUhOOd/JTr81bCm2J5cD+gGL7HeLjASOnZbEJmrlkMrOS0a5X8EFtJkJtk3el2wQkUT5B8aSBw==",
+      "AtmIds": [
+        "1310",
+        "1021",
+        "1500"
+      ],
+      "AtmInfo": {
+        "1.3.1.0": "1310",
+        "1.0.2.1": "1021",
+        "1.5.0.0": "1500"
+      },
+      "NumberOfAtms": 3
+    },
+    {
+      "ServerName": "server 2",
+      "ServerConnection": "SwTm+/I9ZtLXVFfSp64K2wE2AwQwb1JiHAZZHTjs4uOoQVJYgD6+8pjcOV4178RG",
+      "ServerCredentials": "zbc78vwtXeyOTUhOOd/JTgZGxRAWoxGG8IBI5NBqy4X1bwkGwyNB3DnxdHYL59uxlLTciwSPHJnwjSU1Zmm3Hg==",
+      "CashDataStoreCredentials": "zbc78vwtXeyOTUhOOd/JTr81bCm2J5cD+gGL7HeLjASOnZbEJmrlkMrOS0a5X8EFtJkJtk3el2wQkUT5B8aSBw==",
+      "AtmIds": [
+        "3900",
+        "3909"
+      ],
+      "AtmInfo": {
+        "3.9.0.0": "3900",
+        "3.9.0.9": "3909"
+      },
+      "NumberOfAtms": 2
+    }
+  ],
+  "AppServers": [
+    {
+      "ServerName": "app server1",
+      "ServerIP": "10.11.12.13",
+      "ServerPort": "12600"
+    }
+  ]
+}

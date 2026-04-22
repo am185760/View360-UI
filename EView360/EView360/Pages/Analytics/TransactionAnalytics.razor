@@ -1,0 +1,430 @@
+﻿@page "/TransactionAnalytics"
+@using Blazorise.LoadingIndicator;
+@using EView360.Common;
+@using EView360.Services.Analytics;
+@using EView360.Services;
+@using EView360Models.Core;
+@using EView360Models.ViewModels;
+@using global::Common.ViewModel;
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject ILogger<TransactionAnalytics> logger
+@inject TransactionAnalyticsService service
+@inject CommonServices common;
+@inject IJSRuntime jsRuntime
+@inject ATMTreeViewRepository atmRepository
+@inject NotifyService notifyService
+@implements IDisposable
+
+<div class="row content">
+    <div class="col-sm-2 filter_bar border-right-2">
+        <form style="margin-top: 20px;">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <h5>Filters: </h5>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label>From Date: </label>
+                    <DatePicker TValue="DateTime" @ref="@dateRef" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" TimeAs24hr="true" Placeholder="Select Date" @bind-Date="@fromDate"></DatePicker>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label>To Date: </label>
+                    <DatePicker TValue="DateTime" @ref="@dateRef" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" TimeAs24hr="true" Placeholder="Select Date" @bind-Date="@toDate"></DatePicker>
+
+                </div>
+            </div>
+            <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@FilterSubmit" value="Search">
+            <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@ResetFilter" value="Reset">
+
+        </form>
+    </div>
+    <div class="col-sm-10 text-left content_body" style="margin-top:1%">
+        <div>
+            <b><h2 style="font-family:montserrat; font-weight:bold">Transaction Analysis</h2></b>
+        </div>
+        <div class="container" style="margin-top:2%; max-width:100% !important;">
+            <div class="row">
+                <div class="col-sm">
+                    <LoadingIndicator @ref="forTodaysDurationGridRepLoader">
+                        <div class="card mb-5">
+                            <h5 class="card-header">ATM Transaction for today</h5>
+                            <h6 class="card-header">Today [@DateTime.Now.ToString("dd/MM/yyyy")]</h6>
+                            <div class="card-body">
+                                @if (showTodysChart)
+                                {
+                                    <div class="mb-2">
+                                        <Chart @ref="ChartToday" TItem="double" Options="@chartOptions" />
+                                    </div>
+                                }
+
+                            </div>
+                        </div>
+                    </LoadingIndicator>
+                </div>
+                <div class="col-sm">
+                    <LoadingIndicator @ref="lastWeekRepLoader">
+                        <div class="card mb-5">
+                            <h5 class="card-header">ATM Transaction for last week</h5>
+                            <h6 class="card-header">Last Week [@DateTime.Today.AddDays(-7).ToString("dd/MM/yyyy") - @DateTime.Today.AddDays(-1).ToString("dd/MM/yyyy")]</h6>
+                            <div class="card-body">
+                                @if (showLastWeekChart)
+                                {
+                                    <div class="mb-2">
+                                        <Chart @ref="ChartLastWeek" TItem="double" Options="@chartOptions" />
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </LoadingIndicator>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm">
+                    <LoadingIndicator @ref="specifiedDurationChartRepLoader">
+
+                        <div class="card mb-5">
+                            <h5 class="card-header">ATM Transaction for specified duration</h5>
+                            <h6 class="card-header">Selection Criteria [@fromDate.ToString("dd/MM/yyyy") - @toDate.ToString("dd/MM/yyyy")]</h6>
+                            <div class="card-body">
+                                @if (showSpeficDuarationChart)
+                                {
+                                    <div class="mb-2">
+                                        <Chart @ref="ChartDuration" TItem="double" Options="@chartOptions" />
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </LoadingIndicator>
+                </div>
+                <div class="col-sm">
+                    <LoadingIndicator @ref="previousWeekRepLoader">
+                        <div class="card mb-5">
+                            <h5 class="card-header">ATM Transaction for previous week</h5>
+                            <h6 class="card-header">Previous Week [@DateTime.Today.AddDays(-14).ToString("dd/MM/yyyy") - @DateTime.Today.AddDays(-8).ToString("dd/MM/yyyy")]</h6>
+                            <div class="card-body">
+                                @if (showPreviousWeekChart)
+                                {
+                                    <div class="mb-2">
+                                        <Chart @ref="ChartPreviousWeek" TItem="double" Options="@chartOptions" />
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </LoadingIndicator>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+
+
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+
+    .content_body {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+    }
+</style>
+
+
+@code {
+    DateTime fromDate = DateTime.Now.Date.AddDays(-1);
+    DateTime toDate = DateTime.Now.Date;
+    DatePicker<DateTime>? dateRef;
+    [Inject] INotificationService NotificationService { get; set; }
+    [Inject] IMessageService MessageService { get; set; }
+    bool showChart, showTodysChart, showSpeficDuarationChart, showLastWeekChart, showPreviousWeekChart = false;
+    static DateTime currentTime = DateTime.Now;
+    private List<TransactionAnalyticsViewModel> transactionForDuration = new();
+    private List<TransactionAnalyticsViewModel> transactionForToday = new();
+    private List<TransactionAnalyticsViewModel> transactionForLastWeek = new();
+    private List<TransactionAnalyticsViewModel> transactionForPreviousWeek = new();
+    LoadingIndicator? previousWeekRepLoader, specifiedDurationChartRepLoader, lastWeekRepLoader, forTodaysDurationGridRepLoader;
+    private bool IsDisabled = false;
+    private DotNetObjectReference<TransactionAnalytics>? objRef;
+    ChartOptions chartOptions = new()
+        {
+            Plugins = new ChartPlugins
+            {
+                Legend = new ChartLegend
+                {
+                    Display = false
+                }
+            },
+            Scales = new ChartScales
+            {
+                Y = new ChartAxis
+                {
+                    Ticks = new ChartAxisTicks
+                    {
+                        Precision = 0,
+
+                    },
+                    Weight = 2
+                    //AlignToPixels = true
+                    //BeginAtZero = true,
+                    //SuggestedMin = -8`
+
+                }
+            }
+        };
+
+    LineChartOptions lineChartOptions = new()
+        {
+            Plugins = new ChartPlugins
+            {
+                Legend = new ChartLegend
+                {
+                    Display = false
+                }
+            }
+        };
+    Chart<double>? ChartToday = new();
+    Chart<double>? ChartLastWeek = new();
+    Chart<double>? ChartPreviousWeek = new();
+    Chart<double>? ChartDuration = new();
+
+
+    List<string> backgroundColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 0.2f), ChartColor.FromRgba(54, 162, 235, 0.2f), ChartColor.FromRgba(255, 206, 86, 0.2f), ChartColor.FromRgba(75, 192, 192, 0.2f), ChartColor.FromRgba(153, 102, 255, 0.2f), ChartColor.FromRgba(255, 159, 64, 0.2f) };
+    List<string> borderColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 1f), ChartColor.FromRgba(54, 162, 235, 1f), ChartColor.FromRgba(255, 206, 86, 1f), ChartColor.FromRgba(75, 192, 192, 1f), ChartColor.FromRgba(153, 102, 255, 1f), ChartColor.FromRgba(255, 159, 64, 1f) };
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+
+            if (firstRender)
+            {
+                await jsRuntime.InvokeVoidAsync("handleDatePicker", objRef);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at Transaction Analytics, OnAfterRenderAsync as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+
+    private async void FilterSubmit()
+    {
+        //await Task.Run(LoadData);
+        LoadData();
+    }
+
+    public List<double> GetChartData(List<TransactionAnalyticsViewModel> transactionAnalytics)
+    {
+        List<double> transacrionValues = new();
+        float maxFloat = -1;
+
+        foreach (var transaction in transactionAnalytics.OrderBy(x => x.Hr).ToList())
+        {
+            float dataVal = float.Parse(transaction.Counter.ToString());
+            if (dataVal > 0)
+            {
+                transacrionValues.Add(Math.Round(dataVal, 2));
+
+                if (maxFloat < dataVal)
+                    maxFloat = dataVal;
+            }
+        }
+        return transacrionValues;
+    }
+    public async void LoadData()
+    {
+
+        //if (ChartToday!=null)
+        //    await ChartToday.Clear();
+        await specifiedDurationChartRepLoader.Show();
+        await lastWeekRepLoader.Show();
+        await previousWeekRepLoader.Show();
+        await forTodaysDurationGridRepLoader.Show();
+        showChart = showLastWeekChart = showTodysChart = showPreviousWeekChart = showSpeficDuarationChart = false;
+        // IsDisabled = true;
+
+        await this.InvokeAsync(() => this.StateHasChanged());
+        await common.TaskDelay();
+
+        // For Specific Duration
+        //var transactions = await service.GetTransactiomAnalytics(fromDate, toDate);
+        //transactionForDuration = transactions;
+
+        //List<TransactionAnalyticsViewModel> transactionsToday = new();
+        //List<TransactionAnalyticsViewModel> transactionsPreviousWeek = new();
+        //List<TransactionAnalyticsViewModel> transactionForPreviousWeek = new();
+
+
+        // async () => transactionForToday = await service.GetTransactiomAnalytics(DateTime.Today, DateTime.Today),
+        // async () => transactionForDuration = await service.GetTransactiomAnalytics(fromDate, toDate),
+        // async () => transactionForLastWeek = await service.GetTransactiomAnalytics(DateTime.Today.AddDays(-7), DateTime.Today.AddDays(-1)),
+        // async () => transactionForPreviousWeek = await service.GetTransactiomAnalytics(DateTime.Today.AddDays(-14), DateTime.Today.AddDays(-8))
+        await Task.Run(HandleTodaysTransactionChart);
+        await Task.Run(HandleForDurationTransactionChart);
+        await Task.Run(HandleForLastWeekTransactionChart);
+        await Task.Run(HandleForPreviousWeekTransactionChart);
+
+        // For Today
+        //transactionsToday = await service.GetTransactiomAnalytics(DateTime.Today, DateTime.Today);
+        //transactionForToday = transactionsToday;
+
+
+        // For Last Week
+        //transactionsLastWeek = await service.GetTransactiomAnalytics(DateTime.Today.AddDays(-7), DateTime.Today.AddDays(-1));
+        //transactionForLastWeek = transactionsLastWeek;
+
+
+        // For Previous Week
+        //transactionsPreviousWeek = await service.GetTransactiomAnalytics(DateTime.Today.AddDays(-14), DateTime.Today.AddDays(-8));
+        //transactionForPreviousWeek = transactionsPreviousWeek;
+
+
+        showChart = true;
+        await this.InvokeAsync(() => this.StateHasChanged());
+
+        // await HandleRedraw(ChartToday, GetChartLabel(transactionForToday), GetChartData(transactionForToday));
+        // await forTodaysDurationGridRepLoader.Hide();
+
+        // await HandleRedraw(ChartDuration, GetChartLabel(transactionForDuration), GetChartData(transactionForDuration));
+        // await specifiedDurationChartRepLoader.Hide();
+
+        // await HandleRedraw(ChartLastWeek, GetChartLabel(transactionForLastWeek), GetChartData(transactionForLastWeek));
+        // await lastWeekRepLoader.Hide();
+
+        // await HandleRedraw(ChartPreviousWeek, GetChartLabel(transactionForPreviousWeek), GetChartData(transactionForPreviousWeek));
+        // await previousWeekRepLoader.Hide();
+
+
+        // IsDisabled = false;
+        // await this.InvokeAsync(() => this.StateHasChanged());
+    }
+    public async void HandleTodaysTransactionChart()
+    {
+        transactionForToday = await service.GetTransactiomAnalytics(DateTime.Today, DateTime.Today);
+        showTodysChart = true;
+        await this.InvokeAsync(() => this.StateHasChanged());
+        await common.TaskDelay();
+        await HandleRedraw(ChartToday, GetChartLabel(transactionForToday), GetChartData(transactionForToday));
+        await forTodaysDurationGridRepLoader.Hide();
+    }
+
+    public async void HandleForDurationTransactionChart()
+    {
+        transactionForDuration = await service.GetTransactiomAnalytics(fromDate, toDate);
+        showSpeficDuarationChart = true;
+        await this.InvokeAsync(() => this.StateHasChanged());
+        await common.TaskDelay();
+
+        await HandleRedraw(ChartDuration, GetChartLabel(transactionForDuration), GetChartData(transactionForDuration));
+        await specifiedDurationChartRepLoader.Hide();
+    }
+
+    public async void HandleForLastWeekTransactionChart()
+    {
+        transactionForLastWeek = await service.GetTransactiomAnalytics(DateTime.Today.AddDays(-7), DateTime.Today.AddDays(-1));
+        showLastWeekChart = true;
+        await this.InvokeAsync(() => this.StateHasChanged());
+        await common.TaskDelay();
+
+        await HandleRedraw(ChartLastWeek, GetChartLabel(transactionForLastWeek), GetChartData(transactionForLastWeek));
+        await lastWeekRepLoader.Hide();
+
+    }
+
+    public async void HandleForPreviousWeekTransactionChart()
+    {
+        transactionForPreviousWeek = await service.GetTransactiomAnalytics(DateTime.Today.AddDays(-14), DateTime.Today.AddDays(-8));
+        showPreviousWeekChart = true;
+        await this.InvokeAsync(() => this.StateHasChanged());
+        await common.TaskDelay();
+
+        await HandleRedraw(ChartPreviousWeek, GetChartLabel(transactionForPreviousWeek), GetChartData(transactionForPreviousWeek));
+        await previousWeekRepLoader.Hide();
+    }
+
+    public List<string> GetChartLabel(List<TransactionAnalyticsViewModel> transactionAnalytics)
+    {
+        List<string> Labels = new();
+
+        foreach (var transaction in transactionAnalytics.OrderBy(x => x.Hr).ToList())
+        {
+            if (float.Parse(transaction.Counter.ToString()) > 0)
+            {
+                Labels.Add(transaction.Hr.ToString());
+            }
+        }
+        return Labels;
+    }
+
+    BarChartDataset<double> GetChartDataset(List<double> chartData)
+    {
+        return new BarChartDataset<double>
+            {
+                Label = "Transaction",
+                Data = chartData,
+                BackgroundColor = backgroundColors,
+                BorderColor = borderColors,
+                MinBarLength = 10
+                //Fill = true,
+                //PointRadius = 3,
+                //CubicInterpolationMode = "monotone",
+            };
+    }
+
+    private async void ResetFilter()
+    {
+        fromDate = DateTime.Now.Date.AddDays(-1);
+        toDate = DateTime.Now.Date;
+        await this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+
+    async Task HandleRedraw(Chart<double>? Chart, List<string> labels, List<double> chartData)
+    {
+        if (Chart != null)
+        {
+            await Chart.Clear();
+            await Chart.AddLabelsDatasetsAndUpdate(labels, GetChartDataset(chartData));
+        }
+        //await Chart?.Clear();
+
+        //await Chart?.AddLabelsDatasetsAndUpdate(labels, GetChartDataset(chartData));
+    }
+
+    protected override void OnInitialized()
+    {
+        objRef = DotNetObjectReference.Create(this);
+        fromDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0);
+        toDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 59);
+        notifyService.OnAtmChange += AtmSelected;
+        notifyService.OnRegionChange += AtmSelected;
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+    public void Dispose()
+    {
+        notifyService.OnAtmChange -= AtmSelected;
+        notifyService.OnRegionChange -= AtmSelected;
+    }
+
+    private void AtmSelected()
+    {
+        LoadData();
+    }
+}

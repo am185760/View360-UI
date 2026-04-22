@@ -1,0 +1,485 @@
+﻿@page "/TaskStatusReport"
+@page "/TaskStatusReport/{mode}"
+@using EView360.Common;
+@using EView360.Data;
+@using EView360.Services.Reports;
+@using EView360Models.Core;
+@using EView360.Services.Operations;
+@using EView360.Services;
+@using EView360Models.RequestModel;
+@using EView360Models.ViewModels;
+@using Microsoft.Extensions.Caching.Distributed;
+@using Microsoft.Extensions.Options;
+@using Newtonsoft.Json;
+@using System.Text;
+@using System.Dynamic;
+@using System.Net;
+@using System.Data;
+@using global::Common.RequestModel;
+@using static System.Net.WebRequestMethods;
+@using static EView360.Common.Constants;
+@using static EView360.Data.Enumerations;
+@inject BnaTranactionsService service
+@inject AtmTaskService taskService
+@inject ATMTreeViewRepository treeService
+@inject NoteSetTypeService noteSetTypeService
+@inject ILogger<TaskStatusReport> logger
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject NavigationManager NavigationManager
+@inject IJSRuntime jsRuntime
+@inject UserManagementService userManagementService
+@inject AtmService atmService;
+@inject AtmSetupService atmSetupService;
+@inject HttpClient client;
+@inject TaskStatusReportsService taskStatusReportService;
+@inject IOptions<ApiUrl> apiUrl
+@inject YearService yearService
+@inject CommonServices common
+@inject IDistributedCache _distributedCache
+@inject IConfiguration _configuration
+<div class="row content">
+    @if (showSpinner)
+    {
+        <div class="spinner" style="z-index:4"></div>
+    }
+    <div class="col-sm-12">
+        <div class="form-group">
+            <b><h2 style="font-family:montserrat; font-weight:bold; margin-top: 1%;">Task Status Report @(@mode is not null && mode.Equals("Archive") ? "- Archive" : "")</h2></b>
+        </div>
+        <div class="card" style="border-width: medium;border-color: orange; margin-top:5%;">
+            <div class="card-body">
+                <form style="margin-top: 20px;">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <h5>Filters: </h5>
+                        </div>
+                    </div>
+                    @if (@mode is not null && mode.Equals("Archive"))
+                    {
+                        <div class="form-row">
+                            <div class="form-group col-md-1">
+                                <label>Archive Year: </label>
+                            </div>
+                            <div class="form-group col-md-2">
+                                <Select TValue="int" SelectedValue="@ArchiveYear" class="form-control" SelectedValueChanged="@DateChanged">
+                                    @foreach (int year in archiveYears)
+                                    {
+                                        <SelectItem Value=year>@year</SelectItem>
+                                    }
+                                </Select>
+                            </div>
+                        </div>
+                    }
+                    <div class="form-row">
+
+                        <div class="form-group col-md-1">
+                            <label>From(Creation Time): </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            @if (@mode is not null && mode.Equals("Archive"))
+                            {
+                                <DatePicker TValue="DateTime" @ref="@dateRef" DisplayFormat="dd/MM H:m" InputMode="DateInputMode.DateTime" Placeholder="Select Date" @bind-Date="@fromDate" TimeAs24hr="true"></DatePicker>
+                            }
+                            else
+                            {
+                                <DatePicker TValue="DateTime" @ref="@dateRef" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" Placeholder="Select Date" @bind-Date="@fromDate" TimeAs24hr="true"></DatePicker>
+                            }
+                        </div>
+                        <div class="form-group col-md-4 text-right">
+                            <label>To(Creation Time): </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            @if (@mode is not null && mode.Equals("Archive"))
+                            {
+                                <DatePicker TValue="DateTime" @ref="@dateRef" DisplayFormat="dd/MM H:m" InputMode="DateInputMode.DateTime" Placeholder="Select Date" @bind-Date="@toDate" TimeAs24hr="true"></DatePicker>
+                            }
+                            else
+                            {
+                                <DatePicker TValue="DateTime" @ref="@dateRef" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" Placeholder="Select Date" @bind-Date="@toDate" TimeAs24hr="true"></DatePicker>
+                            }
+                        </div>
+
+                    </div>
+
+                    <div class="form-row">
+
+                        <div class="form-group col-md-1">
+                            <label>From(End Time): </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            @if (@mode is not null && mode.Equals("Archive"))
+                            {
+                                <DatePicker TValue="DateTime?" @ref="@dateRefNullable" DisplayFormat="dd/MM H:m" InputMode="DateInputMode.DateTime" Placeholder="Select Date" @bind-Date="@fromEndTime" TimeAs24hr="true"></DatePicker>
+                            }
+                            else
+                            {
+                                <DatePicker TValue="DateTime?" @ref="@dateRefNullable" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" Placeholder="Select Date" @bind-Date="@fromEndTime" TimeAs24hr="true"></DatePicker>
+                            }
+                        </div>
+                        <div class="form-group col-md-4 text-right">
+                            <label>To(End Time): </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            @if (@mode is not null && mode.Equals("Archive"))
+                            {
+                                <DatePicker TValue="DateTime?" @ref="@dateRefNullable" DisplayFormat="dd/MM H:m" InputMode="DateInputMode.DateTime" Placeholder="Select Date" @bind-Date="@toEndTime" TimeAs24hr="true"></DatePicker>
+                            }
+                            else
+                            {
+                                <DatePicker TValue="DateTime?" @ref="@dateRefNullable" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" Placeholder="Select Date" @bind-Date="@toEndTime" TimeAs24hr="true"></DatePicker>
+                            }
+                        </div>
+
+                    </div>
+
+                    <div class="form-row">
+
+                        <div class="form-group col-md-1">
+                            <label for="CreatedByName">User: </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <select @bind="filterCreatedBy" class="form-control">
+                                <option value="">Any</option>
+                                @foreach (var user in appUsers.Select(x => new { x.UserId, x.UserLogin }).Distinct())
+                                {
+                                    <option value="@user.UserId">@user.UserLogin</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4 text-right">
+                            <label>Group : </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <select @bind="filterNoteSetTypeBy" class="form-control">
+                                <option value="">Any</option>
+                                @if (noteSetType != null)
+                                {
+                                    @foreach (var noteSetType in noteSetType?.ToList().Distinct())
+                                    {
+                                        <option value="@noteSetType.NoteSetTypeId">@noteSetType.NoteSetTypeName</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+
+                        <div class="form-group col-md-1">
+                            <label for="CreatedByName">Task Types: </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <select @bind="filterTaskTypes" class="form-control">
+                                <option value="">Any</option>
+                                @foreach (var taskType in atmTaskType.Select(x => new { x.TaskTypeName, x.TaskTypeId }).Distinct())
+                                {
+                                    <option value="@taskType.TaskTypeId">@taskType.TaskTypeName</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="form-group col-md-4 text-right">
+                            <label>Status : </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <select @bind="filterstatusName" class="form-control">
+                                <option value="">Any</option>
+                                @foreach (var status in status.Distinct())
+                                {
+                                    <option value="@status">@status</option>
+                                }
+                            </select>
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-row">
+
+                        <div class="form-group col-md-1">
+                            <label for="CreatedByName">Atm Type : </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <select @bind="filterAtmTerminalType" class="form-control">
+                                <option value="">Any</option>
+                                @foreach (var atmType in atmTerminalType.Distinct())
+                                {
+                                    <option value="@atmType.Name">@atmType.Name</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <input class="btn btn-success mt-1" disabled="@IsDisabled" type="button" onclick="@GenerateReport" value="Generate Report">
+                    <input class="btn btn-success mt-1" disabled="@IsDisabled" type="button" onclick="@ResetFilter" value="Reset">
+                </form>
+            </div>
+        </div>
+    </div>
+    @*    <div class="col-sm-10 text-left" style="margin-top:1%">
+    <div class="form-group">
+    @if (@mode is not null && mode.Equals("Archive"))
+    {
+    <b><h2 style="font-family:montserrat; font-weight:bold">Task Status Report - Archive</h2></b>
+    }
+    else
+    {
+    <b><h2 style="font-family:montserrat; font-weight:bold">Task Status Report</h2></b>
+    }
+    </div>
+    </div>*@
+</div>
+
+@if (@mode is not null)
+{
+    <style>
+        .flatpickr-prev-month, .flatpickr-month .numInputWrapper, .flatpickr-next-month {
+            visibility: hidden;
+        }
+
+        .flatpickr-month {
+            font-size: large;
+        }
+    </style>
+}
+
+<style>
+
+    form {
+        max-width: 100%;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+
+</style>
+
+@code {
+
+    [Parameter]
+    public string? mode { get; set; }
+
+    int ArchiveYear;
+    private List<int> archiveYears = new();
+
+    public List<TaskType> atmTaskType = new();
+    public List<TerminalType> atmTerminalType = new();
+    static DateTime currentTime = DateTime.Now;
+    public List<string> status = new();
+    private string? filterTaskTypes, filterAtmType, filterstatusName, filterAtmTerminalType, filterNoteSetTypeBy = string.Empty;
+    private string filterCreatedBy = string.Empty;
+    private bool showSpinner = false;
+    private bool showGrid = false;
+    private bool showTransactionsBetweenReplenishmentsRow = false;
+    private bool showFromDateAndToDateRow = false;
+    private Modal? modalRef;
+    string duration = string.Empty;
+    //DateTime fromDate, toDate;
+    DateTime? fromEndTime, toEndTime;
+    DateTime fromDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0);
+    DateTime toDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 59);
+
+    DatePicker<DateTime> dateRef;
+    DatePicker<DateTime?> dateRefNullable;
+    public List<AppUserDropdownViewModel> appUsers { get; set; } = new List<AppUserDropdownViewModel>();
+    private List<EView360Models.Core.NoteSetType>? noteSetType;
+    private List<string>? taskStatus;
+    private DotNetObjectReference<TaskStatusReport>? objRef;
+    private string? BaseURl;
+    [Inject] INotificationService NotificationService { get; set; }
+    [Inject] IMessageService MessageService { get; set; }
+    private bool IsDisabled = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        objRef = DotNetObjectReference.Create(this);
+        AppUser appUser = await localStorage.GetItemAsync<AppUser>("AppUser");
+        if (appUser is not null)
+        {
+            service.UserId = appUser.UserId;
+            noteSetTypeService.UserId = appUser.UserId;
+        }
+        if (appUsers is null || appUsers.Count == 0)
+        {
+            appUsers = await userManagementService.GetAllUsers();
+        }
+        if (atmTaskType is null || atmTaskType.Count == 0)
+        {
+            atmTaskType = await atmSetupService.GetAtmTaskType();
+        }
+        if (noteSetType is null || noteSetType.Count == 0)
+        {
+            noteSetType = await noteSetTypeService.GetNoteSetTypeListAsync();
+        }
+        if (status is null || status.Count == 0)
+        {
+            status = await taskService.GetStatusFriendlyName();
+        }
+        if (atmTerminalType is null || atmTerminalType.Count == 0)
+        {
+            atmTerminalType = await atmSetupService.GetAtmTerminalType();
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                await jsRuntime.InvokeVoidAsync("handleDatePicker", objRef);
+
+                fromDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0);
+                toDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 59);
+
+                this.InvokeAsync(() => this.StateHasChanged());
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at TaskStatusReport, OnAfterRenderAsync as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    private async void GenerateReport()
+    {
+        showSpinner = true;
+        IsDisabled = true;
+        await this.InvokeAsync(() => this.StateHasChanged());
+        await common.TaskDelay();
+
+        AppUser appUser = await localStorage.GetItemAsync<AppUser>("AppUser");
+
+        //var selectAtmResponse = await atmService.GetMultipleSelectedAtms();
+        //if (!selectAtmResponse.IsSuccess)
+        //{
+        //    await NotificationService.Error($"{selectAtmResponse.Message}", "Error", (options) =>
+        //    {
+        //        options.IntervalBeforeClose = 4000;
+        //    });
+        //}
+        //else
+        //{
+        string ArchiveYear1 = ArchiveYear == 0 ? string.Empty : ArchiveYear.ToString();
+
+
+        //var atms = ((List<string>)selectAtmResponse.Data);
+        showSpinner = true;
+        await this.InvokeAsync(() => this.StateHasChanged());
+
+        var taskStatusReportRequestModel = new TaskStatusReportRequestModel()
+            {
+                FromDate = (mode is not null && mode.Contains("Archive")) ? new DateTime(ArchiveYear, fromDate.Month, fromDate.Day, fromDate.Hour, fromDate.Minute, fromDate.Second) : fromDate,
+                ToDate = (mode is not null && mode.Contains("Archive")) ? new DateTime(ArchiveYear, toDate.Month, toDate.Day, toDate.Hour, toDate.Minute, toDate.Second) : toDate,
+                EndTimeFrom = (mode is not null && mode.Contains("Archive")) && fromEndTime != null ? new DateTime(ArchiveYear, fromEndTime.Value.Month, fromEndTime.Value.Day, fromEndTime.Value.Hour, fromEndTime.Value.Minute, fromEndTime.Value.Second) : fromEndTime,
+                EndTimeTo = (mode is not null && mode.Contains("Archive")) && toEndTime != null ? new DateTime(ArchiveYear, toEndTime.Value.Month, toEndTime.Value.Day, toEndTime.Value.Hour, toEndTime.Value.Minute, toEndTime.Value.Second) : toEndTime,
+                NoteSetTypeId = filterNoteSetTypeBy == string.Empty ? 0 : Convert.ToInt32(filterNoteSetTypeBy),
+                UserId = filterCreatedBy == string.Empty ? 0 : Convert.ToInt32(filterCreatedBy),
+                TaskType = filterTaskTypes,
+                AtmType = filterAtmTerminalType,
+                Status = filterstatusName,
+                ArchiveYear = ArchiveYear1,
+            };
+        logger.LogWarning("[TaskStatusReportPage:GenerateReport] going in GetTaskStatusReport UI Service ");
+        var data = await taskStatusReportService.GetTaskStatusReport(taskStatusReportRequestModel);
+        logger.LogWarning("[TaskStatusReportPage:GenerateReport] return from GetTaskStatusReport UI Service ");
+        
+        logger.LogWarning("[TaskStatusReportPage:GenerateReport] Start Serializing Datatable ");
+        string serializedDatatable = JsonConvert.SerializeObject(data);
+        logger.LogWarning("[TaskStatusReportPage:GenerateReport] End Serializing Datatable ");
+        
+        logger.LogWarning("[TaskStatusReportPage:GenerateReport] Start convering serialized Datatable into bytes ");
+        byte[] bytes = Encoding.ASCII.GetBytes(serializedDatatable);
+        logger.LogWarning("[TaskStatusReportPage:GenerateReport] End convering serialized Datatable into bytes ");
+
+        string redisKey = $"TaskStatusReport_{appUser.UserId}";
+
+        logger.LogWarning($"TaskStatusReportPage: going to cache the data");
+        _distributedCache.Set(redisKey, bytes, new DistributedCacheEntryOptions()
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_configuration.GetValue<int>("RedisKeyExpirationTimeInMinutes"))
+            });
+        logger.LogWarning($"TaskStatusReportPage: return from cache the data");
+
+
+        var reports = new ReportsRequestModel()
+            {
+                redisKey = $"{redisKey}",
+            };
+
+        showSpinner = false;
+        IsDisabled = false;
+        await this.InvokeAsync(() => this.StateHasChanged());
+        if (data.Rows.Count > 0)
+        {
+            string url = $"{apiUrl.Value.ReportingProjectUrl}ReportPopup.aspx?Report=TaskStatus.rpt&ReportTitle=Task%20Status%20Report&FromDate={fromDate.Date.ToString("MM/dd/yyyy")}&ToDate={toDate.Date.ToString("MM/dd/yyyy")}&GeneratedBy={appUser.UserLogin}&UserId={appUser.UserId}";
+            logger.LogWarning("[TaskStatusReportPage:GenerateReport] going in openWindowWithPost");
+            await jsRuntime.InvokeVoidAsync("openWindowWithPost", url, reports);
+        }
+        //}
+    }
+
+    private async void ResetFilter()
+    {
+        fromDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0);
+        toDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 59);
+
+        ArchiveYear = (mode is not null && mode.Contains("Archive")) ? archiveYears.FirstOrDefault() : 0;
+        fromDate = (mode is not null && mode.Contains("Archive")) ? new DateTime(ArchiveYear, fromDate.Month, fromDate.Day, 0, 0, 0) : fromDate;
+        toDate = (mode is not null && mode.Contains("Archive")) ? new DateTime(ArchiveYear, toDate.Month, toDate.Day, 23, 59, 59) : toDate;
+        fromEndTime = toEndTime = null;
+        filterTaskTypes = filterAtmType = filterstatusName = filterAtmTerminalType = filterNoteSetTypeBy = filterCreatedBy = string.Empty;
+        await this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private Task DateChanged(int selectedYear)
+    {
+        ArchiveYear = selectedYear;
+        fromDate = new DateTime(ArchiveYear, fromDate.Month, fromDate.Day, fromDate.Hour, fromDate.Minute, fromDate.Second);
+        toDate = new DateTime(ArchiveYear, toDate.Month, toDate.Day, toDate.Hour, toDate.Minute, toDate.Second);
+        this.InvokeAsync(() => this.StateHasChanged());
+        return Task.CompletedTask;
+    }
+    protected override void OnParametersSet()
+    {
+        if (mode is not null && mode.Equals("Archive"))
+        {
+            archiveYears = common.GetLastNYears();
+            ArchiveYear = archiveYears.FirstOrDefault();
+            fromDate = new DateTime(ArchiveYear, fromDate.Month, fromDate.Day, fromDate.Hour, fromDate.Minute, fromDate.Second);
+            toDate = new DateTime(ArchiveYear, toDate.Month, toDate.Day, toDate.Hour, toDate.Minute, toDate.Second);
+        }
+        else
+        {
+            fromDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0);
+            toDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 59);
+
+            ArchiveYear = 0;
+        }
+        ArchiveYear = (mode is not null && mode.Contains("Archive")) ? archiveYears.FirstOrDefault() : 0;
+        fromDate = (mode is not null && mode.Contains("Archive")) ? new DateTime(ArchiveYear, fromDate.Month, fromDate.Day, 0, 0, 0) : fromDate;
+        toDate = (mode is not null && mode.Contains("Archive")) ? new DateTime(ArchiveYear, toDate.Month, toDate.Day, 23, 59, 59) : toDate;
+        fromEndTime = toEndTime = null;
+        filterTaskTypes = filterAtmType = filterstatusName = filterAtmTerminalType = filterNoteSetTypeBy = filterCreatedBy = string.Empty;
+        this.InvokeAsync(() => this.StateHasChanged());
+
+    }
+
+}
+

@@ -1,0 +1,445 @@
+﻿@page "/ReplenishmentAnalysis"
+@using EView360.Common;
+@using EView360.Services.Analytics;
+@using EView360.Services;
+@using EView360Models.Core;
+@using EView360Models.ViewModels;
+@using Blazorise.LoadingIndicator
+@using global::Common.ViewModel;
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject ILogger<ReplenishmentAnalysis> logger
+@inject ReplenishmentAnalysisService service
+@inject IJSRuntime jsRuntime
+@inject ATMTreeViewRepository atmRepository
+@inject NotifyService notifyService
+@inject CommonServices common
+@implements IDisposable
+
+
+<div class="row content">
+    <div class="col-sm-2 filter_bar border-right-2">
+        <form style="margin-top: 20px;">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <h5>Filters: </h5>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label>From Date: </label>
+                    <DatePicker TValue="DateTime" @ref="@dateRef" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" TimeAs24hr="true" Placeholder="Select Date" @bind-Date="@fromDate" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label>To Date: </label>
+                    <DatePicker TValue="DateTime" @ref="@dateRef" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" TimeAs24hr="true" Placeholder="Select Date" @bind-Date="@toDate" />
+
+                </div>
+            </div>
+            <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@FilterSubmit" value="Search">
+            <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@ResetFilter" value="Reset">
+
+        </form>
+    </div>
+    <div class="col-sm-10 text-left content_body" style="margin-top:1%">
+        <div>
+            <b><h2 style="font-family:montserrat; font-weight:bold">Replenishment Analysis</h2></b>
+        </div>
+        <div class="container" style="margin-top:2%; max-width:100% !important;">
+            <div class="row">
+                <div class="col-sm">
+                    <LoadingIndicator @ref="lastWeekRepLoader">
+                        <div class="card mb-5" style="max-height: 403px;min-height: 403px;">
+                            <h5 class="card-header">ATM Replenishment for last week</h5>
+                            <h6 class="card-header">Last Week [@DateTime.Today.AddDays(-7).ToString("dd/MM/yyyy") - @DateTime.Today.AddDays(-1).ToString("dd/MM/yyyy")]</h6>
+                            <div class="card-body">
+                                @if (showChart)
+                                {
+                                    <div class="mb-2" style="margin-top: 30px;">
+                                        <LineChart @ref="lineChartLastWeek" TItem="int" Options="@lineChartOptions" />
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </LoadingIndicator>
+                </div>
+                <div class="col-sm">
+                    <LoadingIndicator @ref="specifiedDurationGridRepLoader">
+                        <div class="card mb-5" style="max-height: 403px;min-height: 403px;">
+                            <h5 class="card-header">ATM Replenishment Datagrid for specified duration</h5>
+                            <h6 class="card-header">Selection Criteria Datagrid [@fromDate.ToString("dd/MM/yyyy") - @toDate.ToString("dd/MM/yyyy")]</h6>
+                            <div class="card-body" style="overflow-y: auto;">
+                                @if (showGrid)
+                                {
+                                    <DataGrid @ref="@dataGridRef"
+                                          TItem="ReplenishmentAnalysisViewModel"
+                                          Data="@_ReplenishmentDatagridData"
+                                          ReadData="@OnReadData"
+                                          TotalItems="@ReplenishmentDatagridData?.Count"
+                                          Responsive
+                                          Bordered
+                                          Narrow="true"
+                                          HeaderThemeContrast="@ThemeContrast.Light"
+                                          FixedHeader
+                                          Virtualize
+                                          VirtualizeOptions="@(new() { DataGridMaxHeight = "290px" })">
+
+                                        <DataGridColumn Field="@nameof(ReplenishmentAnalysisViewModel.Title)" Caption="Title" />
+                                        <DataGridDateColumn Field="@nameof(ReplenishmentAnalysisViewModel.ReplenishmentDate)" Caption="Replenishment Date" />
+                                        <DataGridNumericColumn Field="@nameof(ReplenishmentAnalysisViewModel.Amount)" Caption="Amount" />
+                                    </DataGrid>
+                                }
+                            </div>
+                        </div>
+                    </LoadingIndicator>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm">
+                    <LoadingIndicator @ref="specifiedDurationChartRepLoader">
+                        <div class="card mb-5" style="max-height: 403px;min-height: 403px;">
+                            <h5 class="card-header">ATM Replenishment for specified duration</h5>
+                            <h6 class="card-header">Selection Criteria [@fromDate.ToString("dd/MM/yyyy") - @toDate.ToString("dd/MM/yyyy")]</h6>
+                            <div class="card-body">
+                                @if (showChart)
+                                {
+                                    <div class="mb-2" style="margin-top: 30px;">
+                                        <Chart @ref="BarChartDuration" Type="ChartType.Bar" TItem="int" Options="@chartOptions" />
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </LoadingIndicator>
+                </div>
+                <div class="col-sm">
+                    <LoadingIndicator @ref="previousWeekRepLoader">
+                        <div class="card mb-5" style="max-height: 403px;min-height: 403px;">
+                            <h5 class="card-header">ATM Replenishment for previous week</h5>
+                            <h6 class="card-header">Previous Week [@DateTime.Today.AddDays(-14).ToString("dd/MM/yyyy") - @DateTime.Today.AddDays(-8).ToString("dd/MM/yyyy")]</h6>
+                            <div class="card-body">
+                                @if (showChart)
+                                {
+                                    <div class="mb-2" style="margin-top: 30px;">
+                                        <LineChart @ref="lineChartPreviousWeek" TItem="int" Options="@lineChartOptions" />
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </LoadingIndicator>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+
+    .content_body {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+    }
+
+    .hide-legend {
+        display: none !important;
+    }
+
+</style>
+
+
+@code {
+    private DotNetObjectReference<ReplenishmentAnalysis>? objRef;
+
+    static DateTime currentTime = DateTime.Now;
+    DateTime fromDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0);
+    DateTime toDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 0);
+    DatePicker<DateTime>? dateRef;
+    bool showChart = false;
+    bool showGrid = false;
+    bool IsDisabled = false;
+    private long userId;
+
+    private DataGrid<ReplenishmentAnalysisViewModel>? dataGridRef;
+    private List<ReplenishmentAnalysisViewModel> ReplenishmentDatagridData = new();
+    private List<ReplenishmentAnalysisViewModel> _ReplenishmentDatagridData = new();
+    private List<ReplenishmentAnalysisViewModel> ReplenishmentForDuration = new();
+    private List<ReplenishmentAnalysisViewModel> ReplenishmentForLastWeek = new();
+    private List<ReplenishmentAnalysisViewModel> ReplenishmentForPreviousWeek = new();
+
+    LineChart<int>? lineChartLastWeek = new();
+    LineChart<int>? lineChartPreviousWeek = new();
+    Chart<int>? BarChartDuration = new();
+
+    List<string> backgroundColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 0.2f), ChartColor.FromRgba(54, 162, 235, 0.2f), ChartColor.FromRgba(255, 206, 86, 0.2f), ChartColor.FromRgba(75, 192, 192, 0.2f), ChartColor.FromRgba(153, 102, 255, 0.2f), ChartColor.FromRgba(255, 159, 64, 0.2f) };
+    List<string> borderColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 1f), ChartColor.FromRgba(54, 162, 235, 1f), ChartColor.FromRgba(255, 206, 86, 1f), ChartColor.FromRgba(75, 192, 192, 1f), ChartColor.FromRgba(153, 102, 255, 1f), ChartColor.FromRgba(255, 159, 64, 1f) };
+
+
+    LoadingIndicator? previousWeekRepLoader, specifiedDurationChartRepLoader, lastWeekRepLoader, specifiedDurationGridRepLoader;
+    ChartOptions chartOptions = new()
+        {
+            Plugins = new ChartPlugins
+            {
+                Legend = new ChartLegend
+                {
+                    Display = false
+                }
+            },
+            Scales = new ChartScales
+            {
+                Y = new ChartAxis
+                {
+                    Ticks = new ChartAxisTicks
+                    {
+                        Precision = 0
+                    }
+
+                }
+            }
+        };
+
+    LineChartOptions lineChartOptions = new()
+        {
+            Plugins = new ChartPlugins
+            {
+                Legend = new ChartLegend
+                {
+                    Display = false
+                }
+            },
+            Scales = new ChartScales
+            {
+                Y = new ChartAxis
+                {
+                    Ticks = new ChartAxisTicks
+                    {
+                        Precision = 0
+                    }
+                }
+            }
+        };
+
+    [Inject] INotificationService NotificationService { get; set; }
+    [Inject] IMessageService MessageService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        objRef = DotNetObjectReference.Create(this);
+        notifyService.OnAtmChange += AtmSelected;
+        notifyService.OnRegionChange += AtmSelected;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                await jsRuntime.InvokeVoidAsync("handleDatePicker", objRef);
+
+                userId = (await localStorage.GetItemAsync<EView360Models.Core.AppUser>("AppUser")).UserId;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at Replenishment Analysis, OnAfterRenderAsync as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    private void ResetFilter()
+    {
+        fromDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+        toDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 23, 59, 0);
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private async Task OnReadData(DataGridReadDataEventArgs<ReplenishmentAnalysisViewModel> e)
+    {
+        if (!e.CancellationToken.IsCancellationRequested)
+        {
+            List<ReplenishmentAnalysisViewModel> response = null;
+
+            if (e.ReadDataMode is DataGridReadDataMode.Virtualize)
+                response = ReplenishmentDatagridData.Skip(e.VirtualizeOffset).Take(e.VirtualizeCount).ToList();
+            else
+                throw new Exception("Unhandled ReadDataMode");
+
+            if (!e.CancellationToken.IsCancellationRequested)
+            {
+                _ReplenishmentDatagridData = new List<ReplenishmentAnalysisViewModel>(response);
+            }
+        }
+    }
+
+    private async Task LineChartHandleRedraw(LineChart<int>? lineChart, List<string> labels, List<int> chartData)
+    {
+        await lineChart.Clear();
+
+        await lineChart.AddLabelsDatasetsAndUpdate(labels, GetLineChartDataset(chartData));
+    }
+
+    private async Task BarChartHandleRedraw(Chart<int>? barChart, List<string> labels, List<int> chartData)
+    {
+        await barChart.Clear();
+
+        await barChart.AddLabelsDatasetsAndUpdate(labels, GetBarChartDataset(chartData));
+    }
+
+    private BarChartDataset<int> GetBarChartDataset(List<int> chartData)
+    {
+        return new()
+            {
+                Label = "Replenishments",
+                Data = chartData,
+                BackgroundColor = backgroundColors,
+                BorderColor = borderColors,
+                BorderWidth = 1,
+            };
+    }
+
+    private LineChartDataset<int> GetLineChartDataset(List<int> chartData)
+    {
+        return new()
+            {
+                Label = "Replenishments",
+                Data = chartData,
+                BackgroundColor = backgroundColors,
+                BorderColor = borderColors,
+                Fill = false,
+                PointRadius = 3,
+                CubicInterpolationMode = "monotone",
+            };
+    }
+
+    private List<string> GetChartLabel(List<ReplenishmentAnalysisViewModel> replenishmentViews)
+    {
+        List<string> Labels = new();
+
+        foreach (var replenishment in replenishmentViews.OrderBy(x => x.Day).ToList())
+        {
+            if (replenishment.Total > 0)
+            {
+                Labels.Add(replenishment.Day.ToString());
+            }
+        }
+        return Labels;
+    }
+
+    public List<int> GetChartData(List<ReplenishmentAnalysisViewModel> replenishmentViews)
+    {
+        List<int> replenishments = new();
+
+        foreach (var replenishment in replenishmentViews.OrderBy(x => x.Day).ToList())
+        {
+            int dataVal = replenishment.Total;
+            if (dataVal > 0)
+            {
+                replenishments.Add(dataVal);
+            }
+        }
+        return replenishments;
+    }
+
+    private async void FilterSubmit()
+    {
+        IsDisabled = true;
+        await specifiedDurationChartRepLoader.Show();
+        await lastWeekRepLoader.Show();
+        await previousWeekRepLoader.Show();
+        await specifiedDurationGridRepLoader.Show();
+
+        showGrid = false;
+
+        _ReplenishmentDatagridData = new();
+        ReplenishmentDatagridData = new();
+        ReplenishmentForDuration = new();
+        ReplenishmentForLastWeek = new();
+        ReplenishmentForPreviousWeek = new();
+
+        await this.InvokeAsync(() => this.StateHasChanged());
+        await common.TaskDelay();
+
+        ReplenishmentAnalysisResponseViewModel datagridReplenishments = new();
+        ReplenishmentAnalysisResponseViewModel replenishments = new();
+        ReplenishmentAnalysisResponseViewModel replenishmentsLastWeek = new();
+        ReplenishmentAnalysisResponseViewModel replenishmentsPreviousWeek = new();
+
+        logger.LogWarning($"[ReplenishmentAnalysisPage:FilterSubmit] going in GetReplenishmentDatagrid & GetReplenishmentAnalysis ");
+        Parallel.Invoke(
+                       async () => datagridReplenishments = await service.GetReplenishmentDatagrid(fromDate, toDate, userId),
+                       async () => replenishments = await service.GetReplenishmentAnalysis(fromDate, toDate, userId),
+                       async () => replenishmentsLastWeek = await service.GetReplenishmentAnalysis(DateTime.Today.AddDays(-7), DateTime.Today.AddDays(-1), userId),
+                       async () => replenishmentsPreviousWeek = await service.GetReplenishmentAnalysis(DateTime.Today.AddDays(-14), DateTime.Today.AddDays(-8), userId)
+                       );
+        logger.LogWarning($"[ReplenishmentAnalysisPage:FilterSubmit] returning from GetReplenishmentDatagrid & GetReplenishmentAnalysis ");
+
+        // For Specific Duration Datagrid
+        if (datagridReplenishments.IsSucess && datagridReplenishments.ReplenishmentViews?.Count > 0)
+            ReplenishmentDatagridData = datagridReplenishments.ReplenishmentViews;
+
+        showGrid = true;
+        await this.InvokeAsync(() => this.StateHasChanged());
+        await specifiedDurationGridRepLoader.Hide();
+
+
+        //For Specific Duration
+        if (replenishments.IsSucess && replenishments.ReplenishmentViews?.Count > 0)
+            ReplenishmentForDuration = replenishments.ReplenishmentViews;
+
+        // For Last Week
+        if (replenishmentsLastWeek.IsSucess && replenishmentsLastWeek.ReplenishmentViews?.Count > 0)
+            ReplenishmentForLastWeek = replenishmentsLastWeek.ReplenishmentViews;
+
+        // For Previous Week
+        if (replenishmentsPreviousWeek.IsSucess && replenishmentsPreviousWeek.ReplenishmentViews?.Count > 0)
+            ReplenishmentForPreviousWeek = replenishmentsPreviousWeek.ReplenishmentViews;
+
+
+        showChart = true;
+        await this.InvokeAsync(() => this.StateHasChanged());
+
+
+        //if (ReplenishmentForDuration?.Count > 0)
+        await BarChartHandleRedraw(BarChartDuration, GetChartLabel(ReplenishmentForDuration), GetChartData(ReplenishmentForDuration));
+        await specifiedDurationChartRepLoader.Hide();
+
+        //if (ReplenishmentForLastWeek?.Count > 0)
+        await LineChartHandleRedraw(lineChartLastWeek, GetChartLabel(ReplenishmentForLastWeek), GetChartData(ReplenishmentForLastWeek));
+        await previousWeekRepLoader.Hide();
+
+        //if (ReplenishmentForPreviousWeek?.Count > 0)
+        await LineChartHandleRedraw(lineChartPreviousWeek, GetChartLabel(ReplenishmentForPreviousWeek), GetChartData(ReplenishmentForPreviousWeek));
+        await lastWeekRepLoader.Hide();
+
+        IsDisabled = false;
+        showGrid = true;
+        await this.InvokeAsync(() => this.StateHasChanged());
+        await common.TaskDelay();
+    }
+
+    private void AtmSelected()
+    {
+        FilterSubmit();
+    }
+
+    public void Dispose()
+    {
+        objRef?.Dispose();
+        notifyService.OnAtmChange -= AtmSelected;
+        notifyService.OnRegionChange -= AtmSelected;
+    }
+}

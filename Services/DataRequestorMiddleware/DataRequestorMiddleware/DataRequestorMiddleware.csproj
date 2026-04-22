@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <RootNamespace>DataRequestorMiddleware</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Services\Dashboards\**" />
+    <EmbeddedResource Remove="Services\Dashboards\**" />
+    <None Remove="Services\Dashboards\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+    <PackageReference Include="Serilog.Extensions.Logging.File" Version="3.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="SharpZipLib" Version="1.3.3" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Common">
+      <HintPath>..\..\..\Common\bin\Debug\net7.0\Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Data Requestor">
+      <HintPath>..\..\..\DataRequestorLayer\DataRequestor\DataRequestor\bin\Debug\Data Requestor.dll</HintPath>
+    </Reference>
+    <Reference Include="Encryption">
+      <HintPath>..\..\..\DataRequestorLayer\DataRequestor\DataRequestor\Encryption dll\Encryption.dll</HintPath>
+    </Reference>
+    <Reference Include="EView360Models">
+      <HintPath>..\..\..\EView360Models\EView360Models\bin\Debug\net7.0\EView360Models.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

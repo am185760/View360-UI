@@ -1,0 +1,550 @@
+﻿@page "/"
+
+@using EView360.Services;
+@using EView360Models.Core;
+@using EView360Models.ViewModels;
+@using global::Common.ViewModel;
+@using static EView360.Data.Enumerations;
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject UserManagementService userService;
+@inject ATMTreeViewRepository atmRepository
+@inject NotifyService notifyService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime jsRuntime
+@inject ILogger<Index> logger
+
+
+<style>
+
+    .list-group-item:hover {
+        background-color: #fba112 !important;
+        font-weight: bold;
+    }
+
+    .search-box {
+        position: relative;
+    }
+
+        .search-box .glyphicon {
+            position: absolute;
+            padding: 10px;
+            pointer-events: none;
+            left: 15px;
+            top: 0px;
+        }
+</style>
+
+<PageTitle>Index</PageTitle>
+
+<br />
+
+@* <div class="row justify-content-center">
+    <div class="col-sm-10">
+        <div class="search-box">
+
+            <TextEdit @bind-Text="@searchValue" Placeholder="Search Page" />
+            <i class="glyphicon glyphicon-search"></i>
+        </div>
+    </div>
+</div> *@
+
+@* <div class="row justify-content-center">
+    <div class="col-sm-10">
+        <div class="search-box">
+
+        <Autocomplete TItem="AutoCompletePageViewModel"
+                      TValue="string"
+                      Data="@autoCompletePageList"
+                      TextField="@(( item ) => item.PageName)"
+                      ValueField="@(( item ) => item.PageUrl)"
+        @bind-SelectedText="@searchValue"
+                          SelectedValueChanged="@NavigateToPage"
+                      Placeholder="Search..."
+                      Filter="AutocompleteFilter.Contains">
+             <NotFoundContent> Sorry... @context was not found! </NotFoundContent>
+         </Autocomplete>
+        </div>
+    </div>
+</div> *@
+
+
+<style>
+    .dashboard-section {
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .section-title {
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+
+    .shortcut-tile {
+        height: 110px;
+        border-radius: 12px;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s ease;
+        text-align: center;
+    }
+
+        .shortcut-tile i {
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+
+        .shortcut-tile:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+</style>
+
+
+<div class="container mt-2">
+
+    <div class="row g-4">
+
+        @* ================= ADMINISTRATION ================= *@
+        @if (adminPermission)
+        {
+            <div class="col-12">
+                <div class="dashboard-section">
+
+                    <h5 class="section-title text-primary">
+                        <i class="fas fa-user-cog me-2"></i>
+                        Administration
+                    </h5>
+
+                    <div class="row g-3">
+
+                        @if (CheckPermission((int)Permissions.ViewNoteSetType))
+                        {
+                            <div class="col-md-3 col-sm-6">
+                                <div class="shortcut-tile bg-danger"
+                                     @onclick="@(x => NavigationManager.NavigateTo($"{"NoteSetType"}"))">
+                                    <i class="fa fa-solid fa-layer-group"></i>
+                                    <span>Note Set Type</span>
+                                </div>
+                            </div>
+                        }
+
+                        @if (CheckPermission((int)Permissions.ViewATMsList))
+                        {
+                            <div class="col-md-3 col-sm-6">
+                                <div class="shortcut-tile bg-warning"
+                                     @onclick="@(x => NavigationManager.NavigateTo($"{"AtmSetup"}"))">
+                                    <i class="fa fa-solid fa-credit-card" style="color:white"></i>
+                                    <span>ATM Setup</span>
+                                </div>
+                            </div>
+                        }
+
+                        @if (CheckPermission((int)Permissions.ViewUserList))
+                        {
+                            <div class="col-md-3 col-sm-6">
+                                <div class="shortcut-tile bg-success"
+                                     @onclick="@(x => NavigationManager.NavigateTo($"{"UserManagement"}"))">
+                                    <i class="fa fa-solid fa-user"></i>
+                                    <span>User Management</span>
+                                </div>
+                            </div>
+                        }
+
+                        @if (CheckPermission((int)Permissions.ViewGroupList))
+                        {
+                            <div class="col-md-3 col-sm-6">
+                                <div class="shortcut-tile bg-info"
+                                     @onclick="@(x => NavigationManager.NavigateTo($"{"GroupManagement"}"))">
+                                    <i class="fa fa-solid fa-users"></i>
+                                    <span>Group Management</span>
+                                </div>
+                            </div>
+                        }
+
+                    </div>
+                </div>
+            </div>
+        }
+
+
+        @* ================= OPERATIONS ================= *@
+        @if (operationPermission)
+        {
+            <div class="col-12" style="margin-top:1%;">
+                <div class="dashboard-section">
+
+                    <h5 class="section-title text-success">
+                        <i class="fa fa-solid fa-cogs me-2"></i>
+                        Operations
+                    </h5>
+
+                    <div class="row g-3">
+
+                        @if (CheckPermission((int)Permissions.AlertMonitoringHistory))
+                        {
+                            <div class="col-md-3 col-sm-6">
+                                <div class="shortcut-tile bg-primary"
+                                     @onclick="@(x => NavigationManager.NavigateTo($"{"AlertMonitoring"}"))">
+                                    <i class="fa fa-solid fa-bell"></i>
+                                    <span>Alert Monitoring</span>
+                                </div>
+                            </div>
+                        }
+
+                        @if (CheckPermission((int)Permissions.TaskStatusMonitoringHistory))
+                        {
+                            <div class="col-md-3 col-sm-6">
+                                <div class="shortcut-tile bg-secondary"
+                                     @onclick="@(x => NavigationManager.NavigateTo($"{"AtmTask"}"))">
+                                    <i class="fa fa-solid fa fa-cogs"></i>
+                                    <span>Task Status Monitoring</span>
+                                </div>
+                            </div>
+                        }
+
+                        @if (CheckPermission((int)Permissions.ViewTransactions))
+                        {
+                            <div class="col-md-3 col-sm-6">
+                                <div class="shortcut-tile bg-dark"
+                                     @onclick="@(x => NavigationManager.NavigateTo($"{"WithdrawalTransaction"}"))">
+                                    <i class="fas fa-money-check-alt"></i>
+                                    <span>Withdrawal Transaction</span>
+                                </div>
+                            </div>
+                        }
+
+                        @if (CheckPermission((int)Permissions.ViewCashPositions))
+                        {
+                            <div class="col-md-3 col-sm-6">
+                                <div class="shortcut-tile bg-warning"
+                                     @onclick="@(x => NavigationManager.NavigateTo($"{"CashPosition"}"))">
+                                    <i class="fas fa-list-ol"></i>
+                                    <span>Cash Position</span>
+                                </div>
+                            </div>
+                        }
+
+                    </div>
+                </div>
+            </div>
+        }
+
+
+        @* ================= REPORTS ================= *@
+        @if (reportPermission)
+        {
+            <div class="col-12" style="margin-top:1%;">
+                <div class="dashboard-section">
+
+                    <h5 class="section-title text-danger">
+                        <i class="fas fa-chart-pie me-2"></i>
+                        Reports
+                    </h5>
+
+                    <div class="row g-3">
+
+                        @if (CheckPermission((int)Permissions.TaskStatusReport))
+                        {
+                            <div class="col-md-3 col-sm-6">
+                                <div class="shortcut-tile bg-danger"
+                                     @onclick="@(x => NavigationManager.NavigateTo($"{"TaskStatusReport"}"))">
+                                    <i class="fa fa-solid fa-clipboard-list"></i>
+                                    <span>Task Status Report</span>
+                                </div>
+                            </div>
+                        }
+
+                        @if (CheckPermission((int)Permissions.ATMSummaryReport))
+                        {
+                            <div class="col-md-3 col-sm-6">
+                                <div class="shortcut-tile bg-info"
+                                     @onclick="@(x => NavigationManager.NavigateTo($"{"AtmSummaryReport"}"))">
+                                    <i class="fa fa-solid fa-file-invoice"></i>
+                                    <span>ATM Summary Report</span>
+                                </div>
+                            </div>
+                        }
+
+                        @if (CheckPermission((int)Permissions.EJReplenishmentReport))
+                        {
+                            <div class="col-md-3 col-sm-6">
+                                <div class="shortcut-tile bg-success"
+                                     @onclick="@(x => NavigationManager.NavigateTo($"{"ReplenishmentReport"}"))">
+                                    <i class="fa fa-bar-chart"></i>
+                                    <span>Replenishment Report</span>
+                                </div>
+                            </div>
+                        }
+
+                        @if (CheckPermission((int)Permissions.LowBalanceReport))
+                        {
+                            <div class="col-md-3 col-sm-6">
+                                <div class="shortcut-tile bg-secondary"
+                                     @onclick="@(x => NavigationManager.NavigateTo($"{"LowBalanceReport"}"))">
+                                    <i class="fa fa-clipboard"></i>
+                                    <span>Low Balance Report</span>
+                                </div>
+                            </div>
+                        }
+
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
+</div>
+
+
+@code {
+    [Inject] INotificationService NotificationService { get; set; }
+    string searchValue = string.Empty;
+    bool adminPermission, operationPermission, reportPermission, archivePermission, analyticPermission;
+
+    Dictionary<int, string> userRight;
+    AppUser appUser;
+    RightsViewModel rights = new();
+    public string selectedSearchValue { get; set; }
+    public string selectedAutoCompleteText { get; set; }
+
+    private List<AutoCompletePageViewModel> autoCompletePageList = new List<AutoCompletePageViewModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            appUser = await localStorage.GetItemAsync<AppUser>("AppUser");
+            var permissions = await localStorage.GetItemAsync<Dictionary<int, string>>("userRights");
+            if (permissions is not null)
+            {
+                userRight = permissions;
+            }
+
+            rights = await userService.GetRightsByType();
+            adminPermission = CheckAdminViewPermission();
+            operationPermission = CheckOperationViewPermission();
+            reportPermission = CheckReportViewPermission();
+            archivePermission = CheckArchiveViewPermission();
+            analyticPermission = CheckPermission((int)Permissions.ViewGraphList);
+            InitializePageList();
+            await this.InvokeAsync(() => this.StateHasChanged());
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at Index, OnInitializedAsync as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    private bool CheckPermission(int right)
+    {
+        try
+        {
+            if (userRight is not null)
+                return userRight.ContainsKey(right);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at Index, CheckPermission as: {ex.Message}");
+
+            NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+        return false;
+    }
+
+    private bool CheckAdminViewPermission()
+    {
+        try
+        {
+            foreach (int id in userRight.Keys)
+            {
+                if (rights.AdminRights.Contains(id))
+                    return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at Index, CheckAdminViewPermission as: {ex.Message}");
+
+            NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+        return false;
+    }
+
+    private bool CheckOperationViewPermission()
+    {
+        try
+        {
+            foreach (int id in userRight.Keys)
+            {
+                if (rights.OperationRights.Contains(id))
+                    return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at Index, CheckOperationViewPermission as: {ex.Message}");
+
+            NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+        return false;
+    }
+
+    private bool CheckReportViewPermission()
+    {
+        try
+        {
+            foreach (int id in userRight.Keys)
+            {
+                if (rights.ReportRights.Contains(id))
+                    return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at Index, CheckReportViewPermission as: {ex.Message}");
+
+            NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+        return false;
+    }
+
+    private bool CheckArchiveViewPermission()
+    {
+        try
+        {
+            foreach (int id in userRight.Keys)
+            {
+                if (rights.ArchiveRights.Contains(id))
+                    return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at Index, CheckArchiveViewPermission as: {ex.Message}");
+
+            NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+        return false;
+    }
+
+    public async Task NavigateToWindow(string url)
+    {
+        try
+        {
+            string baseurl = $"{NavigationManager.BaseUri}{url}";
+            await jsRuntime.InvokeVoidAsync("open", baseurl, "_blank", "location=yes,height=1000,width=5000,scrollbars=yes,status=yes");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at Index, NavigateToWindow as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    public async Task NavigateToPage(string page)
+    {
+        try
+        {
+            NavigationManager.NavigateTo(page, false);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at Index, NavigateToPage as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    public void InitializePageList()
+    {
+       autoCompletePageList.AddRange(new List<AutoCompletePageViewModel>
+       {
+           new AutoCompletePageViewModel { PageUrl = "NoteSetType", PageName = "Note Set Type Setup" },
+           new AutoCompletePageViewModel { PageUrl = "AtmSetup", PageName = "Atm Setup" },
+           new AutoCompletePageViewModel { PageUrl = "UserManagement", PageName = "Users" },
+           new AutoCompletePageViewModel { PageUrl = "GroupManagement", PageName = "Groups" },
+           new AutoCompletePageViewModel { PageUrl = "ApplicationConfiguration", PageName = "Application Configuration" },
+           new AutoCompletePageViewModel { PageUrl = "AuditLog", PageName = "Activity Log" },
+           new AutoCompletePageViewModel { PageUrl = "RecreateDailyFeed", PageName = "Recreate Daily Feed" },
+           new AutoCompletePageViewModel { PageUrl = "AlertTemplate", PageName = "Alert Template" },
+           new AutoCompletePageViewModel { PageUrl = "ScheduleReportGeneration", PageName = "Schedule Report" },
+           new AutoCompletePageViewModel { PageUrl = "AlertMonitoring", PageName = "Alert Monitoring (History)" },
+           new AutoCompletePageViewModel { PageUrl = "AtmTask", PageName = "Task Status Monitoring (History)" },
+           new AutoCompletePageViewModel { PageUrl = "DailyFeedStatus", PageName = "Order Download And Daily Feed Status (History)" },
+           new AutoCompletePageViewModel { PageUrl = "OrderDownloadDashboardDataGrid", PageName = "Order Download And Daily Feed Dashboard" },
+           new AutoCompletePageViewModel { PageUrl = "AtmTaskDashboard", PageName = "Task Dashboard" },
+           new AutoCompletePageViewModel { PageUrl = "BNATransactionDashboard", PageName = "BNA Deposit Dashboard" },
+           new AutoCompletePageViewModel { PageUrl = "MinimumThresholdDashboardDataGrid", PageName = "Minimum Threshold Dashboard" },
+           new AutoCompletePageViewModel { PageUrl = "ReportTask", PageName = "Report Task Monitoring" },
+           new AutoCompletePageViewModel { PageUrl = "TransactionsHourlyAnalysis", PageName = "Transaction Hourly Analysis" },
+           new AutoCompletePageViewModel { PageUrl = "ATMNetworkInfo", PageName = "ATM Network Information" },
+           new AutoCompletePageViewModel { PageUrl = "BalanceInvestigation", PageName = "Balance Investigation" },
+           new AutoCompletePageViewModel { PageUrl = "CashPositionDashboard", PageName = "Cash Position Dashboard" },
+           new AutoCompletePageViewModel { PageUrl = "CashPositionDashboard/0/true", PageName = "Recycler Cash Position Dashboard" },
+           new AutoCompletePageViewModel { PageUrl = "WithdrawalTransaction", PageName = "Withdrawal Transaction (History)" },
+           new AutoCompletePageViewModel { PageUrl = "CashPosition", PageName = "Cash Position (History)" },
+           new AutoCompletePageViewModel { PageUrl = "CashPosition/0/true", PageName = "Recycler Cash Position (History)" },
+           new AutoCompletePageViewModel { PageUrl = "#", PageName = "Cash Position vs DFF (History)" },
+           new AutoCompletePageViewModel { PageUrl = "BnaTransaction", PageName = "BNA Transactions (History)" },
+           new AutoCompletePageViewModel { PageUrl = "#", PageName = "CPM Transactions (History)" },
+           new AutoCompletePageViewModel { PageUrl = "Replenishment", PageName = "Replenishment" },
+           new AutoCompletePageViewModel { PageUrl = "TaskStatusReport", PageName = "Task Status Report" },
+           new AutoCompletePageViewModel { PageUrl = "AlertMonitoringReport", PageName = "Alert Monitoring Report" },
+           new AutoCompletePageViewModel { PageUrl = "OutOfCashReport", PageName = "Out of Cash Report" },
+           new AutoCompletePageViewModel { PageUrl = "AtmSummaryReport", PageName = "Atm Summary Report" },
+           new AutoCompletePageViewModel { PageUrl = "DeadAtmReport", PageName = "Dead ATM Report" },
+           new AutoCompletePageViewModel { PageUrl = "LowBalanceReport", PageName = "Low Balance Report" },
+           new AutoCompletePageViewModel { PageUrl = "PurgeBinThresholdReport", PageName = "Purge Bin Alert Report" },
+           new AutoCompletePageViewModel { PageUrl = "UserReport", PageName = "User List Report" },
+           new AutoCompletePageViewModel { PageUrl = "GroupReport", PageName = "Group List Report" },
+           new AutoCompletePageViewModel { PageUrl = "AuditLogReport", PageName = "Audit Log Report" },
+           new AutoCompletePageViewModel { PageUrl = "ReplenishmentReport", PageName = "Replenishment Report" },
+           new AutoCompletePageViewModel { PageUrl = "CashPositionsReport", PageName = "Cash Positions Report" },
+           new AutoCompletePageViewModel { PageUrl = "CashUtilizationReport", PageName = "Cash Utilization Report" },
+           new AutoCompletePageViewModel { PageUrl = "BnaCounterReport", PageName = "BNA Counter Report" },
+           new AutoCompletePageViewModel { PageUrl = "CPMCounterReport", PageName = "CPM Counter Report" },
+           new AutoCompletePageViewModel { PageUrl = "CashWithdrawalReport", PageName = "Cash Withdrawal Report" },
+           new AutoCompletePageViewModel { PageUrl = "ATMWithoutTransaction24Hour", PageName = "ATM Without Transaction 24hr" },
+           new AutoCompletePageViewModel { PageUrl = "ReplenishmentReturnReport", PageName = "Replenishment Return Report" },
+           new AutoCompletePageViewModel { PageUrl = "NoCashWithdrawalReport", PageName = "No Cash Withdrawal Report" },
+           new AutoCompletePageViewModel { PageUrl = "ReplenishmentAnalysis", PageName = "Replenishment Analysis" },
+           new AutoCompletePageViewModel { PageUrl = "TransactionAnalytics", PageName = "Transaction Analytics" },
+           new AutoCompletePageViewModel { PageUrl = "CashUtilization", PageName = "Cash Utilization Analysis" },
+           new AutoCompletePageViewModel { PageUrl = "DenominationUtilizationAnalysis", PageName = "Denomination Utilization Analysis" },
+       });
+    }
+}

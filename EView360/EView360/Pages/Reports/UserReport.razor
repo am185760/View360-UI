@@ -1,0 +1,276 @@
+﻿@page "/UserReport"
+@page "/UserReport/{mode}"
+
+@using EView360.Data;
+@using EView360.Services.Reports;
+@using EView360Models.Core;
+@using EView360.Services.Operations;
+@using EView360.Services;
+@using EView360Models.RequestModel;
+@using Microsoft.Extensions.Caching.Distributed;
+@using global::Common.RequestModel;
+@using global::Common.ViewModel;
+@using Microsoft.Extensions.Options;
+@using Newtonsoft.Json;
+@using System.Text;
+@using System.Dynamic;
+@using System.Net;
+@using static System.Net.WebRequestMethods;
+@using static EView360.Common.Constants;
+@using static EView360.Data.Enumerations;
+@inject ILogger<User> logger
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject NavigationManager NavigationManager
+@inject IJSRuntime jsRuntime
+@inject UserManagementService userManagementService
+@inject AtmService atmService;
+@inject AtmSetupService atmSetupService;
+@inject HttpClient client;
+@inject IOptions<ApiUrl> apiUrl
+@inject YearService yearService
+@inject UserReportService service
+@inject IDistributedCache _distributedCache
+@inject IConfiguration _configuration
+
+<div class="row content">
+    @if (showSpinner)
+    {
+        <div class="spinner" style="z-index:4"></div>
+    }
+    <div class="col-sm-12">
+        <div class="form-group">
+            <b><h2 style="font-family:montserrat; font-weight:bold; margin-top: 1%;">Users List Report </h2></b>
+        </div>
+        <div class="card" style="border-width: medium;border-color: orange; margin-top:3%;">
+            <div class="card-body">
+                <form style="margin-top: 20px;">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <h5>Filters: </h5>
+                        </div>
+                    </div>
+
+
+                    <div class="form-row">
+                        <div class="form-group col-md-1">
+                            <label>User ID: </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <input type="email" class="form-control" @bind="filteredUserLogin" id="searchNoteSetType" placeholder="Search ID..">
+
+                        </div>
+                        <div class="form-group col-md-4 text-right">
+                            <label>Full Name: </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <input type="email" class="form-control" @bind="filteredUserName" id="searchNoteSetType" placeholder="Search name..">
+                        </div>
+                    </div>
+
+                    <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@GenerateReport" value="Generate Report">
+                    <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@ResetFilter" value="Reset">
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<style>
+
+    form {
+        max-width: 100%;
+    }
+
+    .table-primary .showAnimation {
+        animation: spin 1200ms linear infinite;
+    }
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        margin-top: 20px;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        width: 170px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    .modal-body {
+        height: 70vh;
+        overflow-y: auto;
+    }
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+
+</style>
+
+@code {
+
+    [Parameter]
+    public string? mode { get; set; }
+
+    int ArchiveYear;
+    private List<int> archiveYears = new();
+    private bool isCurrent = false;
+    private bool showSpinner = false;
+    private bool showGrid = false;
+    private bool showTransactionsBetweenReplenishmentsRow = false;
+    private bool showFromDateAndToDateRow = false;
+    private Modal? modalRef;
+    static DateTime currentTime = DateTime.Now;
+    string duration = string.Empty;
+    DateTime? fromDate, toDate;
+    DatePicker<DateTime?> dateRef;
+    private List<NoteSetTypeViewModel>? NoteSetTypes = new();
+    [Inject] INotificationService NotificationService { get; set; }
+    [Inject] IMessageService MessageService { get; set; }
+    private bool IsDisabled = false;
+
+    private string filteredUserName = string.Empty;
+    private string filteredUserLogin = string.Empty;
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                fromDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0);
+                toDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 59);
+
+                if (mode is not null && mode.Equals("Archive"))
+                {
+                    archiveYears = yearService.GetLastNYears(5);
+                    ArchiveYear = archiveYears.FirstOrDefault();
+                    fromDate = new DateTime(ArchiveYear, fromDate.Value.Month, fromDate.Value.Day, fromDate.Value.Hour, fromDate.Value.Minute, fromDate.Value.Second);
+                    toDate = new DateTime(ArchiveYear, toDate.Value.Month, toDate.Value.Day, toDate.Value.Hour, toDate.Value.Minute, toDate.Value.Second);
+
+                }
+
+                await this.InvokeAsync(() => this.StateHasChanged());
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at UserReport, OnAfterRenderAsync as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    private async void GenerateReport()
+    {
+        AppUser appUser = await localStorage.GetItemAsync<AppUser>("AppUser");
+
+        var selectAtmResponse = await atmService.GetMultipleSelectedAtms();
+        if (!selectAtmResponse.IsSuccess)
+        {
+            await NotificationService.Error($"{selectAtmResponse.Message}", "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+        else
+        {
+            var atms = ((List<string>)selectAtmResponse.Data);
+            string selectedAtms = string.Join(",", atms);
+            showSpinner = true;
+            IsDisabled = true;
+            await this.InvokeAsync(() => this.StateHasChanged());
+
+            UserReportRequestModel requestModel = new()
+                {
+                    FullName = filteredUserName,
+                    UserId = filteredUserLogin,
+                    SelectedAtmIds = atms
+                };
+            logger.LogWarning("[UserReportPage:GenerateReport] going in GetUsersReport");
+            var data = await service.GetUsersReport(requestModel);
+            logger.LogWarning("[UserReportPage:GenerateReport] return from GetUsersReport");
+
+            logger.LogWarning("[UserReportPage:GenerateReport] Start Serializing Datatable ");
+            string serializedDatatable = JsonConvert.SerializeObject(data);
+            logger.LogWarning("[UserReportPage:GenerateReport] End Serializing Datatable ");
+
+            logger.LogWarning("[UserReportPage:GenerateReport] Start convering serialized Datatable into bytes ");
+            byte[] bytes = Encoding.ASCII.GetBytes(serializedDatatable);
+            logger.LogWarning("[UserReportPage:GenerateReport] End convering serialized Datatable into bytes ");
+
+            string redisKey = $"UserReport_{appUser.UserId}";
+
+            logger.LogWarning($"UserReportPage: going to cache the data");
+            _distributedCache.Set(redisKey, bytes, new DistributedCacheEntryOptions()
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_configuration.GetValue<int>("RedisKeyExpirationTimeInMinutes"))
+                });
+            logger.LogWarning($"UserReportPage: return from cache the data");
+
+
+            var reports = new ReportsRequestModel()
+                {
+                    redisKey = $"{redisKey}",
+                };
+            
+            showSpinner = false;
+            IsDisabled = false;
+            await this.InvokeAsync(() => this.StateHasChanged());
+            Task.Delay(4);
+            if (data.Rows.Count > 0)
+            {
+                string url = $"{apiUrl.Value.ReportingProjectUrl}ReportPopup.aspx?Report=UserList.rpt&FromDate=" + DateTime.Now.ToString("MM/dd/yyyy") + "&ToDate=" + DateTime.Now.ToString("MM/dd/yyyy") + "&ReportTitle=User List&GeneratedBy=" + appUser.UserLogin + "&UserId=" + appUser.UserId;
+                await jsRuntime.InvokeVoidAsync("openWindowWithPost", url, reports);
+            }
+        }
+    }
+
+    private async void ResetFilter()
+    {
+        fromDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0);
+        toDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 59);
+
+        ArchiveYear = (mode is not null && mode.Contains("Archive")) ? archiveYears.FirstOrDefault() : 0;
+        fromDate = (mode is not null && mode.Contains("Archive")) ? new DateTime(ArchiveYear, fromDate.Value.Month, fromDate.Value.Day, fromDate.Value.Hour, fromDate.Value.Minute, fromDate.Value.Second) : fromDate;
+        toDate = (mode is not null && mode.Contains("Archive")) ? new DateTime(ArchiveYear, toDate.Value.Month, toDate.Value.Day, toDate.Value.Hour, toDate.Value.Minute, toDate.Value.Second) : toDate;
+
+        await this.InvokeAsync(() => this.StateHasChanged());
+    }
+    private Task DateChanged(int selectedYear)
+    {
+        ArchiveYear = selectedYear;
+        fromDate = new DateTime(ArchiveYear, fromDate.Value.Month, fromDate.Value.Day, fromDate.Value.Hour, fromDate.Value.Minute, fromDate.Value.Second);
+        toDate = new DateTime(ArchiveYear, toDate.Value.Month, toDate.Value.Day, toDate.Value.Hour, toDate.Value.Minute, toDate.Value.Second);
+        this.InvokeAsync(() => this.StateHasChanged());
+        return Task.CompletedTask;
+    }
+
+}
+

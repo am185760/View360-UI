@@ -1,0 +1,330 @@
+﻿@page "/RecreateDailyFeed"
+@using EView360.Services;
+@using EView360Models.ViewModels;
+@using static EView360.Data.Enumerations;
+@inject RecreateDailyFeedService service
+@inject ILogger<RecreateDailyFeed> logger
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject IJSRuntime jsRuntime
+
+
+<div class="row content">
+    <div class="col-sm-2 filter_bar border-right-2">
+        <form style="margin-top: 20px;">
+
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <h5>Filters: </h5>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="float-left">From Date:</label>
+                    <DatePicker TValue="DateTime" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" @bind-Date="@filteredFromDate" class="form-control" TimeAs24hr="true" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="float-left">To Date:</label>
+                    <DatePicker TValue="DateTime" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" @bind-Date="@filteredToDate" class="form-control" TimeAs24hr="true" />
+                </div>
+            </div>
+            <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@FilterSubmit" value="Search">
+            <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@ResetFilter" value="Reset">
+            @if (CheckPermission((int)Permissions.CreateDailyFeedSchedule))
+            {
+                <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@Add" value="Add" style="margin-left: 3px;">
+            }
+
+        </form>
+    </div>
+
+
+    <div class="col-sm-10 text-left" style="margin-top:1%">
+        <div>
+            <b><h2 style="font-family:montserrat; font-weight:bold">Recreate Daily Feed</h2></b>
+        </div>
+
+        @if (showSpinner)
+        {
+            <div class="spinner" style="z-index:4"></div>
+        }
+
+        @if (showGrid)
+        {
+            <DataGrid @ref="@dataGridRef"
+                  TItem="EView360Models.Core.DailyFeedSchedule"
+                  Data="@filteredDailyFeedSchedules"
+                  Editable
+                  Responsive="true"
+                  ShowPager
+                  RowRemoving="@OnRowRemoving"
+                  RowRemoved="@OnRowRemoved"
+                  UseValidation
+                  ShowValidationsSummary="false"
+                  ShowValidationFeedback
+                  PopupSize="ModalSize.Small"
+                  Bordered
+                  PageSize="50"
+                  FixedHeader
+                  Narrow="true"
+                  Sortable  SortMode="DataGridSortMode.Single"
+                  HeaderThemeContrast="@ThemeContrast.Light">
+
+
+                @*<DataGridColumn Field="@nameof(EView360Models.Core.DailyFeedSchedule.Mcn)" Caption="MCN" />*@
+
+                <DataGridDateColumn Field="@nameof(EView360Models.Core.DailyFeedSchedule.DateFrom)" Caption="Date From" DisplayFormat="{0:dd/MM/yyyy}" />
+
+                <DataGridDateColumn Field="@nameof(EView360Models.Core.DailyFeedSchedule.DateTo)" Caption="Date To" DisplayFormat="{0:dd/MM/yyyy}" />
+
+                <DataGridColumn Field="@nameof(EView360Models.Core.DailyFeedSchedule.RetryCount)" Caption="Retry Remaining" />
+
+                <DataGridColumn Field="@nameof(EView360Models.Core.DailyFeedSchedule.FailureReason)" Caption="Failure Reason" />
+
+                <DataGridCheckColumn Field="@nameof(EView360Models.Core.DailyFeedSchedule.IsExecuted)" Caption="Executed" />
+
+
+                <DataGridCommandColumn CellClass="@((item)=> "all_headers")" ClearFilterCommandAllowed="false">
+                    <NewCommandTemplate />
+                    <EditCommandTemplate />
+                    <DeleteCommandTemplate>
+                         @if (CheckPermission((int)Permissions.DeleteDailyFeedSchedule))
+                        {
+                            <Button Clicked="@context.Clicked" title="Delete"><Icon Name="IconName.Delete" TextColor="TextColor.Danger" IconSize=IconSize.Small /></Button>
+                        }
+                    </DeleteCommandTemplate>
+                </DataGridCommandColumn>
+            </DataGrid>
+        }
+
+        <Modal @bind-Visible="@showModal">
+            <ModalContent Centered Size="ModalSize.Default">
+                <ModalHeader style="background-color:green;color:white;">
+                    <ModalTitle>Schedule Daily Feed</ModalTitle>
+                    <CloseButton />
+                </ModalHeader>
+                <ModalBody Overflow="Overflow.Hidden">
+
+                    <Field Horizontal>
+                        <FieldLabel ColumnSize="ColumnSize.Is1">From:</FieldLabel>
+                        <FieldBody ColumnSize="ColumnSize.Is11"><DatePicker TValue="DateTime" DisplayFormat="dd/MM/yyyy" InputMode="DateInputMode.Date" @bind-Date="@thisDailyFeedSchedule.DateFrom" /></FieldBody>
+                    </Field>
+
+                    <Field Horizontal>
+                        <FieldLabel ColumnSize="ColumnSize.Is1">To:</FieldLabel>
+                        <FieldBody ColumnSize="ColumnSize.Is11"><DatePicker TValue="DateTime" DisplayFormat="dd/MM/yyyy" InputMode="DateInputMode.Date" @bind-Date="@thisDailyFeedSchedule.DateTo" /></FieldBody>
+                    </Field>
+
+                    <Field Horizontal>
+                        <FieldLabel ColumnSize="ColumnSize.Is1"><Check TValue="bool?" @bind-Checked=thisDailyFeedSchedule.DeleteCurrentData /></FieldLabel>
+                        <FieldBody ColumnSize="ColumnSize.Is11">Delete Existing Data Before Generation</FieldBody>
+                    </Field>
+
+                    @*<Field Horizontal>
+                        <FieldLabel ColumnSize="ColumnSize.Is1"><Check TValue="bool?" @bind-Checked=thisDailyFeedSchedule.EnableDffGeneration /></FieldLabel>
+                        <FieldBody ColumnSize="ColumnSize.Is11">Enable DFF Generation</FieldBody>
+                    </Field>*@
+
+                </ModalBody>
+                <ModalFooter>
+                    <Button Color="Color.Secondary" Clicked="@HideModal">Close</Button>
+                    <Button Color="Color.Success" Clicked="@SubmitFeed">Save</Button>
+                </ModalFooter>
+            </ModalContent>
+        </Modal>
+
+    </div>
+</div>
+
+<style>
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        margin-top: 20px;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    .modal-body {
+        max-height: 75vh;
+        overflow-y: auto;
+    }
+
+
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    /* .all_headers_form {
+                        margin-left: 12px;
+                        padding: 5px;
+                    }
+                */
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+</style>
+
+@code {
+    private bool showSpinner = false;
+    private bool showGrid = false;
+    private bool showModal = false;
+    private bool IsDisabled = false;
+
+
+    private DataGrid<EView360Models.Core.DailyFeedSchedule>? dataGridRef;
+    private List<EView360Models.Core.DailyFeedSchedule> DailyFeedSchedules = new();
+    private List<EView360Models.Core.DailyFeedSchedule> filteredDailyFeedSchedules = new();
+    private EView360Models.Core.DailyFeedSchedule? thisDailyFeedSchedule = new();
+    Dictionary<int, string> userRights;
+
+    private DateTime filteredFromDate;
+    private DateTime filteredToDate;
+
+    private DotNetObjectReference<RecreateDailyFeed>? objRef;
+    
+    [Inject] INotificationService NotificationService { get; set; }
+    [Inject] IMessageService MessageService { get; set; }
+    [Inject] AuditLogService auditService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        objRef = DotNetObjectReference.Create(this);
+        userRights = await localStorage.GetItemAsync<Dictionary<int, string>>("userRights");
+
+        if (DailyFeedSchedules is null || DailyFeedSchedules.Count == 0)
+        {
+            DateTime currentTime = DateTime.Now;
+            filteredFromDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0);
+            filteredToDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 0);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                await jsRuntime.InvokeVoidAsync("handleDatePicker", objRef);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at RecreateDailyFeed, OnAfterRenderAsync as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    private bool CheckPermission(int right)
+    {
+        try
+        {
+            if (userRights is not null)
+                return userRights.ContainsKey(right);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at RecreateDailyFeed, CheckPermission as: {ex.Message}");
+
+            NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+        return false;
+    }
+
+    private async Task LoadData()
+    {
+        showSpinner = IsDisabled = true;
+        await this.InvokeAsync(() => this.StateHasChanged());
+        logger.LogWarning($"[RecreateDailyFeedPage:LoadData] going in GetDailyFeedSchedules ");
+        filteredDailyFeedSchedules = DailyFeedSchedules = await service.GetDailyFeedSchedules(filteredFromDate, filteredToDate);
+        logger.LogWarning($"[RecreateDailyFeedPage:LoadData] returning from GetDailyFeedSchedules ");
+        showSpinner = IsDisabled = false;
+        showGrid = true;
+        await this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private async void FilterSubmit()
+    {
+        await LoadData();
+    }
+
+    private void ResetFilter()
+    {
+        filteredFromDate = DateTime.Now.Date.AddDays(-1);
+        filteredToDate = DateTime.Now;
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private void Add()
+    {
+        showModal = true;
+        thisDailyFeedSchedule.DateFrom = DateTime.Now;
+        thisDailyFeedSchedule.DateTo = DateTime.Now;
+    }
+
+    private async void SubmitFeed()
+    {
+        thisDailyFeedSchedule.Mcn = "-";
+        thisDailyFeedSchedule.IsExecuted = false;
+        thisDailyFeedSchedule.CreationTime = DateTime.Now;
+        thisDailyFeedSchedule.RetryCount = await service.GetRetryCount();
+        thisDailyFeedSchedule.CreatedBy = (await localStorage.GetItemAsync<EView360Models.Core.AppUser>("AppUser")).UserId;
+        thisDailyFeedSchedule.EnableDffGeneration = (thisDailyFeedSchedule.EnableDffGeneration == null) ? false : thisDailyFeedSchedule.EnableDffGeneration;
+        thisDailyFeedSchedule.DeleteCurrentData = (thisDailyFeedSchedule.DeleteCurrentData == null) ? false : thisDailyFeedSchedule.DeleteCurrentData;
+
+        BaseModel result = await service.CreateNewSchedule(thisDailyFeedSchedule);
+        if (result.IsSuccess)
+        {
+            await service.RenderSuccessBox("Success", result.Message);
+            await auditService.InsertAuditLogEntry("Daily feed schedule added", thisDailyFeedSchedule.CreatedBy, (long)Permissions.CreateDailyFeedSchedule);
+            await LoadData();
+        }
+        await HideModal();
+    }
+
+    async Task OnRowRemoving(CancellableRowChange<EView360Models.Core.DailyFeedSchedule> cancellableRow)
+    {
+        if (!await MessageService.Confirm("Are you sure you want to delete daily feed schedule?", "Confirmation", (options) => { options.ConfirmButtonColor = Color.Success; }))
+        {
+            cancellableRow.Cancel = true;
+        }
+    }
+
+    async Task OnRowRemoved(EView360Models.Core.DailyFeedSchedule dailyFeedSchedule)
+    {
+        BaseModel result = await service.DeleteSchedule(dailyFeedSchedule.DailyFeedScheduleId);
+        if (result.IsSuccess)
+        {
+            await service.RenderSuccessBox("Success", result.Message);
+            await auditService.InsertAuditLogEntry("Daily feed schedule deleted", dailyFeedSchedule.CreatedBy, (long)Permissions.DeleteDailyFeedSchedule);
+            await LoadData();
+        }
+    }
+
+    private Task HideModal()
+    {
+        showModal = false;
+        this.InvokeAsync(() => this.StateHasChanged());
+        return Task.CompletedTask;
+    }
+}

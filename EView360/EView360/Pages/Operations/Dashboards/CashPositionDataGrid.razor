@@ -1,0 +1,155 @@
+﻿@page "/CashPositionDataGrid/{NoteSetTypeId:long}/{minNoteThresholdReached:int}"
+@page "/CashPositionDataGrid/{NoteSetTypeId:long}/{minNoteThresholdReached:int}/{ArchiveYear:int}"
+@page "/CashPositionDataGrid/{NoteSetTypeId:long}/{minNoteThresholdReached:int}/{ArchiveYear:int}/{IsRecycler:bool}"
+@page "/CashPositionDataGrid/{NoteSetTypeId:long}/{minNoteThresholdReached:int}/{ArchiveYear:int}/{IsRecycler:bool}/{IsRegion:bool}/{FilterValues}"
+
+@layout EmptyLayout
+@using EView360.Services.Operations;
+@using EView360.Common;
+@using EView360.Services;
+@using EView360.Services.Operations.DashBoard;
+@using EView360Models.Core;
+@using EView360Models.RequestModel;
+@using EView360Models.ViewModels;
+@using static EView360.Common.Constants;
+@inject CashPositionDashboardService service
+@inject ATMTreeViewRepository treeService
+@inject ILogger<CashPositionDataGrid> logger
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject IJSRuntime jsRuntime
+@inject CommonServices commonService
+@implements IDisposable
+
+<html>
+<head>
+    <!-- 'title' tag with content of 'Home' -->
+    <title>@(IsRecycler ? "Recycler " : "")Cash Positions Dashboard - Total No.of Records = @cashPositions?.Count - Data Generated At: @refreshCurrentTime - Next Refresh Countdown: @counter
+    </title>
+</head>
+
+<body>
+    <div class="row content">
+        @if (showSpinner)
+        {
+            <div class="spinner spinner_Dashboard" style="z-index:4"></div>
+        }
+        <div class="col-sm-12 text-left only-col">
+            @if (showGrid)
+            {
+                <DataGrid TItem="CashPositionViewModel"
+                      Data="@_cashPositions"
+                      ReadData="@OnReadData"
+                      TotalItems="@cashPositions?.Count"
+                      Responsive
+                      Bordered
+                      Narrow="true"
+                      HeaderThemeContrast="@ThemeContrast.Light"
+                      FixedHeader
+                      SortMode="DataGridSortMode.Single"
+                      SortChanged="SortData"
+                      Virtualize
+                      VirtualizeOptions="@(new() { DataGridMaxHeight = "735px", DataGridHeight="735px"})">
+
+                    @if (!IsRecycler)
+                    {
+                        <DataGridColumn TItem="CashPositionViewModel" TextAlignment="TextAlignment.Center" Field="@nameof(CashPositionViewModel.AtmTitle)" Caption="MOB" Sortable="false">
+                            <DisplayTemplate>
+                                @{
+                                    if (context.MinOperatingBalance is null)
+                                    {
+                                        <Icon Name="@("fa-question-circle")" TextColor="TextColor.Secondary" />
+                                    }
+                                    else if (context.TotalRemaining >= 100000)
+                                    {
+                                        <Icon Name="@("fa-exclamation-triangle")" TextColor="TextColor.Success" />
+                                    }
+                                    else if (context.TotalRemaining < 100000)
+                                    {
+                                        <Icon Name="@("fa-exclamation-triangle")" TextColor="TextColor.Warning" />
+                                    }
+                                    else if (context.TotalRemaining < 50000)
+                                    {
+                                        <Icon Name="@("fa-exclamation-triangle")" TextColor="TextColor.Danger" />
+                                    }
+                                }
+                            </DisplayTemplate>
+                        </DataGridColumn>
+                    }
+
+                    <DataGridColumn Field="@nameof(CashPositionViewModel.AtmTitle)" Caption="Atm Title" />
+                    <DataGridDateColumn Field="@nameof(CashPositionViewModel.LastTrxnAt)" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" Caption="Last Transaction" />
+                    <DataGridDateColumn Field="@nameof(CashPositionViewModel.LastReplenishmentAt)" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" Caption="Last Replenished" />
+
+                    <DataGridNumericColumn Field="@nameof(CashPositionViewModel.DenominationType1)" Caption="Type1" CellStyle="@((item)=> "background-color: greenyellow;")" />
+                    <DataGridNumericColumn Field="@nameof(CashPositionViewModel.Cassette1Denomination)" Caption="Remaining" />
+
+                    <DataGridNumericColumn Field="@nameof(CashPositionViewModel.DenominationType2)" Caption="Type2" CellStyle="@((item)=> "background-color: palevioletred;")" />
+                    <DataGridNumericColumn Field="@nameof(CashPositionViewModel.Cassette2Denomination)" Caption="Remaining" />
+
+                    <DataGridNumericColumn Field="@nameof(CashPositionViewModel.DenominationType3)" Caption="Type3" CellStyle="@((item)=> "background-color: darkorange;")" />
+                    <DataGridNumericColumn Field="@nameof(CashPositionViewModel.Cassette3Denomination)" Caption="Remaining" />
+
+                    <DataGridNumericColumn Field="@nameof(CashPositionViewModel.DenominationType4)" Caption="Type4" CellStyle="@((item)=> "background-color: skyblue;")" />
+                    <DataGridNumericColumn Field="@nameof(CashPositionViewModel.Cassette4Denomination)" Caption="Remaining" />
+
+                    <DataGridNumericColumn Field="@nameof(CashPositionViewModel.TotalRemaining)" Caption="Total Remaining" />
+                    <DataGridNumericColumn Field="@nameof(CashPositionViewModel.PurgedNotes)" Caption="Purged Notes" />
+                    <DataGridNumericColumn Field="@nameof(CashPositionViewModel.PurgedAmount)" Caption="Purged Amount" />
+
+                </DataGrid>
+            }
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+<style>
+
+    .only-col {
+        padding-right: 0px !important;
+        padding-left: 0px !important;
+    }
+
+    .table-primary .showAnimation {
+        animation: spin 1200ms linear infinite;
+    }
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        width: 170px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+
+</style>
+
+

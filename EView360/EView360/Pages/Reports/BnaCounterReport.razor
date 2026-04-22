@@ -1,0 +1,435 @@
+﻿@page "/BnaCounterReport"
+@page "/BnaCounterReport/{mode}"
+
+@using EView360.Common;
+@using EView360.Data;
+@using EView360.Services.Reports;
+@using EView360Models.Core;
+@using EView360.Services.Operations;
+@using EView360.Services;
+@using EView360Models.RequestModel;
+@using Microsoft.Extensions.Caching.Distributed;
+@using Microsoft.Extensions.Options;
+@using Newtonsoft.Json;
+@using System.Text;
+@using System.Dynamic;
+@using System.Net;
+@using System.Data;
+@using global::Common.RequestModel;
+@using global::Common.ViewModel;
+@using static System.Net.WebRequestMethods;
+@using static EView360.Common.Constants;
+@using static EView360.Data.Enumerations;
+@inject NoteSetTypeService noteSetTypeService
+@inject ILogger<BnaCounterReport> logger
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject NavigationManager NavigationManager
+@inject IJSRuntime jsRuntime
+@inject UserManagementService userManagementService
+@inject AtmService atmService;
+@inject AtmSetupService atmSetupService;
+@inject HttpClient client;
+@inject BnaCounterReportService service;
+@inject OutOfCashReportService outOfCashservice;
+@inject IOptions<ApiUrl> apiUrl
+@inject YearService yearService
+@inject CommonServices common
+@inject IConfiguration configuration;
+@inject IDistributedCache _distributedCache
+@inject IConfiguration _configuration
+<div class="row content">
+    @if (showSpinner)
+    {
+        <div class="spinner" style="z-index:4"></div>
+    }
+    <div class="col-sm-12">
+        <div class="form-group">
+            <b><h2 style="font-family:montserrat; font-weight:bold; margin-top: 1%;">BNA Counter Report @(@mode is not null && mode.Equals("Archive") ? "- Archive" : "")</h2></b>
+        </div>
+
+        <div class="card" style="border-width: medium;border-color: orange; margin-top:2%;">
+            <div class="card-body">
+                <form style="margin-top: 20px;">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <h5>Filters: </h5>
+                        </div>
+                    </div>
+                    @if (@mode is not null && mode.Equals("Archive"))
+                    {
+                        <div class="form-row">
+                            <div class="form-group col-md-1">
+                                <label>Archive Year: </label>
+                            </div>
+                            <div class="form-group col-md-2">
+                                <Select TValue="int" SelectedValue="@ArchiveYear" class="form-control" SelectedValueChanged="@DateChanged">
+                                    @foreach (int year in archiveYears)
+                                    {
+                                        <SelectItem Value=year>@year</SelectItem>
+                                    }
+                                </Select>
+                            </div>
+                        </div>
+                    }
+                    <div class="form-row">
+                        <div class="form-group col-md-1">
+                            <label>From Date: </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            @if (@mode is not null && mode.Equals("Archive"))
+                            {
+                                <DatePicker TValue="DateTime" @ref="@dateRef" DisplayFormat="dd/MM H:m" InputMode="DateInputMode.DateTime" Placeholder="Select Date" @bind-Date="@fromDate" TimeAs24hr="true"></DatePicker>
+                            }
+                            else
+                            {
+                                <DatePicker TValue="DateTime" @ref="@dateRef" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" Placeholder="Select Date" @bind-Date="@fromDate" TimeAs24hr="true"></DatePicker>
+                            }
+                        </div>
+                        <div class="form-group col-md-4 text-right">
+                            <label>To Date: </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            @if (@mode is not null && mode.Equals("Archive"))
+                            {
+                                <DatePicker TValue="DateTime" @ref="@dateRef" DisplayFormat="dd/MM H:m" InputMode="DateInputMode.DateTime" Placeholder="Select Date" @bind-Date="@toDate" TimeAs24hr="true"></DatePicker>
+
+                            }
+                            else
+                            {
+                                <DatePicker TValue="DateTime" @ref="@dateRef" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" Placeholder="Select Date" @bind-Date="@toDate" TimeAs24hr="true"></DatePicker>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+
+                        <div class="form-group col-md-1 input-sm">
+                            <label>Report Type: </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <RadioGroup TValue="int" Name="Transactions" @bind-CheckedValue="@reportTypeId">
+                                <Radio Value="0">Detail</Radio>
+                                <Radio Value="1">Summary</Radio>
+                            </RadioGroup>
+                        </div>
+
+                        <div class="form-group col-md-4 text-right">
+                            <label>Current: </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <Check TValue="bool" @bind-Checked="@isCurrent"></Check>
+                        </div>
+
+
+                    </div>
+                    <div class="form-row">
+
+                        <div class="form-group col-md-1">
+                            <label>Group: </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <ListView TItem="NoteSetTypeViewModel"
+                                      Data="NoteSetTypes"
+                                      TextField="(item) => item.NoteSetTypeName"
+                                      ValueField="(item) => item.NoteSetTypeId.ToString()"
+                                      Mode="ListGroupMode.Static"
+                                      MaxHeight="125px"
+                                      Style="margin-top: 2%">
+                                <ItemTemplate>
+                                    <Check TValue="bool" @bind-Checked="context.Item.isSelected">@context.Text</Check>
+                                </ItemTemplate>
+                            </ListView>
+                        </div>
+                    </div>
+                    <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@GenerateReport" value="Generate Report">
+                    <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@ResetFilter" value="Reset">
+                </form>
+            </div>
+        </div>
+
+
+
+    </div>
+
+</div>
+
+@if (@mode is not null)
+{
+    <style>
+        .flatpickr-prev-month, .flatpickr-month .numInputWrapper, .flatpickr-next-month {
+            visibility: hidden;
+        }
+
+        .flatpickr-month {
+            font-size: large;
+        }
+    </style>
+}
+<style>
+
+    form {
+        max-width: 100%;
+    }
+
+    .table-primary .showAnimation {
+        animation: spin 1200ms linear infinite;
+    }
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        margin-top: 20px;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        width: 170px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    .modal-body {
+        height: 70vh;
+        overflow-y: auto;
+    }
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+
+</style>
+
+@code {
+
+    [Parameter]
+    public string? mode { get; set; }
+    int ArchiveYear;
+    private List<int> archiveYears = new();
+
+    private bool isCurrent = false;
+    private bool showSpinner = false;
+    private int reportTypeId = 0;
+    private bool showTransactionsBetweenReplenishmentsRow = false;
+    private bool showFromDateAndToDateRow = false;
+    private Modal? modalRef;
+    string duration = string.Empty;
+    static DateTime currentTime = DateTime.Now;
+    DateTime fromDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0);
+    DateTime toDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 59);
+    DatePicker<DateTime> dateRef;
+    private List<NoteSetTypeViewModel>? NoteSetTypes = new();
+    [Inject] INotificationService NotificationService { get; set; }
+    [Inject] IMessageService MessageService { get; set; }
+    private DotNetObjectReference<BnaCounterReport>? objRef;
+    private bool IsDisabled = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        objRef = DotNetObjectReference.Create(this);
+
+        AppUser appUser = await localStorage.GetItemAsync<AppUser>("AppUser");
+        if (appUser is not null)
+        {
+            //service.UserId = appUser.UserId;
+            noteSetTypeService.UserId = appUser.UserId;
+            NoteSetTypes = await outOfCashservice.GetNoteSetTypesByUser(appUser.UserId);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                await jsRuntime.InvokeVoidAsync("handleDatePicker", objRef);
+
+                fromDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0);
+                toDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 59);
+
+
+                await this.InvokeAsync(() => this.StateHasChanged());
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at BnaCounterReport, OnAfterRenderAsync as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    private async void GenerateReport()
+    {
+        string reportName, reportFriendlyName, rptName = "";
+        AppUser appUser = await localStorage.GetItemAsync<AppUser>("AppUser");
+        string redisKey = $"BnaCounterReport_{appUser.UserId}";
+        string redisKeySubReport = $"BnaCounterSubReportReport_{appUser.UserId}";
+
+        //var selectAtmResponse = await atmService.GetMultipleSelectedAtms();
+        //if (!selectAtmResponse.IsSuccess)
+        //{
+        //    await NotificationService.Error($"{selectAtmResponse.Message}", "Error", (options) =>
+        //    {
+        //        options.IntervalBeforeClose = 4000;
+        //    });
+        //}
+        //else
+        //{
+        //var atms = ((List<string>)selectAtmResponse.Data);
+        //string selectedAtms = string.Join(",", atms);
+        showSpinner = true;
+        IsDisabled = true;
+        await this.InvokeAsync(() => this.StateHasChanged());
+        await common.TaskDelay();
+
+        BnaCounterReportRequestModel requestModel = new()
+            {
+                FromDate = (mode is not null && mode.Contains("Archive")) ? new DateTime(ArchiveYear, fromDate.Month, fromDate.Day, fromDate.Hour, fromDate.Minute, fromDate.Second) : fromDate,
+                ToDate = (mode is not null && mode.Contains("Archive")) ? new DateTime(ArchiveYear, toDate.Month, toDate.Day, toDate.Hour, toDate.Minute, toDate.Second) : toDate,
+                //SelectedAtms = atms,
+                IsCurrent = isCurrent,
+                ReportTypeId = reportTypeId,
+                ArchiveYear = ArchiveYear == 0 ? string.Empty : ArchiveYear.ToString(),
+                isDeadATMExcluded = configuration.GetValue<bool>("isDeadATMExcluded"),
+                NoteSetTypeIds = NoteSetTypes.Where(x => x.isSelected).Select(x => x.NoteSetTypeId).ToList(),
+                UserId = appUser.UserId
+            };
+
+        string URL = null;
+        DataTable data = new DataTable();
+        DataTable SubReportdata = null;
+        if (reportTypeId == 1)
+        {
+            URL = $"{apiUrl.Value.ReportingProjectUrl}ReportPopup.aspx?Report=BNACounterSummaryRpt.rpt&ReportTitle=BNA Counter Summary Report&FromDate=" + fromDate.ToString("MM/dd/yyyy") + "&ToDate=" + toDate.ToString("MM/dd/yyyy") + "&GeneratedBy=" + appUser.UserLogin + "&UserId=" + appUser.UserId;
+
+            logger.LogWarning("[BnaCounterReportPage:GenerateReport] going in GetBnaCounterSubReportReport UI sevice");
+            SubReportdata = await service.GetBnaCounterSubReportReport(requestModel);
+            logger.LogWarning("[BnaCounterReportPage:GenerateReport] return from GetBnaCounterSubReportReport UI service");
+
+            logger.LogWarning("[BnaCounterReportPage:GenerateReport] Start Serializing Datatable Sub Report ");
+            string serializedDatatableSubReport = JsonConvert.SerializeObject(SubReportdata);
+            logger.LogWarning("[BnaCounterReportPage:GenerateReport] End Serializing Datatable Sub Report");
+
+            logger.LogWarning("[BnaCounterReportPage:GenerateReport] Start convering serialized Datatable Sub Report into bytes ");
+            byte[] SubReportbytes = Encoding.ASCII.GetBytes(serializedDatatableSubReport);
+            logger.LogWarning("[BnaCounterReportPage:GenerateReport] End convering serialized Datatable Sub Report into bytes ");
+
+            logger.LogWarning($"BnaCounterReportPage: going to cache the  subreport data");
+            _distributedCache.Set(redisKey, SubReportbytes, new DistributedCacheEntryOptions()
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_configuration.GetValue<int>("RedisKeyExpirationTimeInMinutes"))
+                });
+            logger.LogWarning($"BnaCounterReportPage: return from cache the subreport data");
+
+
+        }
+        else
+        {
+            URL = $"{apiUrl.Value.ReportingProjectUrl}ReportPopup.aspx?Report=BNACounterRpt.rpt&ReportTitle=BNA Counter Detail Report&FromDate=" + fromDate.ToString("MM/dd/yyyy") + "&ToDate=" + toDate.ToString("MM/dd/yyyy") + "&GeneratedBy=" + appUser.UserLogin + "&UserId=" + appUser.UserId;
+        }
+
+        logger.LogWarning($"BnaCounterReportPage:GenerateReport] going in GetBnaCounterReport UI service");
+        data = await service.GetBnaCounterReport(requestModel);
+        logger.LogWarning($"BnaCounterReportPage:GenerateReport] return from GetBnaCounterReport UI service");
+        
+
+        logger.LogWarning("[BnaCounterReportPage:GenerateReport] Start Serializing Datatable ");
+        string serializedDatatable = JsonConvert.SerializeObject(data);
+        logger.LogWarning("[BnaCounterReportPage:GenerateReport] End Serializing Datatable ");
+
+        logger.LogWarning("[BnaCounterReportPage:GenerateReport] Start convering serialized Datatable into bytes ");
+        byte[] bytes = Encoding.ASCII.GetBytes(serializedDatatable);
+        logger.LogWarning("[BnaCounterReportPage:GenerateReport] End convering serialized Datatable into bytes ");
+
+
+        logger.LogWarning($"CashPositionRpt: going to cache the data");
+        _distributedCache.Set(redisKey, bytes, new DistributedCacheEntryOptions()
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_configuration.GetValue<int>("RedisKeyExpirationTimeInMinutes"))
+            });
+        logger.LogWarning($"CashPositionRpt: return from cache the data");
+
+
+
+        
+        var reports = new ReportsRequestModel()
+            {
+                redisKey = $"{redisKey}",
+                redisKeySubReport = $"{redisKeySubReport}",
+            };
+       
+        showSpinner = false;
+        IsDisabled = false;
+        await this.InvokeAsync(() => this.StateHasChanged());
+        if (data.Rows.Count > 0)
+        {
+            //string url = $"{apiUrl.ReportingProjectUrl}ReportPopup.aspx?Report=CashUtilization.rpt&ReportTitle=Cash Utilization Report&FromDate=" + fromDate.ToString("MM/dd/yyyy") + "&ToDate=" + toDate.ToString("MM/dd/yyyy") + "&GeneratedBy=" + appUser.UserLogin + "&UserId=" + appUser.UserId;
+            logger.LogWarning($"BnaCounterReportPage: going in openWindowWithPost");
+            await jsRuntime.InvokeVoidAsync("openWindowWithPost", URL, reports);
+        }
+        //}
+    }
+
+    private async void ResetFilter()
+    {
+        fromDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0);
+        toDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 59);
+
+        reportTypeId = 0;
+        NoteSetTypes.Select(x => { x.isSelected = false; return x; }).ToList();
+        isCurrent = false;
+        await this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private Task DateChanged(int selectedYear)
+    {
+        ArchiveYear = selectedYear;
+        fromDate = new DateTime(ArchiveYear, fromDate.Month, fromDate.Day, fromDate.Hour, fromDate.Minute, fromDate.Second);
+        toDate = new DateTime(ArchiveYear, toDate.Month, toDate.Day, toDate.Hour, toDate.Minute, toDate.Second);
+        this.InvokeAsync(() => this.StateHasChanged());
+        return Task.CompletedTask;
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (mode is not null && mode.Equals("Archive"))
+        {
+            archiveYears = common.GetLastNYears();
+            ArchiveYear = archiveYears.FirstOrDefault();
+            fromDate = new DateTime(ArchiveYear, fromDate.Month, fromDate.Day, fromDate.Hour, fromDate.Minute, fromDate.Second);
+            toDate = new DateTime(ArchiveYear, toDate.Month, toDate.Day, toDate.Hour, toDate.Minute, toDate.Second);
+        }
+        else
+        {
+            fromDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0);
+            toDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 59);
+
+            ArchiveYear = 0;
+        }
+        reportTypeId = 0;
+        NoteSetTypes.Select(x => { x.isSelected = false; return x; }).ToList();
+        isCurrent = false;
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+}
+

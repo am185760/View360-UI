@@ -1,0 +1,381 @@
+﻿@page "/ATMNetworkInfo"
+@using EView360.Services;
+@using EView360Models.Core;
+@using EView360Models.ViewModels;
+@inject AtmNetworkInfoService service
+@inject ILogger<ATMNetworkInfo> logger
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject ATMTreeViewRepository atmRepository 
+ @inject NotifyService notifyService
+@inject AtmSetupService atmSetupService
+@inject UserManagementService userManagementService
+@implements IDisposable
+
+<div class="row content">
+    <div class="col-sm-2 filter_bar border-right-2">
+        <form style="margin-top: 20px;">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <h5>Filters: </h5>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label class="float-left" for="CreatedByName">Created By:</label>
+                    <select @bind="filterCreatedBy" class="form-control">
+                        <option value="*">Any</option>
+                        @foreach (var user in appUsers.Select(x => new { x.UserId, x.UserLogin }).Distinct())
+                        {
+                            <option value="@user.UserId">@user.UserLogin</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label for="inputEmail4">ATM Title: </label>
+                    <input type="email" class="form-control" @bind="filterAtmTitle" id="searchNoteSetType" placeholder="Search name..">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label for="inputEmail4">IP: </label>
+                    <input type="email" class="form-control" @bind="filterAtmIp" id="searchNoteSetType" placeholder="Search name..">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label class="float-left" for="CreatedByName">Status:</label>
+                    <select @bind="filterAtmStatus" class="form-control">
+                        <option value="*">All</option>
+                        <option value="true">true</option>
+                        <option value="false">false</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label class="float-left" for="CreatedByName">ATM Type:</label>
+                    <select @bind="filterAtmType" class="form-control">
+                        <option value="*">Any</option>
+                        @foreach (string token in atmTypeList)
+                        {
+                            <option value="@token">@token</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@LoadData" value="Search">
+            <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@ResetFilter" value="Reset">
+        </form>
+    </div>
+
+
+    <div class="col-sm-10 text-left" style="margin-top:1%">
+        <div class="form-group">
+            <h2>ATM Network Information</h2>
+        </div>
+        @if (showSpinner)
+        {
+            <div class="spinner" style="z-index:4"></div>
+        }
+
+        @if (showGrid)
+        {
+            <DataGrid @ref="@dataGridRef"
+                  TItem="AtmNetworkViewModel"
+                  Data="@filteredAtms"
+                  @bind-SelectedRow="@selectedAtm"
+                  Editable
+                  Responsive="true"
+                  ShowPager
+                  Bordered
+                  PageSize="50"
+                  FixedHeader
+                  FixedHeaderDataGridHeight="570px"
+                  FixedHeaderDataGridMaxHeight="570px"
+                  Narrow="true"
+                  Sortable  SortMode="DataGridSortMode.Single"
+                  HeaderThemeContrast="@ThemeContrast.Light">
+
+
+                <DataGridColumn Field="@nameof(AtmNetworkViewModel.Title)" Caption="Title" />
+                <DataGridColumn Field="@nameof(AtmNetworkViewModel.Ip)" Caption="IP" />
+                <DataGridColumn Field="@nameof(AtmNetworkViewModel.Location)" Caption="Location" />
+                <DataGridColumn Field="@nameof(AtmNetworkViewModel.AtmStreamingHeartbeatReceivedAt)" Caption="Atm Streaming Heartbeat Received At" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" />
+                <DataGridColumn Field="@nameof(AtmNetworkViewModel.AtmOnDemandHeartbeatReceivedAt)" Caption="On Demand Heartbeat Received At" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" />
+                <DataGridColumn Field="@nameof(AtmNetworkViewModel.AtmDataStreamingHeartbeatPort)" Caption="Atm Data Streaming Heartbeat Port" />
+                <DataGridColumn Field="@nameof(AtmNetworkViewModel.AtmDataStreamingPort)" Caption="Atm Data Streaming Port" />
+                <DataGridColumn Field="@nameof(AtmNetworkViewModel.AtmOnDemandRequestPort)" Caption="Atm On Demand Request Port" />
+                <DataGridColumn Field="@nameof(AtmNetworkViewModel.AtmOnDemandRequestHearbeatPort)" Caption="Atm On Demand Request Hearbeat Port" />
+                <DataGridNumericColumn TextAlignment="TextAlignment.End" Field="@nameof(AtmNetworkViewModel.AtmType)" Caption="Type" />
+                <DataGridNumericColumn TextAlignment="TextAlignment.End" Field="@nameof(AtmNetworkViewModel.LastStatusReply)" Caption="Last Status Reply" />
+                <DataGridColumn TItem="AtmNetworkViewModel" Field="@nameof(AtmNetworkViewModel.AtmId)" Caption="Ping">
+                    <DisplayTemplate>
+                        <Button Clicked="@(()=>PingAtm(context))">
+                            <Icon Class="@pingAnimationClass" Name="@("fa-spinner")" TextColor="TextColor.Success" />
+                        </Button>
+                    </DisplayTemplate>
+                </DataGridColumn>
+                <DataGridColumn TItem="AtmNetworkViewModel" Field="@nameof(AtmNetworkViewModel.AtmId)" Caption="Telnet">
+                    <DisplayTemplate>
+                        <Button Clicked="@(()=>TelnetAtm(context))">
+                            <Icon Class="@telnetAnimationClass" Name="@("fa-spinner")" TextColor="TextColor.Warning" />
+                        </Button>
+                    </DisplayTemplate>
+                </DataGridColumn>
+
+            </DataGrid>
+        }
+    </div>
+</div>
+
+
+
+<style>
+    
+    .table-primary .showAnimation {
+        animation: spin 1200ms linear infinite;
+    }
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        margin-top: 20px;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        width: 170px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+</style>
+
+@code {
+    private bool showSpinner = false;
+    private bool showGrid = false;
+    private string pingAnimationClass = "stopAnimation";
+    private string telnetAnimationClass = "stopAnimation";
+    public List<AtmNetworkViewModel> atms = new();
+    private List<AtmNetworkViewModel> filteredAtms = new();
+    private AtmNetworkViewModel selectedAtm;
+    private DataGrid<AtmNetworkViewModel>? dataGridRef;
+    private string filterCreatedBy = "*";
+    private string filterAtmTitle = string.Empty;
+    private string filterAtmIp = string.Empty;
+    private string filterAtmType = "*";
+    private string filterAtmStatus = "*";
+    private long? selectedTreeRegion;
+    private List<long>? selectedTreeAtm;
+    [Inject] INotificationService NotificationService { get; set; }
+    [Inject] IMessageService MessageService { get; set; }
+    public List<AppUserDropdownViewModel> appUsers { get; set; } = new List<AppUserDropdownViewModel>();
+    public List<TerminalType> atmTerminalTypes = new();
+    public List<string> atmTypeList = new();
+    private bool IsDisabled = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        notifyService.OnAtmChange += AtmSelected;
+        notifyService.OnRegionChange += RegionSelected;
+
+        EView360Models.Core.AppUser appUser = await localStorage.GetItemAsync<EView360Models.Core.AppUser>("AppUser");
+        if (appUser is not null)
+        {
+            service.UserId = appUser.UserId;
+        }
+        if (appUsers is null || appUsers.Count == 0)
+        {
+            appUsers = await userManagementService.GetAllUsers();
+        }
+        if (atmTerminalTypes is null || atmTerminalTypes.Count == 0)
+        {
+            atmTerminalTypes = await atmSetupService.GetAtmTerminalType();
+            if (atmTerminalTypes?.Count > 0)
+            {
+                atmTypeList = atmTerminalTypes.Select(x => x.Name).ToList();
+            }
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {           
+
+            //if (firstRender && (atms is null || atms.Count == 0))
+            //{
+            //    await LoadData();
+            //}
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at AtmNetworkInfo, OnAfterRenderAsync as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    private async Task LoadData()
+    {
+        long? createdBy = null;
+        string atmTitle = string.Empty;
+        string atmIP = string.Empty;
+        string atmType = string.Empty;
+        bool? atmStatus = null;
+        atms = filteredAtms = new List<AtmNetworkViewModel>();
+
+        showSpinner = true;
+        showGrid = false;
+        IsDisabled = true;
+        this.InvokeAsync(() => this.StateHasChanged());
+
+        if (filterCreatedBy != "*")
+            createdBy = long.Parse(filterCreatedBy);
+
+        if (!string.IsNullOrEmpty(filterAtmTitle))
+            atmTitle = filterAtmTitle;
+
+        if (!string.IsNullOrEmpty(filterAtmIp))
+            atmIP = filterAtmIp;
+
+        if (filterAtmType != "*")
+            atmType = filterAtmType;
+
+        if (filterAtmStatus != "*")
+            atmStatus = bool.Parse(filterAtmStatus);
+
+        atms = filteredAtms = await service.GetAtmNetworkInfoAsync(createdBy, atmTitle, atmIP, atmType, atmStatus);
+
+        showSpinner = false;
+        showGrid = true;
+        IsDisabled = false;
+        this.InvokeAsync(() => this.StateHasChanged());
+
+        if (atms is null || atms.Count == 0)
+        {
+            await NotificationService.Info("No record found or check logs for error", "Information", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    private async Task PingAtm(AtmNetworkViewModel atm)
+    {
+        pingAnimationClass = "showAnimation";
+        this.InvokeAsync(() => this.StateHasChanged());
+        await RenderInfoBox("Information", "Ping atm in progress");
+        await Task.Delay(200);
+        string status = await service.PingAtm(atm);
+        if (!string.IsNullOrEmpty(status))
+        {
+            await HandleStatusAlert(status);
+            string updateStatus = await service.UpdateAtmPingStatus(atm.AtmId, atm.Title, DateTime.Now, (!status.Contains("An Error occured") ? status : "Failed"));
+            await HandleStatusAlert(updateStatus);
+        }   
+    }
+
+    private async Task TelnetAtm(AtmNetworkViewModel atm)
+    {
+        telnetAnimationClass = "showAnimation";
+        this.InvokeAsync(() => this.StateHasChanged());
+        await RenderInfoBox("Information", "Telnet atm in progress");
+        await Task.Delay(200);
+        string status = await service.TelnetAtm(atm);
+        if (!string.IsNullOrEmpty(status))
+        {
+            await HandleStatusAlert(status);
+            string updateStatus = await service.UpdateAtmTelnetStatus(atm.AtmId, atm.Title, DateTime.Now, (!status.Contains("An Error occured") ? status : "Failed"));
+            await HandleStatusAlert(updateStatus);
+        }
+    }
+
+    private async Task HandleStatusAlert(string status)
+    {
+        pingAnimationClass = "NoAnimation";
+        telnetAnimationClass = "NoAnimation";
+        this.InvokeAsync(() => this.StateHasChanged());
+        if (status.Trim().ToLower().Contains("completed") || status.Trim().ToLower().Contains("success"))
+        {
+            await RenderSuccessBox("Success", status);
+        }
+        else
+        {
+            await RenderErrorBox("Error", status);
+        }
+    }
+
+
+    private void ResetFilter()
+    {
+        filteredAtms = atms;
+        filterCreatedBy = filterAtmStatus = filterAtmType = "*";
+        filterAtmTitle = filterAtmIp = string.Empty;
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    public async Task RenderSuccessBox(string title, string message)
+    {
+        await NotificationService.Success(message, title, (options) =>
+        {
+            options.IntervalBeforeClose = 4000;
+        });
+    }
+
+    async Task RenderInfoBox(string title, string message)
+    {
+        await NotificationService.Info(message, title, (options) =>
+        {
+            options.IntervalBeforeClose = 3000;
+        });
+        await Task.CompletedTask;
+    }
+
+    public async Task RenderErrorBox(string title, string message)
+    {
+        await NotificationService.Error(message, title, (options) =>
+        {
+            options.IntervalBeforeClose = 5000;
+        });
+    }
+
+    private async void AtmSelected()
+    {
+        await LoadData();
+    }
+
+    private async void RegionSelected()
+    {
+        await LoadData();
+    }
+
+    public void Dispose()
+    {
+        notifyService.OnAtmChange -= AtmSelected;
+        notifyService.OnRegionChange -= RegionSelected;
+    }
+}

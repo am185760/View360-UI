@@ -1,0 +1,270 @@
+﻿@page "/NoteSetTypeForm"
+@inject ILogger<NoteSetTypeForm> logger
+
+
+<div id="modalDialog" class="modal" tabindex="-1" role="dialog" style="display:block">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color:green;color:white;">
+                <h5 class="modal-title">Edit Note Set Type</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="@OnCancelCallback">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <EditForm id="EditNoteSetTypeModal" EditContext="editContext" OnValidSubmit=@SubmitHandler>
+                    <DataAnnotationsValidator />
+                    <Microsoft.AspNetCore.Components.Forms.ValidationSummary />
+                    <div class="form-group row">
+                        <label for="setTypeName" class="col-sm-2 col-form-label">Note Set Type Name</label>
+                        <div class="col-sm-3">
+                            <InputText class="form-control" id="setTypeName" @bind-Value="thisNoteSetType.NoteSetTypeName" />
+                        </div>
+                    </div>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Note Type</th>
+                                <th>Note Title</th>
+                                <th>Denominations</th>
+                                <th>Multi Currency</th>
+                                <th>isRecycler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><b>Type 1</b></td>
+                                <td>
+                                    <div class="form-group">
+                                        <InputText class="form-control" @bind-Value="thisNoteSetType.DenominationType1Title" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-group">
+                                        <InputNumber class="form-control" @bind-Value="thisNoteSetType.DenominationType1" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-check">
+                                        <Check TValue="bool?" @bind-Checked="thisNoteSetType.IsType1MultiCurrency" class="form-check-input" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-check">
+                                        <Check TValue="bool?" @bind-Checked="thisNoteSetType.IsType1Recycler" class="form-check-input" />
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><b>Type 2</b></td>
+                                <td>
+                                    <div class="form-group">
+                                        <InputText class="form-control" @bind-Value="thisNoteSetType.DenominationType2Title" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-group">
+                                        <InputNumber class="form-control" @bind-Value="thisNoteSetType.DenominationType2" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-check">
+                                        <Check TValue="bool?" @bind-Checked="thisNoteSetType.IsType2MultiCurrency" class="form-check-input" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-check">
+                                        <Check TValue="bool?" @bind-Checked="thisNoteSetType.IsType2Recycler" class="form-check-input" />
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><b>Type 3</b></td>
+                                <td>
+                                    <div class="form-group">
+                                        <InputText class="form-control" @bind-Value="thisNoteSetType.DenominationType3Title" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-group">
+                                        <InputNumber class="form-control" @bind-Value="thisNoteSetType.DenominationType3" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-check">
+                                        <Check TValue="bool?" @bind-Checked="thisNoteSetType.IsType3MultiCurrency" class="form-check-input" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-check">
+                                        <Check TValue="bool?" @bind-Checked="thisNoteSetType.IsType3Recycler" class="form-check-input" />
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><b>Type 4</b></td>
+                                <td>
+                                    <div class="form-group">
+                                        <InputText class="form-control" @bind-Value="thisNoteSetType.DenominationType4Title" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-group">
+                                        <InputNumber class="form-control" @bind-Value="thisNoteSetType.DenominationType4" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-check">
+                                        <Check TValue="bool?" @bind-Checked="thisNoteSetType.IsType4MultiCurrency" class="form-check-input" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-check">
+                                        <Check TValue="bool?" @bind-Checked="thisNoteSetType.IsType4Recycler" class="form-check-input" />
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><b>Type 5</b></td>
+                                <td>
+                                    <div class="form-group">
+                                        <InputText class="form-control" @bind-Value="thisNoteSetType.DenominationType5Title" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-group">
+                                        <InputNumber class="form-control" @bind-Value="thisNoteSetType.DenominationType5" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-check">
+                                        <Check TValue="bool?" @bind-Checked="thisNoteSetType.IsType5MultiCurrency" class="form-check-input" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-check">
+                                        <Check TValue="bool?" @bind-Checked="thisNoteSetType.IsType5Recycler" class="form-check-input" />
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><b>Type 6</b></td>
+                                <td>
+                                    <div class="form-group">
+                                        <InputText class="form-control" @bind-Value="thisNoteSetType.DenominationType6Title" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-group">
+                                        <InputNumber class="form-control" @bind-Value="thisNoteSetType.DenominationType6" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-check">
+                                        <Check TValue="bool?" @bind-Checked="thisNoteSetType.IsType6MultiCurrency" class="form-check-input" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-check">
+                                        <Check TValue="bool?" @bind-Checked="thisNoteSetType.IsType6Recycler" class="form-check-input" />
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><b>Type 7</b></td>
+                                <td>
+                                    <div class="form-group">
+                                        <InputText class="form-control" @bind-Value="thisNoteSetType.DenominationType7Title" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-group">
+                                        <InputNumber class="form-control" @bind-Value="thisNoteSetType.DenominationType7" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-check">
+                                        <Check TValue="bool?" @bind-Checked="thisNoteSetType.IsType7MultiCurrency" class="form-check-input" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-check">
+                                        <Check TValue="bool?" @bind-Checked="thisNoteSetType.IsType7Recycler" class="form-check-input" />
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </EditForm>
+            </div>
+            <div class="modal-footer">
+                <input type="submit" form="EditNoteSetTypeModal" class="btn btn-success" value="Save" />
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="@OnCancelCallback">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    private EditContext? editContext;
+    private ValidationMessageStore? messageStore;
+    private bool show = true;
+    [Parameter] public EView360Models.Core.NoteSetType thisNoteSetType { get; set; }
+    [Parameter] public EventCallback<EView360Models.Core.NoteSetType> OnSubmitCallback { get; set; }
+    [Parameter] public EventCallback<EView360Models.Core.NoteSetType> OnCancelCallback { get; set; }
+    [Parameter] public string modalTitle { get; set; }
+    [Parameter] public List<EView360Models.Core.NoteSetType> noteSetTypes { get; set; }
+    [Parameter] public bool isEdit { get; set; }
+    [Inject] INotificationService NotificationService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            editContext = new(thisNoteSetType);
+            editContext.OnValidationRequested += CheckName;
+            messageStore = new(editContext);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at NoteSetTypeForm, OnInitializedAsync as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    private void CheckName(object? sender, ValidationRequestedEventArgs args)
+    {
+        try
+        {
+            messageStore?.Clear();
+            string notSetTypeName = thisNoteSetType.NoteSetTypeName;
+
+            if ((isEdit && noteSetTypes.Any(x => x.NoteSetTypeName.Trim().ToLower() == notSetTypeName?.Trim()?.ToLower() && x.NoteSetTypeId != thisNoteSetType.NoteSetTypeId)) || (!isEdit && noteSetTypes.Any(x => x.NoteSetTypeName.Trim().ToLower() == notSetTypeName?.Trim()?.ToLower())))
+            {
+                messageStore?.Add(() => thisNoteSetType.NoteSetTypeName, "Note type name already exists. Please provide unique name");
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at NoteSetTypeForm, CheckName as: {ex.Message}");
+        }
+    }
+
+    private async void SubmitHandler()
+    {
+        await OnSubmitCallback.InvokeAsync(thisNoteSetType);
+    }
+
+    public void Dispose()
+    {
+        if (editContext is not null)
+        {
+            editContext.OnValidationRequested -= CheckName;
+        }
+    }
+}

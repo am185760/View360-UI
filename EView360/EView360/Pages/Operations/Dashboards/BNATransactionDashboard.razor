@@ -1,0 +1,219 @@
+﻿@page "/BNATransactionDashboard"
+@page "/BNATransactionDashboard/{mode}"
+
+@using EView360.Services.Operations;
+@using EView360.Common;
+@using EView360.Services;
+@using EView360Models.Core;
+@using EView360Models.RequestModel;
+@using EView360Models.ViewModels;
+@inject BnaTranactionsService service
+@inject NoteSetTypeService noteSetTypeService
+@inject AtmService atmService
+@inject ATMTreeViewRepository treeService
+@inject ILogger<BNATransactionDashboard> logger
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject NavigationManager NavigationManager
+@inject IJSRuntime jsRuntime
+@inject NavigationManager NavigationManager
+@inject YearService yearService
+<div class="row content">
+    <div class="col-sm-2 filter_bar border-right-2">
+        <form style="margin-top: 20px;">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <h5>Filters: </h5>
+                </div>
+            </div>
+
+            @if (@mode is not null && mode.Equals("Archive"))
+            {
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label>Archive Year: </label>
+                        <Select TValue="int" SelectedValue="@ArchiveYear" class="form-control" SelectedValueChanged="@DateChanged">
+                            @foreach (int year in archiveYears)
+                            {
+                                <SelectItem Value=year>@year</SelectItem>
+                            }
+                        </Select>
+                    </div>
+                </div>
+            }
+            <div class="row">
+                <div class="col-sm-12">
+                    <label class="float-left" for="filterNoteSetTypeBy">Note Set Type :</label>
+                    <select @bind="filterNoteSetTypeBy" class="form-control">
+                        <option value="*">Any</option>
+                        @if (noteSetTypes?.Count > 0)
+                        {
+                            @foreach (var noteSetType in noteSetTypes?.ToList().Distinct())
+                            {
+                                <option value="@noteSetType.NoteSetTypeId">@noteSetType.NoteSetTypeName</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="form-row" style="margin-top: 10%;">
+                <div class="col">
+                    <input class="btn btn-sm btn-success" type="button" onclick="@LoadData" value="Generate Dashboard">
+                </div>
+                <div class="col">
+                    <input class="btn btn-sm btn-success" type="button" @onclick="@(x => NavigationManager.NavigateTo($"{NavigationManager.BaseUri}"))" value="Close">
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+    <div class="col-sm-10 text-left" style="margin-top:1%">
+        <div class="form-group">
+            @if (@mode is not null && mode.Equals("Archive"))
+            {
+                <b><h2 style="font-family:montserrat; font-weight:bold">BNA Deposit Dashboard - Archive</h2></b>
+            }
+            else
+            {
+                <b><h2 style="font-family:montserrat; font-weight:bold">BNA Deposit Dashboard</h2></b>
+            }
+        </div>
+    </div>
+</div>
+
+
+
+<style>
+
+    .table-primary .showAnimation {
+        animation: spin 1200ms linear infinite;
+    }
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        margin-top: 20px;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        width: 170px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+
+</style>
+
+@code {
+
+    [Parameter]
+    public string? mode { get; set; }
+
+    int ArchiveYear;
+    private List<int> archiveYears = new();
+    private bool showSpinner = false;
+    private bool showGrid = false;
+    bool showCancelBtn = false;
+    DateTime fromDate = DateTime.Now.Date.AddDays(-1);
+    DateTime toDate = DateTime.Now.Date;
+    public List<NoteSetType>? noteSetTypes = new();
+    [Inject] INotificationService NotificationService { get; set; }
+    [Inject] IMessageService MessageService { get; set; }
+
+    private string? filterNoteSetTypeBy = "*";
+
+    protected override async Task OnInitializedAsync()
+    {
+        AppUser appUser = await localStorage.GetItemAsync<AppUser>("AppUser");
+        if (appUser is not null)
+        {
+            service.UserId = appUser.UserId;
+            noteSetTypeService.UserId = appUser.UserId;
+        }
+        noteSetTypes = await noteSetTypeService.GetNoteSetTypeListAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (mode is not null && mode.Equals("Archive"))
+            {
+                archiveYears = yearService.GetLastNYears(5);
+                ArchiveYear = archiveYears.FirstOrDefault();
+                await this.InvokeAsync(() => this.StateHasChanged());
+            }
+        }
+
+    }
+    private async Task LoadData()
+    {
+        List<string> atmIDs = new();
+        List<string> regionIDs = new();
+        string filter = string.Empty;
+        int noteSetTypeId = filterNoteSetTypeBy != "*" ? int.Parse(filterNoteSetTypeBy) : 0;
+        (atmIDs, regionIDs) = await treeService.GetSelectedAtmOrRegionList();
+        string url = $"{NavigationManager.BaseUri}/BNATransactionDataGrid/{noteSetTypeId}";
+        if (regionIDs?.Count > 0)
+        {
+            filter = "(" + string.Join(",", regionIDs) + ")";
+            url += $"/true/{filter}";
+        }
+        else
+        {
+            filter = "(" + string.Join(",", atmIDs) + ")";
+            url += $"/false/{filter}";
+        }
+
+        await jsRuntime.InvokeVoidAsync("open", url, "_blank", "location=yes,height=1000,width=5000,scrollbars=yes,status=yes");
+    }
+
+    public async Task RenderSuccessBox(string title, string message)
+    {
+        await NotificationService.Success(message, title, (options) =>
+        {
+            options.IntervalBeforeClose = 4000;
+        });
+    }
+
+    async Task RenderInfoBox(string title, string message)
+    {
+        await NotificationService.Info(message, title, (options) =>
+        {
+            options.IntervalBeforeClose = 3000;
+        });
+        await Task.CompletedTask;
+    }
+
+    public async Task RenderErrorBox(string title, string message)
+    {
+        await NotificationService.Error(message, title, (options) =>
+        {
+            options.IntervalBeforeClose = 5000;
+        });
+    }
+    private Task DateChanged(int selectedYear)
+    {
+        ArchiveYear = selectedYear;
+        return Task.CompletedTask;
+    }
+}

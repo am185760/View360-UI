@@ -1,0 +1,201 @@
+﻿@page "/CashPositionDashboard"
+@page "/CashPositionDashboard/{mode}"
+@page "/CashPositionDashboard/{mode}/{IsRecycler:bool?}"
+
+@using EView360.Services.Operations;
+@using EView360.Common;
+@using EView360.Services.Operations.DashBoard;
+@using EView360.Services;
+@using EView360Models.Core;
+@using EView360Models.RequestModel;
+@using EView360Models.ViewModels;
+@inject CashPositionService service
+@inject ATMTreeViewRepository atmService
+@inject ILogger<CashPositionDashboard> logger
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject NavigationManager NavigationManager
+@inject IJSRuntime jsRuntime
+
+
+<div class="row content">
+    <div class="col-sm-2 filter_bar border-right-2">
+        <form style="margin-top: 20px;">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <h5>Filters: </h5>
+                </div>
+            </div>
+            @if (isArchive)
+            {
+                <div class="form-row">
+                    <div class="form-group col-md-8">
+                        <label>Archive Year: </label>
+                        <select class="form-control" @bind="ArchiveYear">
+                            <option value="2022">2022</option>
+                            <option value="2021">2021</option>
+                            <option value="2020">2020</option>
+                            <option value="2019">2019</option>
+                            <option value="2018">2018</option>
+
+                        </select>
+                    </div>
+                </div>
+            }
+            @if (noteSetTypes?.Count > 0)
+            {
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label class="float-left" for="CreatedByName">Group :</label>
+                        <select @bind="filterNoteSetTypeName" class="form-control">
+                            <option value="*">Select</option>
+                            @foreach (string name in noteSetTypes.Select(x => x.NoteSetTypeName).ToList().Distinct())
+                            {
+                                <option value="@name">@name</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            }
+            <div class="form-check">
+                <Check TValue="bool" @bind-Checked="@minNoteThresholdReached">Min Notes Threshold Reached :</Check>
+            </div>
+            <div class="form-row" style="margin-top: 10%;">
+                <div class="col">
+                    <input class="btn btn-sm btn-success" type="button" onclick="@LoadData" value="Generate Dashboard">
+                </div>
+                <div class="col">
+                    <input class="btn btn-sm btn-success" type="button" @onclick="@(x => NavigationManager.NavigateTo($"{NavigationManager.BaseUri}"))" value="Close">
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+    <div class="col-sm-10 text-left" style="margin-top:1%">
+        <div class="form-group">
+            <b><h2 style="font-family:montserrat; font-weight:bold">@((IsRecycler.HasValue && IsRecycler.Value) ? "Recycler " : "")Cash Positions Dashboard @(isArchive ? "- Archive" : "")</h2></b>
+        </div>
+    </div>
+</div>
+
+
+
+<style>
+
+    .table-primary .showAnimation {
+        animation: spin 1200ms linear infinite;
+    }
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        margin-top: 20px;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        width: 170px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+
+</style>
+
+@code {
+    bool showCancelBtn = false;
+    public List<CashPositionViewModel>? cashPositions = new();
+    public List<NoteSetTypeViewModel>? noteSetTypes = new();
+    [Inject] INotificationService NotificationService { get; set; }
+    private string filterNoteSetTypeName = "*";
+    private bool minNoteThresholdReached = false;
+    private long noteSetTypeId;
+
+    //archive
+    [Parameter]
+    public string? mode { get; set; }
+    bool isArchive = false;
+    int ArchiveYear = DateTime.Now.Year - 1;
+
+    [Parameter]
+    public bool? IsRecycler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(mode) && mode.Equals("Archive"))
+        {
+            isArchive = true;
+        }
+        AppUser appUser = await localStorage.GetItemAsync<AppUser>("AppUser");
+        if (appUser is not null)
+        {
+            service.UserId = appUser.UserId;
+        }
+        noteSetTypes = await service.GetNoteSetTypeAsync();
+        if (noteSetTypes is null || !noteSetTypes.Any())
+        {
+            await RenderInfoBox("Information", "Note set types not found");
+        }
+    }
+
+
+    protected override void OnParametersSet()
+    {
+        filterNoteSetTypeName = "*";
+        base.OnParametersSet();
+    }
+
+    private async Task LoadData()
+    {        
+        List<string> atmIDs = new();
+        List<string> regionIDs = new();
+        string filter = string.Empty;
+        (atmIDs, regionIDs) = await atmService.GetSelectedAtmOrRegionList();
+
+        noteSetTypeId = filterNoteSetTypeName == "*" ? 0 : noteSetTypes.Where(x => x.NoteSetTypeName == filterNoteSetTypeName).First().NoteSetTypeId;
+
+        string url = $"{NavigationManager.BaseUri}/CashPositionDataGrid/{noteSetTypeId}/{Convert.ToInt32(minNoteThresholdReached)}";
+        url += isArchive ? $"/{ArchiveYear}" : "/0";
+        url += (IsRecycler.HasValue && IsRecycler.Value) ? "/true" : "/false";
+
+        if (regionIDs?.Count > 0)
+        {
+            filter = "(" + string.Join(",", regionIDs) + ")";
+            url += $"/true/{filter}";
+        }
+        else
+        {
+            filter = "(" + string.Join(",", atmIDs) + ")";
+            url += $"/false/{filter}";
+        }
+
+        await jsRuntime.InvokeVoidAsync("open", url, "_blank", "location=yes,height=1000,width=5000,scrollbars=yes,status=yes");
+    }
+
+    async Task RenderInfoBox(string title, string message)
+    {
+        await NotificationService.Info(message, title, (options) =>
+        {
+            options.IntervalBeforeClose = 3000;
+        });
+        await Task.CompletedTask;
+    }
+}

@@ -1,0 +1,841 @@
+﻿@page "/ApplicationConfiguration"
+@using DataRequestor;
+@using EView360.Services;
+@using System.Text;
+@using EView360.Services.Operations;
+@using EView360Models.ViewModels;
+@using Encryption;
+@using Newtonsoft.Json;
+@using static EView360.Data.Enumerations;
+@inject ApplicationConfigurationServices service
+@inject ILogger<ApplicationConfiguration> logger
+@inject NavigationManager NavigationManager
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject ATMTreeViewRepository atmTreeService
+@inject AtmTaskService atmTaskService
+
+<div class="row content">
+    <div class="col-sm-12 text-left" style="margin-top:1%">
+        <div class="form-group">
+            <h2>Application Configuration</h2>
+        </div>
+        @if (showSpinner)
+        {
+            <div class="spinner appConfigSpinner"></div>
+        }
+
+        @if (showGrid)
+        {
+            <EditForm id="EditAppConf" EditContext="editContext" OnValidSubmit=@SubmitHandler Context="parentContext">
+                <DataAnnotationsValidator />
+                <Microsoft.AspNetCore.Components.Forms.ValidationSummary />
+                <Tabs RenderMode="TabsRenderMode.LazyLoad" SelectedTab="@TabName">
+                    <Items>
+                        <Tab Name="CMSG" @onclick="@(e => SetTabPanel("CMSG"))">Currency Management System General</Tab>
+                        @*<Tab Name="CACD" @onclick="@(e => SetTabPanel("CACD"))">Currency And Cash Data Archiving/Purging</Tab>*@
+                        @*<Tab Name="ServicesManagement" @onclick="@(e => SetTabPanel("ServicesManagement"))">Services Management</Tab>*@
+                        <Tab Name="DailyFeedConfiguration" @onclick="@(e => SetTabPanel("DailyFeedConfiguration"))">Daily Feed Configuration</Tab>
+                        <Tab Name="SmtpConfiguration" @onclick="@(e => SetTabPanel("SmtpConfiguration"))">Smtp Configuration</Tab>
+                        @if (CheckPermission((int)Permissions.DataBaseConfiguration))
+                        {
+                        <Tab Name="DBConfiguration" @onclick="@(e => SetTabPanel("DBConfiguration"))">Database Configuration</Tab>    
+                        }                        
+                        <Tab Name="DBServersInfo" @onclick="@(e => SetTabPanel("DBServersInfo"))">Database Servers Info.</Tab>
+                        <Tab Name="AppServersInfo" @onclick="@(e => SetTabPanel("AppServersInfo"))">Application Servers Info.</Tab>
+                    </Items>
+                    <Content>
+                        <TabPanel Name="CMSG">
+                            <div class="row content" style="margin-top: 1%;">
+                                <div class="col-sm-6 text-left CMSG_First">
+                                    <div class="form-group row">
+                                        <label for="serverIp" class="col-sm-6 col-form-label col-form-label-sm">
+                                            Server IP
+                                        </label>
+                                        <div class="col-sm-4">
+                                            <InputText class="form-control form-control-sm input-sm" id="serverIp" @bind-Value="appSetting.ServerIp" />
+                                        </div>
+                                    </div>
+                                    @*<div class="form-group row">
+                                <label for="serverPort" class="col-sm-6 col-form-label col-form-label-sm">Server Port</label>
+                                <div class="col-sm-4">
+                                <InputNumber class="form-control form-control-sm" id="serverPort" @bind-Value="appSetting.ServerPort" />
+                                </div>
+                                </div>
+                                <div class="form-group row">
+                                <label for="defaultPort" class="col-sm-6 col-form-label col-form-label-sm">ATM Default Port</label>
+                                <div class="col-sm-4">
+                                <InputNumber class="form-control form-control-sm" id="defaultPort" @bind-Value="appSetting.DefaltAtmPort" />
+                                </div>
+                                </div>*@
+                                    @*<div class="form-group row">
+                                <label for="Comm" class="col-sm-6 col-form-label col-form-label-sm">Is Ciphered Comm</label>
+                                <div class="col-sm-4">
+                                <Check TValue="bool?" @bind-Checked="appSetting.IsCipheredComm" class="form-check-input" />
+                                </div>
+                                </div>*@
+                                    @*<div class="form-group row">
+                                <label for="defaultPort" class="col-sm-6 col-form-label col-form-label-sm">Cash Order Execution Time</label>
+                                <div class="col-sm-4">
+                                <Addons>
+                                <Addon AddonType="AddonType.Body">
+                                <TimePicker Class="timePicker_COET" @ref="@timePicker" TValue="TimeSpan" Size="Size.Small" />
+                                </Addon>
+                                <Addon AddonType="AddonType.End" Size="Size.Small">
+                                <Button Color="Color.Light" Clicked="@(()=>timePicker.ToggleAsync())" Size="Size.Small">
+                                <Icon Name="IconName.CalendarDay" IconSize="IconSize.Small" />
+                                </Button>
+                                </Addon>
+                                </Addons>
+                                </div>
+                                </div>*@
+                                    <div class="form-group row">
+                                        <label for="RefreshInterval" class="col-sm-6 col-form-label col-form-label-sm">Service Refresh Interval(min)</label>
+                                        <div class="col-sm-4">
+                                            <InputNumber class="form-control form-control-sm" id="RefreshInterval" @bind-Value="appSetting.RefreshInterval" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="Comm" class="col-sm-6 col-form-label col-form-label-sm">Parsing Enabled</label>
+                                        <div class="col-sm-4">
+                                            <Check TValue="bool" @bind-Checked="appSetting.ParsingEnabled" class="form-check-input" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="Comm" class="col-sm-6 col-form-label col-form-label-sm">Allow Secured Access</label>
+                                        <div class="col-sm-4">
+                                            <Check TValue="bool?" @bind-Checked="appSetting.IsSecuredAccess" class="form-check-input" />
+                                        </div>
+                                    </div>
+                                    @*<div class="form-group row">
+                                <label for="Comm" class="col-sm-6 col-form-label col-form-label-sm">Google Maps Enabled</label>
+                                <div class="col-sm-4">
+                                <Check TValue="bool?" @bind-Checked="appSetting.IsGoogleMapEnabled" class="form-check-input" />
+                                </div>
+                                </div>*@
+                                    <div class="form-group row">
+                                        <label class="col-sm-6 col-form-label col-form-label-sm" for="CreatedByName">Service Logging Level:</label>
+                                        <div class="col-md-4">
+                                            <select @bind="appSetting.ServiceLogLevel" class="form-control form-control-sm">
+                                                <option value="Error">Error</option>
+                                                <option value="Warning">Warning</option>
+                                                <option value="Info">Info</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="serverIp" class="col-sm-6 col-form-label col-form-label-sm">
+                                            Cash Data Log Stores Location
+                                        </label>
+                                        <div class="col-sm-4">
+                                            <InputText class="form-control form-control-sm" id="serverIp" @bind-Value="appSetting.CashDataStoresLocation" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="serverIp" class="col-sm-6 col-form-label col-form-label-sm">
+                                            Log File Path
+                                        </label>
+                                        <div class="col-sm-4">
+                                            <InputText class="form-control form-control-sm" id="serverIp" @bind-Value="appSetting.LogFilePath" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="serverIp" class="col-sm-6 col-form-label col-form-label-sm">
+                                            Temporary Folder Path
+                                        </label>
+                                        <div class="col-sm-4">
+                                            <InputText class="form-control form-control-sm" id="serverIp" @bind-Value="appSetting.TemporaryFolder" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="serverIp" class="col-sm-6 col-form-label col-form-label-sm">
+                                            Downloaded Folder Path
+                                        </label>
+                                        <div class="col-sm-4">
+                                            <InputText class="form-control form-control-sm" id="serverIp" @bind-Value="appSetting.DownloadedFilePath" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="RefreshInterval" class="col-sm-6 col-form-label col-form-label-sm">Heart Beat Refresh Interval</label>
+                                        <div class="col-sm-4">
+                                            <InputNumber class="form-control form-control-sm" id="RefreshInterval" @bind-Value="appSetting.HeartBeatRefreshInterval" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="serverPort" class="col-sm-6 col-form-label col-form-label-sm">ATM Data Streaming Heathbeat Port</label>
+                                        <div class="col-sm-4">
+                                            <InputNumber class="form-control form-control-sm" id="serverPort" @bind-Value="appSetting.AtmDataStreamingHeartbeatPort" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="serverPort" class="col-sm-6 col-form-label col-form-label-sm">ATM Data Streaming Port</label>
+                                        <div class="col-sm-4">
+                                            <InputNumber class="form-control form-control-sm" id="serverPort" @bind-Value="appSetting.AtmDataStreamingPort" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="serverPort" class="col-sm-6 col-form-label col-form-label-sm">ATM On-Demand Request Port</label>
+                                        <div class="col-sm-4">
+                                            <InputNumber class="form-control form-control-sm" id="serverPort" @bind-Value="appSetting.AtmOnDemandRequestPort" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="serverPort" class="col-sm-6 col-form-label col-form-label-sm">ATM On-Demand Request Heartbeat Port</label>
+                                        <div class="col-sm-4">
+                                            <InputNumber class="form-control form-control-sm" id="serverPort" @bind-Value="appSetting.AtmOnDemandRequestHearbeatPort" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="tcp" class="col-sm-6 col-form-label col-form-label-sm">TCP Timeout</label>
+                                        <div class="col-sm-4">
+                                            <InputNumber class="form-control form-control-sm" id="tcp" @bind-Value="appSetting.Tcptimeout" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 text-left">
+                                    <form class="border-3">
+                                        <div class="form-group CJR_heading">
+                                            <h4>Configure Job Retries</h4>
+                                        </div>
+                                        @*<div class="form-group row CJR_row">
+                                    <label for="serverPort" class="col-sm-6 col-form-label col-form-label-sm">Number of retry for Cash Order Upload</label>
+                                    <div class="col-sm-4">
+                                    <InputNumber class="form-control form-control-sm" id="serverPort" @bind-Value="appSetting.RetryCountCashOrderUpload" />
+                                    </div>
+                                    </div>*@
+                                        @*<div class="form-group row CJR_row">
+                                    <label for="serverPort" class="col-sm-6 col-form-label col-form-label-sm">Number of retry for Cash Order Download</label>
+                                    <div class="col-sm-4">
+                                    <InputNumber class="form-control form-control-sm" id="serverPort" @bind-Value="appSetting.RetryCountCashOrderDownload" />
+                                    </div>
+                                    </div>*@
+                                        <div class="form-group row CJR_row">
+                                            <label for="serverPort" class="col-sm-6 col-form-label col-form-label-sm">Number of retry for DFF Upload</label>
+                                            <div class="col-sm-4">
+                                                <InputNumber class="form-control form-control-sm" id="serverPort" @bind-Value="appSetting.RetryCountDffUpload" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group row CJR_row">
+                                            <label for="serverPort" class="col-sm-6 col-form-label col-form-label-sm">Number of retry for Uploading Configuration</label>
+                                            <div class="col-sm-4">
+                                                <InputNumber class="form-control form-control-sm" id="serverPort" @bind-Value="appSetting.RetryCountConfUpload" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group row CJR_row">
+                                            <label for="serverPort" class="col-sm-6 col-form-label col-form-label-sm">Number of retry for Downloading Counter File</label>
+                                            <div class="col-sm-4">
+                                                <InputNumber class="form-control form-control-sm" id="serverPort" @bind-Value="appSetting.RetryCountCounterFile" />
+                                            </div>
+                                        </div>
+                                        @*<div class="form-group row CJR_row">
+                                    <label for="serverPort" class="col-sm-6 col-form-label col-form-label-sm">Number of retry for Executing Restart Schedule</label>
+                                    <div class="col-sm-4">
+                                    <InputNumber class="form-control form-control-sm" id="serverPort" @bind-Value="appSetting.RetryCountRestartSchedule" />
+                                    </div>
+                                    </div>*@
+                                        @*<div class="form-group row CJR_row">
+                                    <label for="serverPort" class="col-sm-6 col-form-label col-form-label-sm">Number of retry for Executing DateTime Sync Schedule</label>
+                                    <div class="col-sm-4">
+                                    <InputNumber class="form-control form-control-sm" id="serverPort" @bind-Value="appSetting.RetryCountDatetimeSchedule" />
+                                    </div>
+                                    </div>*@
+                                    </form>
+                                </div>
+                            </div>
+                        </TabPanel>
+                        @*<TabPanel Name="CACD">
+                    <form class="" style="margin-top: 3%;margin-left: 1%;">
+                    <div class="form-group">
+                    <h5>Configuration For Data Archiving </h5>
+                    </div>
+                    <div class="form-group row">
+                    <label class="col-sm-3 col-form-label col-form-label-sm" for="CreatedByName">Archive/Purge Data Older Than:</label>
+                    <div class="col-md-2">
+                    <select @bind="appSetting.ArchivalDays" class="form-control form-control-sm">
+                    <option selected="selected" value="3">3 Months</option>
+                    <option value="4">4 Months</option>
+                    <option value="5">5 Months</option>
+                    <option value="6">6 Months</option>
+                    <option value="7">7 Months</option>
+                    <option value="8">8 Months</option>
+                    <option value="9">9 Months</option>
+                    <option value="10">10 Months</option>
+                    <option value="11">11 Months</option>
+                    <option value="12">1 Year</option>
+                    <option value="18">1.5 Years</option>
+                    <option value="24">2 Years</option>
+                    <option value="36">3  Years</option>
+                    <option value="-1">Never</option>
+                    </select>
+                    </div>
+                    </div>
+                    <div class="form-group row">
+                    <label for="serverIp" class="col-sm-3 col-form-label col-form-label-sm">
+                    Server
+                    </label>
+                    <div class="col-sm-2">
+                    <InputText class="form-control form-control-sm" id="serverIp" @bind-Value="appSetting.ArchivalServer" />
+                    </div>
+                    </div>
+                    <div class="form-group row">
+                    <label for="serverIp" class="col-sm-3 col-form-label col-form-label-sm">
+                    Database
+                    </label>
+                    <div class="col-sm-2">
+                    <InputText class="form-control form-control-sm" id="serverIp" @bind-Value="appSetting.ArchivalDatabase" />
+                    </div>
+                    </div>
+                    <div class="form-group row">
+                    <label for="serverIp" class="col-sm-3 col-form-label col-form-label-sm">
+                    Username
+                    </label>
+                    <div class="col-sm-2">
+                    <InputText class="form-control form-control-sm" id="serverIp" @bind-Value="appSetting.ArchivalUsername" />
+                    </div>
+                    </div>
+                    <div class="form-group row">
+                    <label for="serverIp" class="col-sm-3 col-form-label col-form-label-sm">
+                    Password
+                    </label>
+                    <div class="col-sm-2">
+                    <InputText type="password" class="form-control form-control-sm" id="serverIp" @bind-Value="appSetting.ArchivalPassword" />
+                    </div>
+                    </div>
+                    </form>
+                    </TabPanel>*@
+                        @*<TabPanel Name="ServicesManagement">
+                    <form class="" style="margin-top: 3%;margin-left: 1%;">
+                    <div class="table-responsive-sm" style="background-color: white; width:60%">
+                    <table class="table table-sm border-2">
+                    <thead>
+                    <tr>
+                    <th>Service</th>
+                    <th>Status</th>
+                    <th>Start/Stop</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (EView360Models.Core.CcmsService ccmsService in ccmsServices)
+                    {
+                    <tr>
+                    <td>
+                    @ccmsService.Name
+                    </td>
+                    <td class="@ccmsService.ServiceStatus status">
+                    @ccmsService.ServiceStatus
+                    </td>
+                    <td>
+                    <div class="parentDiv_switch">
+                    <Switch TValue="bool?" Color="Color.Success" @onchange="@(e => OnSwitchChange(bool.Parse(e.Value.ToString()), ccmsService.Name))"
+                    Checked="ccmsService.IsStartScheduled" Class="switch_data">Remember Me</Switch>
+                    </div>
+                    </td>
+                    </tr>
+                    }
+                    </tbody>
+                    </table>
+                    </div>
+
+                    </form>
+                    </TabPanel>*@
+                        <TabPanel Name="DailyFeedConfiguration">
+                            <form class="" style="margin-top: 3%;margin-left: 1%;">
+                                <div class="form-group row">
+                                    <label for="serverIp" class="col-sm-2 col-form-label col-form-label-sm">
+                                        FTP Uri
+                                    </label>
+                                    <div class="col-sm-2">
+                                        <InputText class="form-control form-control-sm" id="serverIp" @bind-Value="appSetting.DailyFeedFtpUri" />
+                                    </div>
+                                    <Tooltip Text="This is the ftp location on which daily feed files will be uploaded">
+                                        <Icon Name="IconName.ExclamationCircle" IconSize="IconSize.Small" TextColor="TextColor.Success" />
+                                    </Tooltip>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="serverIp" class="col-sm-2 col-form-label col-form-label-sm">
+                                        FTP Username
+                                    </label>
+                                    <div class="col-sm-2">
+                                        <InputText class="form-control form-control-sm" id="serverIp" @bind-Value="appSetting.DailyFeedFtpUsername" />
+                                    </div>
+                                    <Tooltip Text="This is the username for the specified ftp location.">
+                                        <Icon Name="IconName.ExclamationCircle" IconSize="IconSize.Small" TextColor="TextColor.Success" />
+                                    </Tooltip>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="serverIp" class="col-sm-2 col-form-label col-form-label-sm">
+                                        FTP Password
+                                    </label>
+                                    <div class="col-sm-2">
+                                        <InputText type="password" class="form-control form-control-sm" id="serverIp" @bind-Value="appSetting.DailyFeedFtpPassword" />
+                                    </div>
+                                    <Tooltip Text="This is the password for the specified ftp location.">
+                                        <Icon Name="IconName.ExclamationCircle" IconSize="IconSize.Small" TextColor="TextColor.Success" />
+                                    </Tooltip>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="defaultPort" class="col-sm-2 col-form-label col-form-label-sm">DFs Generation Time</label>
+                                    <div class="col-sm-2">
+                                        <Addons>
+                                            <Addon AddonType="AddonType.Body">
+                                                <TimePicker @ref="@timePickerDailyFeed" TValue="TimeSpan" Size="Size.Small" />
+                                            </Addon>
+                                            <Addon AddonType="AddonType.End" Size="Size.Small">
+                                                <Button Color="Color.Light" Clicked="@(()=>timePickerDailyFeed.ToggleAsync())" Size="Size.Small">
+                                                    <Icon Name="IconName.CalendarDay" IconSize="IconSize.Small" />
+                                                </Button>
+                                            </Addon>
+                                        </Addons>
+                                    </div>
+                                    <Tooltip Text="This will be time at which daily feed file will be generated.">
+                                        <Icon Name="IconName.ExclamationCircle" IconSize="IconSize.Small" TextColor="TextColor.Success" />
+                                    </Tooltip>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="serverIp" class="col-sm-2 col-form-label col-form-label-sm">
+                                        DFs File Path
+                                    </label>
+                                    <div class="col-sm-2">
+                                        <InputText class="form-control form-control-sm" id="serverIp" @bind-Value="appSetting.DailyFeedOutputFilePath" />
+                                    </div>
+                                    <Tooltip Text="This is the path where daily feed files will be generated.">
+                                        <Icon Name="IconName.ExclamationCircle" IconSize="IconSize.Small" TextColor="TextColor.Success" />
+                                    </Tooltip>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="serverIp" class="col-sm-2 col-form-label col-form-label-sm">
+                                        Lag Interval
+                                    </label>
+                                    <div class="col-sm-2">
+                                        <InputNumber class="form-control form-control-sm" id="serverIp" @bind-Value="appSetting.DailyFeedGenerationDelay" />
+                                    </div>
+                                    <Tooltip Text="This specify the delay between current system time and summary generation time.">
+                                        <Icon Name="IconName.ExclamationCircle" IconSize="IconSize.Small" TextColor="TextColor.Success" />
+                                    </Tooltip>
+                                </div>
+                            </form>
+                        </TabPanel>
+                        <TabPanel Name="SmtpConfiguration">
+                            <form class="" style="margin-top: 3%;margin-left: 1%;">
+                                <div class="form-group">
+                                    <h5>
+                                        Configuration For SMTP
+                                    </h5>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="serverIp" class="col-sm-2 col-form-label col-form-label-sm">
+                                        Server
+                                    </label>
+                                    <div class="col-sm-2">
+                                        <InputText autocomplete="off" class="form-control form-control-sm" id="serverIp" @bind-Value="appSetting.SmtpServer" />
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="serverIp" class="col-sm-2 col-form-label col-form-label-sm">
+                                        Port
+                                    </label>
+                                    <div class="col-sm-2">
+                                        <InputNumber class="form-control form-control-sm" id="serverIp" @bind-Value="appSetting.SmtpPort" />
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="serverIp" class="col-sm-2 col-form-label col-form-label-sm">
+                                        Username
+                                    </label>
+                                    <div class="col-sm-2">
+                                        <InputText autocomplete="off" class="form-control form-control-sm" id="serverIp" @bind-Value="appSetting.SmtpUsername" />
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="serverIp" class="col-sm-2 col-form-label col-form-label-sm">
+                                        Password
+                                    </label>
+                                    <div class="col-sm-2">
+                                        <InputText class="form-control form-control-sm" id="serverIp" @bind-Value="appSetting.SmtpPassword" type="password" />
+                                    </div>
+                                </div>
+                            </form>
+                        </TabPanel>
+
+                        @if (CheckPermission((int)Permissions.DataBaseConfiguration))
+                        {
+                            <TabPanel Name="DBConfiguration">
+                                <form class="" style="margin-top: 3%;margin-left: 1%;">
+                                    <div class="form-group row">
+                                        <label for="serverIp" class="col-sm-2 col-form-label col-form-label-sm">
+                                            Core Database Name
+                                        </label>
+                                        <div class="col-sm-2">
+                                            <InputText autocomplete="off" class="form-control form-control-sm" id="coreDb" @bind-Value="appSetting.CoreDbName" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="serverIp" class="col-sm-2 col-form-label col-form-label-sm">
+                                            Cash Database Name
+                                        </label>
+                                        <div class="col-sm-2">
+                                            <InputText autocomplete="off" class="form-control form-control-sm" id="cashDb" @bind-Value="appSetting.CashDbName" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="serverIp" class="col-sm-2 col-form-label col-form-label-sm">
+                                            EJ Database Name
+                                        </label>
+                                        <div class="col-sm-2">
+                                            <InputText autocomplete="off" class="form-control form-control-sm" id="txDb" @bind-Value="appSetting.TxDbName" />
+                                        </div>
+                                    </div>
+                                </form>
+                            </TabPanel>
+                        }
+                        
+                        <TabPanel Name="DBServersInfo">
+                            <form class="" style="margin-top: 3%;margin-left: 1%;">
+                                <DataGrid @ref="@dataGridRef"
+                                          TItem="DBServerInfo"
+                                          Data="@DBServers"
+                                          Editable="false"
+                                          Responsive="true"
+                                                        ShowPager
+                                                        UseValidation
+                                           PopupSize="ModalSize.Large"
+                                                        Bordered
+                                           PageSize="50"
+                                                        FixedHeader
+                                           FixedHeaderDataGridHeight="450px"
+                                           FixedHeaderDataGridMaxHeight="450px"
+                                           Narrow="true"
+                                                        Sortable SortMode="DataGridSortMode.Single"
+                                           HeaderThemeContrast="@ThemeContrast.Light">
+
+
+                                     <DataGridColumn TItem="DBServerInfo" Field="@nameof(DBServerInfo.ServerName)" Caption="Server Name" />
+                                     @*<DataGridColumn TItem="DBServerInfo" Field="@nameof(DBServerInfo.ServerConnection)" Caption="Server Connection" />
+                                <DataGridColumn TItem="DBServerInfo" Field="@nameof(DBServerInfo.ServerCredentials)" Caption="Server Credentials" />
+                                <DataGridColumn TItem="DBServerInfo" Field="@nameof(DBServerInfo.MaxPoolSize)" Caption="Max Pool Size" />*@
+                                     <DataGridColumn TItem="DBServerInfo" Field="@nameof(DBServerInfo.MaxATMs)" Caption="Max Atms" />
+                                     <DataGridColumn TItem="DBServerInfo" Field="@nameof(DBServerInfo.AtmInfo)" Caption="Atm List">
+                                         <DisplayTemplate>
+                                             <Button Clicked="@(()=>ShowAtmList(context.ServerName))">
+                                                 <Icon Name="@("fa-newspaper-o")" TextColor="TextColor.Success" />
+                                             </Button>
+                                         </DisplayTemplate>
+                                     </DataGridColumn>
+                                 </DataGrid>
+                             </form>
+                         </TabPanel>
+                         <TabPanel Name="AppServersInfo">
+                             <form class="" style="margin-top: 3%;margin-left: 1%;">
+                                 <DataGrid @ref="@dataGridRef2"
+                                           TItem="AppServerInfo"
+                                           Data="@AppServers"
+                                           Editable="false"
+                                           Responsive="true"
+                                                        ShowPager
+                                                        UseValidation
+                                           PopupSize="ModalSize.Large"
+                                                        Bordered
+                                           PageSize="50"
+                                                        FixedHeader
+                                           FixedHeaderDataGridHeight="400px"
+                                           FixedHeaderDataGridMaxHeight="400px"
+                                           Narrow="true"
+                                                        Sortable SortMode="DataGridSortMode.Single"
+                                           HeaderThemeContrast="@ThemeContrast.Light">
+
+
+                                     @*<DataGridColumn TItem="AppServerInfo" Field="@nameof(AppServerInfo.ServerName)" Caption="Server Name" />*@
+                                     <DataGridColumn TItem="AppServerInfo" Field="@nameof(AppServerInfo.ServerIP)" Caption="Server IP" />
+                                     <DataGridColumn TItem="AppServerInfo" Field="@nameof(AppServerInfo.ServerPort)" Caption="Server Port" />
+                                 </DataGrid>
+                             </form>
+                         </TabPanel>
+                     </Content>
+                 </Tabs>
+                 <div class="modal-footer float-left">
+                     @if (CheckPermission((int)Permissions.ChangeConfiguration))
+                    {
+                        <button type="submit" form="EditAppConf" class="btn btn-success" disabled="@IsDisabled">
+                            <span class="@btnSpinner spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Save
+                        </button>
+                    }
+                    <input type="button" class="btn btn-secondary" disabled="@IsDisabled" value="Cancel" @onclick="@(x => NavigationManager.NavigateTo($"{NavigationManager.BaseUri}"))" />
+                </div>
+            </EditForm>
+
+            <Modal @ref="atmLstModalRef">
+                <ModalContent Centered Size="ModalSize.Large">
+                     <ModalHeader>
+                         <ModalTitle>Atm List</ModalTitle>
+                         <CloseButton />
+                     </ModalHeader>
+                     <ModalBody MaxHeight="50">
+                         <div>
+                             <ListView TItem="KeyValuePair<string, string>"
+                                       Data="AtmInfo"
+                                       TextField="(item) => item.Value"
+                                       ValueField="(item) => item.Key"
+                                       Mode="ListGroupMode.Static"
+                                       MaxHeight="300px">
+                                 <ItemTemplate>
+                                     <Div Flex="Flex.InlineFlex.JustifyContent.Between" Width="Width.Is100">
+                                         <Small>@context.Item.Value</Small>
+                                         <Small>@context.Item.Key</Small>
+                                     </Div>
+                                 </ItemTemplate>
+                             </ListView>
+                         </div>
+                     </ModalBody>
+                 </ModalContent>
+             </Modal>
+        }
+    </div>
+</div>
+
+<style>
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        margin-top: 20px;
+        width: 100%;
+        background-color: white;
+    }
+
+    .appConfigSpinner {
+        margin-top: 15%;
+    }
+
+    .form-group {
+        margin-bottom: 0.2rem;
+    }
+
+    .flatpickr-time {
+        width: 90%;
+    }
+
+    .flatpickr-calendar.open {
+        width: 10%;
+    }
+
+    .CJR_row {
+        margin-left: 1%;
+    }
+
+    .CJR_heading {
+        margin-left: 3%;
+        margin-top: 1%;
+    }
+
+    .status.Started {
+        color: #2c9912;
+    }
+
+    .status.Stopped {
+        color: red;
+    }
+</style>
+
+@code {
+
+    private bool showSpinner = true;
+    private bool showGrid = false;
+    private EView360Models.Core.AppSetting appSetting = new();
+    private List<EView360Models.Core.CcmsService> ccmsServices = new();
+    private EditContext? editContext;
+    private long userId;
+    TimePicker<TimeSpan>? timePickerDailyFeed = new();
+    private string? TabName = "CMSG";
+    TimePicker<TimeSpan>? timePicker = new();
+    private ServersInformation serversInformation = new();
+    private List<DBServerInfo> DBServers = new();
+    private List<AppServerInfo> AppServers = new();
+    private DataGrid<DBServerInfo>? dataGridRef;
+    private DataGrid<AppServerInfo>? dataGridRef2;
+    private Modal? atmLstModalRef;
+    public Dictionary<string, string> AtmInfo = new();
+    public string currentServerIp = string.Empty;
+    private bool IsDisabled = false;
+    private string btnSpinner = string.Empty;
+
+    [Inject] INotificationService NotificationService { get; set; }
+    [Inject] AuditLogService auditService { get; set; }
+    Dictionary<int, string> userRights;
+
+    protected async override void OnInitialized()
+    {
+        userRights = await localStorage.GetItemAsync<Dictionary<int, string>>("userRights");
+        userId = (await localStorage.GetItemAsync<EView360Models.Core.AppUser>("AppUser")).UserId;
+        service.UserId = userId;
+        editContext = new(appSetting);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                await LoadData();
+                ccmsServices = await service.GetCCMSService();
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at AppConf., OnAfterRenderAsync as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    private bool CheckPermission(int right)
+    {
+        try
+        {
+            if (userRights is not null)
+                return userRights.ContainsKey(right);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at AppConfig, CheckPermission as: {ex.Message}");
+
+            NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+        return false;
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            appSetting = await service.GetAppSettingAsync();
+            if (appSetting is null)
+            {
+                await NotificationService.Info("No record found or check logs for error", "Information", (options) =>
+                {
+                    options.IntervalBeforeClose = 4000;
+                });
+            }
+
+            if (appSetting != null && appSetting.ServersInfo != null)
+            {
+                currentServerIp = appSetting.ServerIp;
+                string ascii = Encoding.ASCII.GetString(appSetting.ServersInfo);
+                if (!string.IsNullOrEmpty(ascii))
+                {
+                    serversInformation = JsonConvert.DeserializeObject<ServersInformation>(ascii)!;
+                    DBServers = serversInformation.DBServers;
+                    AppServers = serversInformation.AppServers;
+                    DBServers.Select(d => { d.ServerConnection = Encryption.Cryptic.DecryptString(d.ServerConnection, Helper.ConstractKey(false)); return d; }).ToList();
+                    DBServers.Select(d => { d.ServerCredentials = Encryption.Cryptic.DecryptString(d.ServerCredentials, Helper.ConstractKey(false)); return d; }).ToList();
+                }
+            }
+
+
+            timePicker = new TimePicker<TimeSpan>() { Time = appSetting.CashOrderExecutionTime.TimeOfDay };
+            timePickerDailyFeed.Time = appSetting.DailyFeedGenerationTime.HasValue ? appSetting.DailyFeedGenerationTime.Value.TimeOfDay : TimeSpan.Zero;
+            editContext = new(appSetting);
+            showSpinner = false;
+            showGrid = true;
+            this.InvokeAsync(() => this.StateHasChanged());
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at AppConf., LoadData as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+
+    }
+
+    private void ShowAtmList(string serverName)
+    {
+        AtmInfo = DBServers.Where(x => x.ServerName == serverName).FirstOrDefault().AtmInfo;
+
+        atmLstModalRef.Show();
+    }
+
+    void SetTabPanel(string tabName)
+    {
+        TabName = tabName;
+    }
+
+    void OnSwitchChange(bool value, string serviceName)
+    {
+        ccmsServices.Where(x => x.Name == serviceName)
+        .Select(x => { x.IsStartScheduled = value; x.IsStopScheduled = !value; x.ServiceStatus = (value ? "Started" : "Stopped"); return x; }).ToList();
+    }
+
+    private async Task SubmitHandler()
+    {
+        try
+        {
+            IsDisabled = true;
+            btnSpinner = "spinner-border";
+            StateHasChanged();
+
+            appSetting.CashOrderExecutionTime = DateTime.Today.AddHours(timePicker.Time.Hours).AddMinutes(timePicker.Time.Minutes);
+            appSetting.DailyFeedGenerationTime = DateTime.Today.AddHours(timePickerDailyFeed.Time.Hours).AddMinutes(timePickerDailyFeed.Time.Minutes);
+
+            string responseAppSetting = await service.UpdateAppSetting(appSetting);
+            string responseService = await service.UpdateCCMSServices(ccmsServices);
+
+            IsDisabled = false;
+            btnSpinner = "";
+            StateHasChanged();
+
+            if (responseAppSetting.ToLower().Contains("error"))
+            {
+                await NotificationService.Error(responseAppSetting, "Error", (options) =>
+                {
+                    options.IntervalBeforeClose = 4000;
+                });
+            }
+            if (responseService.ToLower().Contains("error"))
+            {
+                await NotificationService.Error(responseService, "Error", (options) =>
+                {
+                    options.IntervalBeforeClose = 4000;
+                });
+            }
+            if (!responseAppSetting.ToLower().Contains("error") && !responseService.ToLower().Contains("error"))
+            {
+                if (appSetting.ServerIp != currentServerIp)
+                {
+                    string response = await atmTaskService.ScheduleConfiguration(atmTreeService.AtmList.Select(x => x.AtmId).ToList());
+                    if (response == "success" || response == Common.Constants.Messages.AtmAlreadyScheduleMsg)
+                    {
+                        await NotificationService.Success("Task configured successfully as Server Ip changed.", "Success", (options) =>
+                        {
+                            options.IntervalBeforeClose = 4000;
+                        });
+                    }
+                }
+                await NotificationService.Success("App Config. changes update", "Success", (options) =>
+                {
+                    options.IntervalBeforeClose = 4000;
+                });
+                //await Task.Delay(1000);
+                //NavigationManager.NavigateTo("/index");
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at AppConf., SubmitHandler as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+}

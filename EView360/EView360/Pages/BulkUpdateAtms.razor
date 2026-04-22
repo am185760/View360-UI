@@ -1,0 +1,258 @@
+﻿@page "/BulkUpdateAtms"
+
+@using EView360.Services;
+@using global::Common.ViewModel;
+@inject ILogger<BulkUpdateAtms> logger
+@inject ATMTreeViewRepository atmRepository
+@inject NotifyService notifyService
+@inject AtmSetupService service
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+
+<div class="col-sm-12 text-left" style="margin-top:1%">
+    <div>
+        <b><h2 style="font-family:montserrat; font-weight:bold">Bulk Update ATMs</h2></b>
+    </div>
+
+    @if (showSpinner)
+    {
+        <div class="spinner" style="z-index:4"></div>
+    }
+
+    @if (showGrid)
+    {
+        <Fields>
+            <Field ColumnSize="ColumnSize.Is4.OnDesktop.Is12.OnMobile">
+                    <NumericEdit Tvalue="int?" @bind-Value="@bulkMinOperatingBalance" Placeholder="Minimum Operating Balance" />
+            </Field>
+            <Field ColumnSize="ColumnSize.Is4.OnDesktop.Is12.OnMobile">
+                <NumericEdit Tvalue="int?" @bind-Value="@bulkOutOfCashThreshold"  Placeholder="Out Of Cash Threshold" />
+            </Field>
+            <Field ColumnSize="ColumnSize.Is4.OnDesktop.Is12.OnMobile">
+                <Button Color="Color.Success" Clicked="@(()=>OnBulkApply())">Apply For All</Button>
+                <Button Color="Color.Link" Clicked="@(()=>OnClear())">Clear</Button>
+            </Field>
+
+        </Fields>
+        <DataGrid @ref="@dataGridRef"
+                  TItem="BulkUpdateAtmViewModel"
+        @bind-SelectedRow="@selectedAtm"
+                  Data="@filteredAtms"
+                    Editable
+                   EditMode="DataGridEditMode.Inline"
+                    ShowPager
+                   PageSize="50"
+                   FixedHeaderDataGridHeight="570px"
+                   FixedHeaderDataGridMaxHeight="570px"
+                   Responsive="true"
+                    Bordered
+                    FixedHeader
+                   Narrow="true"
+                    Sortable SortMode="DataGridSortMode.Single"
+                    Resizable
+                   HeaderThemeContrast="@ThemeContrast.Light">
+
+             <DataGridColumns>
+                 
+                 <DataGridColumn Field="@nameof(BulkUpdateAtmViewModel.Title)" Caption="Title" />
+                 <DataGridNumericColumn Field="@nameof(BulkUpdateAtmViewModel.MinOperatingBalance)" Caption="Min Operating Balance" Editable />
+                 <DataGridNumericColumn Field="@nameof(BulkUpdateAtmViewModel.OutOfCashThreshold)" Caption="Out Of Cash Threshold" Editable />
+                 <DataGridCommandColumn NewCommandAllowed="false" EditCommandAllowed="false" DeleteCommandAllowed="false" CancelCommandAllowed>
+                 <SaveCommandTemplate>
+                     <Button ElementId="btnSave" Type="ButtonType.Submit" PreventDefaultOnSubmit Color="Color.Primary" Clicked="@context.Clicked">Update</Button>
+                     </SaveCommandTemplate>
+                     <CancelCommandTemplate>
+                         <Button ElementId="btnCancel" Color="Color.Secondary" Clicked="@context.Clicked">@context.LocalizationString</Button>
+                     </CancelCommandTemplate>
+                 </DataGridCommandColumn>
+             </DataGridColumns>
+             <ButtonRowTemplate>
+                 <Button Color="Color.Primary" Disabled="(selectedAtm is null)" Clicked="context.EditCommand.Clicked">Edit Selected</Button>
+                 <Button Color="Color.Success" Clicked="@(()=>onBulkSave())">Save Changes</Button>
+
+             </ButtonRowTemplate>
+         </DataGrid>
+    }
+
+</div>
+
+<style>
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        margin-top: 20px;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    .modal-body {
+        max-height: 75vh;
+        overflow-y: auto;
+    }
+
+
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    /* .all_headers_form {
+                                    margin-left: 12px;
+                                    padding: 5px;
+                                }
+                            */
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+</style>
+
+@code {
+
+    private bool showSpinner = true;
+    private bool showGrid = false;
+    private bool IsDisabled = false;
+    private List<BulkUpdateAtmViewModel> atms = new();
+    private List<BulkUpdateAtmViewModel> filteredAtms = new();
+    private BulkUpdateAtmViewModel? selectedAtm;
+    private DataGrid<BulkUpdateAtmViewModel>? dataGridRef;
+    private long? selectedTreeRegion;
+    private List<long>? selectedTreeAtm;
+    private List<long>? selectedTreeRegionHierarchy;
+    private EView360Models.Core.AppUser appUser;
+    private int? bulkMinOperatingBalance;
+    private int? bulkOutOfCashThreshold;
+
+    [Inject] INotificationService NotificationService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            showSpinner = true;
+            showGrid = false;
+            appUser = await localStorage.GetItemAsync<EView360Models.Core.AppUser>("AppUser");
+            service.userId = appUser.UserId;
+            notifyService.OnAtmChange += AtmSelected;
+            notifyService.OnRegionChange += RegionSelected;
+            selectedTreeRegion = await atmRepository.GetSelectedRegionId();
+            if ((atms is null || atms.Count == 0))
+            {
+                await LoadData();
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at AtmSetup, OnAfterRenderAsync as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    private async void AtmSelected()
+    {
+        await InvokeAsync(async () =>
+        {
+            selectedTreeAtm = await atmRepository.GetSelectedAtmId();
+            selectedTreeRegion = (await atmRepository.GetSelectedAtmParentId())?.FirstOrDefault();
+            filteredAtms = atms;
+            filteredAtms = filteredAtms.Where(x => selectedTreeAtm.Contains(x.AtmId)).ToList();
+            await this.InvokeAsync(() => this.StateHasChanged());
+        });
+    }
+
+    private async void RegionSelected()
+    {
+        await InvokeAsync(async () =>
+        {
+            selectedTreeAtm = await atmRepository.GetSelectedAtmId();
+            selectedTreeRegion = await atmRepository.GetSelectedRegionId();
+            selectedTreeRegionHierarchy = await atmRepository.GetSelectedRegionIdWithAllChildRegions();
+            filteredAtms = atms;
+            filteredAtms = filteredAtms.Where(x => selectedTreeRegionHierarchy.Contains((long)x.RegionId)).ToList();
+            await this.InvokeAsync(() => this.StateHasChanged());
+        });
+    }
+
+    async Task OnClear()
+    {
+        bulkMinOperatingBalance = bulkOutOfCashThreshold = null;
+    }
+
+    async Task OnBulkApply()
+    {
+        if (bulkMinOperatingBalance != null)
+            filteredAtms.ForEach(x => { x.MinOperatingBalance = bulkMinOperatingBalance.Value; });
+        if (bulkOutOfCashThreshold != null)
+            filteredAtms.ForEach(x => { x.OutOfCashThreshold = bulkOutOfCashThreshold.Value; });
+    }
+
+    async Task onBulkSave()
+    {
+        await service.BulkUpdateAtm(filteredAtms);
+    }
+    private async void FilterSubmit()
+    {
+        showSpinner = IsDisabled = true;
+        showGrid = false;
+
+        filteredAtms = atms;
+
+
+        //filter on already selected Atms on tree
+        selectedTreeAtm = await atmRepository.GetSelectedAtmId();
+        selectedTreeRegionHierarchy = await atmRepository.GetSelectedRegionIdWithAllChildRegions();
+        if (selectedTreeAtm != null)
+        {
+            //Single atm already selected on tree
+            if (selectedTreeAtm.Count == 1)
+                filteredAtms = filteredAtms.Where(x => selectedTreeAtm.Contains(x.AtmId)).ToList();
+
+            //Region already selected on tree
+            else if (selectedTreeRegionHierarchy != null && selectedTreeRegionHierarchy.Count != 0)
+                filteredAtms = filteredAtms.Where(x => selectedTreeRegionHierarchy.Contains((long)x.RegionId)).ToList();
+        }
+
+        showGrid = true;
+        showSpinner = IsDisabled = false;
+        await this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private async Task LoadData()
+    {
+        showSpinner = IsDisabled = true;
+        showGrid = false;
+
+        logger.LogWarning($"[AtmSetupPage:LoadData] going in GetAtmFieldByUserId ");
+        atms = filteredAtms = await service.GetAtmFieldByUserId();
+        logger.LogWarning($"[AtmSetupPage:LoadData] returning from GetAtmFieldByUserId ");
+
+        FilterSubmit(); //to filter for selected Atms if selections already on tree before loading Atms
+
+        if (atms is null || atms.Count == 0)
+        {
+            await NotificationService.Info("No records found", "Information", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    public void Dispose()
+    {
+        notifyService.OnAtmChange -= AtmSelected;
+        notifyService.OnRegionChange -= RegionSelected;
+    }
+}

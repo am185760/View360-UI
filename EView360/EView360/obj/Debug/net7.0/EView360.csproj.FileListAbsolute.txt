@@ -1,0 +1,666 @@
+C:\View360 Repo\EView360\EView360\obj\Debug\net7.0\EView360.csproj.AssemblyReference.cache
+C:\View360 Repo\EView360\EView360\obj\Debug\net7.0\EView360.GeneratedMSBuildEditorConfig.editorconfig
+C:\View360 Repo\EView360\EView360\obj\Debug\net7.0\EView360.AssemblyInfoInputs.cache
+C:\View360 Repo\EView360\EView360\obj\Debug\net7.0\EView360.AssemblyInfo.cs
+C:\View360 Repo\EView360\EView360\obj\Debug\net7.0\EView360.csproj.CoreCompileInputs.cache
+C:\View360 Repo\EView360\EView360\obj\Debug\net7.0\EView360.MvcApplicationPartsAssemblyInfo.cache
+C:\View360 Repo\EView360\EView360\obj\Debug\net7.0\EView360.RazorAssemblyInfo.cache
+C:\View360 Repo\EView360\EView360\obj\Debug\net7.0\EView360.RazorAssemblyInfo.cs
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\web.config
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\appsettings.Development.json
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\appsettings.json
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\EView360.staticwebassets.runtime.json
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\EView360.exe
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\EView360.deps.json
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\EView360.runtimeconfig.json
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\EView360.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\EView360.pdb
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Azure.Core.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Azure.Identity.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\BitMiracle.LibTiff.NET.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Blazored.LocalStorage.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Blazored.SessionStorage.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Blazored.SessionStorage.TestExtensions.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Blazorise.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Blazorise.Bootstrap.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Blazorise.Charts.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Blazorise.Components.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Blazorise.DataGrid.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Blazorise.Icons.FontAwesome.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Blazorise.LoadingIndicator.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Blazorise.Snackbar.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Bunit.Core.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\ClosedXML.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\DocumentFormat.OpenXml.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Enums.NET.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\EPPlus.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\EPPlus.Interfaces.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\EPPlus.System.Drawing.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\ExcelNumberFormat.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\IronSoftware.Drawing.Common.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\SixLabors.Fonts.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\SixLabors.ImageSharp.Drawing.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\IronXL.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Irony.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\itextsharp.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Lambda2Js.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\MathNet.Numerics.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.Authorization.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.Components.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.Components.Forms.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.Components.Web.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.Connections.Abstractions.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.Http.Connections.Client.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.Http.Connections.Common.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.Metadata.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.SignalR.Client.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.SignalR.Client.Core.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.SignalR.Common.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.SignalR.Protocols.Json.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.Bcl.AsyncInterfaces.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.Data.SqlClient.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.Relational.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.SqlServer.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.Extensions.Caching.StackExchangeRedis.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.Extensions.Features.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.Extensions.Logging.Abstractions.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.Extensions.Options.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.Identity.Client.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.Identity.Client.Extensions.Msal.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.IdentityModel.Abstractions.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.IdentityModel.Logging.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.IdentityModel.Protocols.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.IdentityModel.Tokens.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.IO.RecyclableMemoryStream.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.JSInterop.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.SqlServer.Server.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.Win32.SystemEvents.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Newtonsoft.Json.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\NPOI.OOXML.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\NPOI.OpenXml4Net.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\NPOI.OpenXmlFormats.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\NPOI.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Pipelines.Sockets.Unofficial.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\BouncyCastle.Crypto.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Serilog.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Serilog.Extensions.Logging.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Serilog.Extensions.Logging.File.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Serilog.Formatting.Compact.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Serilog.Sinks.Async.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Serilog.Sinks.File.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Serilog.Sinks.RollingFile.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\ICSharpCode.SharpZipLib.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\SixLabors.ImageSharp.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\StackExchange.Redis.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\System.Configuration.ConfigurationManager.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\System.Data.SqlClient.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\System.Diagnostics.PerformanceCounter.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\System.DirectoryServices.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\System.DirectoryServices.AccountManagement.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\System.DirectoryServices.Protocols.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\System.Drawing.Common.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\System.IdentityModel.Tokens.Jwt.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\System.IO.Packaging.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\System.Memory.Data.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\System.Runtime.Caching.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\System.Security.Cryptography.ProtectedData.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\System.Security.Permissions.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\System.Windows.Extensions.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\XLParser.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\unix\lib\netcoreapp3.1\Microsoft.Data.SqlClient.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\netcoreapp3.1\Microsoft.Data.SqlClient.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win-arm\native\Microsoft.Data.SqlClient.SNI.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\net7.0\Microsoft.Win32.SystemEvents.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win-arm64\native\sni.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win-x64\native\sni.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win-x86\native\sni.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\unix\lib\netcoreapp2.1\System.Data.SqlClient.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\netcoreapp2.0\System.Diagnostics.PerformanceCounter.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.DirectoryServices.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.DirectoryServices.AccountManagement.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\linux\lib\net7.0\System.DirectoryServices.Protocols.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\osx\lib\net7.0\System.DirectoryServices.Protocols.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.DirectoryServices.Protocols.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.Drawing.Common.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\netstandard2.0\System.Runtime.Caching.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.Security.Cryptography.ProtectedData.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.Windows.Extensions.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\ceTe.DynamicPDF.20.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Common.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Data Requestor.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\DataRequestorMiddleware.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Encryption.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\EView360Models.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Data Requestor.pdb
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Data Requestor.dll.config
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\EView360Models.pdb
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Common.pdb
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\DataRequestorMiddleware.pdb
+C:\View360 Repo\EView360\EView360\obj\Debug\net7.0\staticwebassets\msbuild.EView360.Microsoft.AspNetCore.StaticWebAssets.props
+C:\View360 Repo\EView360\EView360\obj\Debug\net7.0\staticwebassets\msbuild.build.EView360.props
+C:\View360 Repo\EView360\EView360\obj\Debug\net7.0\staticwebassets\msbuild.buildMultiTargeting.EView360.props
+C:\View360 Repo\EView360\EView360\obj\Debug\net7.0\staticwebassets\msbuild.buildTransitive.EView360.props
+C:\View360 Repo\EView360\EView360\obj\Debug\net7.0\staticwebassets.pack.json
+C:\View360 Repo\EView360\EView360\obj\Debug\net7.0\staticwebassets.build.json
+C:\View360 Repo\EView360\EView360\obj\Debug\net7.0\staticwebassets.development.json
+C:\View360 Repo\EView360\EView360\obj\Debug\net7.0\scopedcss\Shared\MainLayout.razor.rz.scp.css
+C:\View360 Repo\EView360\EView360\obj\Debug\net7.0\scopedcss\Shared\NavMenu.razor.rz.scp.css
+C:\View360 Repo\EView360\EView360\obj\Debug\net7.0\scopedcss\bundle\EView360.styles.css
+C:\View360 Repo\EView360\EView360\obj\Debug\net7.0\scopedcss\projectbundle\EView360.bundle.scp.css
+C:\View360 Repo\EView360\EView360\obj\Debug\net7.0\EView360.csproj.CopyComplete
+C:\View360 Repo\EView360\EView360\obj\Debug\net7.0\EView360.dll
+C:\View360 Repo\EView360\EView360\obj\Debug\net7.0\refint\EView360.dll
+C:\View360 Repo\EView360\EView360\obj\Debug\net7.0\EView360.pdb
+C:\View360 Repo\EView360\EView360\obj\Debug\net7.0\EView360.genruntimeconfig.cache
+C:\View360 Repo\EView360\EView360\obj\Debug\net7.0\ref\EView360.dll
+C:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Interop.LicenseVerifierLib.dll
+D:\View360 Repo\EView360\EView360\obj\Debug\net7.0\EView360.csproj.AssemblyReference.cache
+D:\View360 Repo\EView360\EView360\obj\Debug\net7.0\rpswa.dswa.cache.json
+D:\View360 Repo\EView360\EView360\obj\Debug\net7.0\EView360.GeneratedMSBuildEditorConfig.editorconfig
+D:\View360 Repo\EView360\EView360\obj\Debug\net7.0\EView360.AssemblyInfoInputs.cache
+D:\View360 Repo\EView360\EView360\obj\Debug\net7.0\EView360.AssemblyInfo.cs
+D:\View360 Repo\EView360\EView360\obj\Debug\net7.0\EView360.csproj.CoreCompileInputs.cache
+D:\View360 Repo\EView360\EView360\obj\Debug\net7.0\EView360.MvcApplicationPartsAssemblyInfo.cache
+D:\View360 Repo\EView360\EView360\obj\Debug\net7.0\EView360.RazorAssemblyInfo.cache
+D:\View360 Repo\EView360\EView360\obj\Debug\net7.0\EView360.RazorAssemblyInfo.cs
+D:\View360 Repo\EView360\EView360\obj\Debug\net7.0\EView360.sourcelink.json
+D:\View360 Repo\EView360\EView360\obj\Debug\net7.0\EView360.dll
+D:\View360 Repo\EView360\EView360\obj\Debug\net7.0\refint\EView360.dll
+D:\View360 Repo\EView360\EView360\obj\Debug\net7.0\EView360.pdb
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\appsettings.Development.json
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\appsettings.json
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\web.config
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\EView360.staticwebassets.runtime.json
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\EView360.staticwebassets.endpoints.json
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\EView360.exe
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\EView360.deps.json
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\EView360.runtimeconfig.json
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\EView360.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\EView360.pdb
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Azure.Core.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Azure.Identity.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\BitMiracle.LibTiff.NET.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Blazored.LocalStorage.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Blazored.SessionStorage.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Blazored.SessionStorage.TestExtensions.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Blazorise.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Blazorise.Bootstrap.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Blazorise.Charts.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Blazorise.Components.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Blazorise.DataGrid.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Blazorise.Icons.FontAwesome.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Blazorise.LoadingIndicator.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Blazorise.Snackbar.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Bunit.Core.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\ClosedXML.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\DocumentFormat.OpenXml.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Enums.NET.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\EPPlus.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\EPPlus.Interfaces.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\EPPlus.System.Drawing.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\ExcelNumberFormat.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\IronSoftware.Drawing.Common.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\SixLabors.Fonts.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\SixLabors.ImageSharp.Drawing.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\IronXL.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Irony.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\itextsharp.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Lambda2Js.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\MathNet.Numerics.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.Authorization.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.Components.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.Components.Forms.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.Components.Web.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.Connections.Abstractions.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.Http.Connections.Client.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.Http.Connections.Common.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.Metadata.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.SignalR.Client.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.SignalR.Client.Core.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.SignalR.Common.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.SignalR.Protocols.Json.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.Bcl.AsyncInterfaces.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.Data.SqlClient.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.Relational.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.SqlServer.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.Extensions.Caching.StackExchangeRedis.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.Extensions.Features.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.Extensions.Logging.Abstractions.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.Extensions.Options.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.Identity.Client.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.Identity.Client.Extensions.Msal.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.IdentityModel.Abstractions.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.IdentityModel.JsonWebTokens.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.IdentityModel.Logging.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.IdentityModel.Protocols.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.IdentityModel.Tokens.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.IO.RecyclableMemoryStream.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.JSInterop.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.SqlServer.Server.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Microsoft.Win32.SystemEvents.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Newtonsoft.Json.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\NPOI.OOXML.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\NPOI.OpenXml4Net.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\NPOI.OpenXmlFormats.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\NPOI.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Pipelines.Sockets.Unofficial.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\BouncyCastle.Crypto.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Serilog.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Serilog.Extensions.Logging.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Serilog.Extensions.Logging.File.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Serilog.Formatting.Compact.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Serilog.Sinks.Async.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Serilog.Sinks.File.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Serilog.Sinks.RollingFile.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\ICSharpCode.SharpZipLib.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\SixLabors.ImageSharp.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\StackExchange.Redis.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\System.Configuration.ConfigurationManager.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\System.Data.SqlClient.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\System.Diagnostics.PerformanceCounter.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\System.DirectoryServices.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\System.DirectoryServices.AccountManagement.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\System.DirectoryServices.Protocols.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\System.Drawing.Common.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\System.IdentityModel.Tokens.Jwt.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\System.IO.Packaging.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\System.Memory.Data.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\System.Runtime.Caching.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\System.Security.Cryptography.ProtectedData.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\System.Security.Permissions.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\System.Windows.Extensions.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\XLParser.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\unix\lib\netcoreapp3.1\Microsoft.Data.SqlClient.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\netcoreapp3.1\Microsoft.Data.SqlClient.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win-arm\native\Microsoft.Data.SqlClient.SNI.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\net7.0\Microsoft.Win32.SystemEvents.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win-arm64\native\sni.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win-x64\native\sni.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win-x86\native\sni.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\unix\lib\netcoreapp2.1\System.Data.SqlClient.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\netcoreapp2.0\System.Diagnostics.PerformanceCounter.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.DirectoryServices.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.DirectoryServices.AccountManagement.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\linux\lib\net7.0\System.DirectoryServices.Protocols.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\osx\lib\net7.0\System.DirectoryServices.Protocols.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.DirectoryServices.Protocols.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.Drawing.Common.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\netstandard2.0\System.Runtime.Caching.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.Security.Cryptography.ProtectedData.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.Windows.Extensions.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\ceTe.DynamicPDF.20.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Common.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Data Requestor.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\DataRequestorMiddleware.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Encryption.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\EView360Models.dll
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Data Requestor.pdb
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Data Requestor.dll.config
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\EView360Models.pdb
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\Common.pdb
+D:\View360 Repo\EView360\EView360\bin\Debug\net7.0\DataRequestorMiddleware.pdb
+D:\View360 Repo\EView360\EView360\obj\Debug\net7.0\rjimswa.dswa.cache.json
+D:\View360 Repo\EView360\EView360\obj\Debug\net7.0\rjsmrazor.dswa.cache.json
+D:\View360 Repo\EView360\EView360\obj\Debug\net7.0\rjsmcshtml.dswa.cache.json
+D:\View360 Repo\EView360\EView360\obj\Debug\net7.0\scopedcss\Shared\MainLayout.razor.rz.scp.css
+D:\View360 Repo\EView360\EView360\obj\Debug\net7.0\scopedcss\Shared\NavMenu.razor.rz.scp.css
+D:\View360 Repo\EView360\EView360\obj\Debug\net7.0\scopedcss\bundle\EView360.styles.css
+D:\View360 Repo\EView360\EView360\obj\Debug\net7.0\scopedcss\projectbundle\EView360.bundle.scp.css
+D:\View360 Repo\EView360\EView360\obj\Debug\net7.0\staticwebassets.build.json
+D:\View360 Repo\EView360\EView360\obj\Debug\net7.0\staticwebassets.build.json.cache
+D:\View360 Repo\EView360\EView360\obj\Debug\net7.0\staticwebassets.development.json
+D:\View360 Repo\EView360\EView360\obj\Debug\net7.0\staticwebassets.build.endpoints.json
+D:\View360 Repo\EView360\EView360\obj\Debug\net7.0\staticwebassets.upToDateCheck.txt
+D:\View360 Repo\EView360\EView360\obj\Debug\net7.0\EView360.csproj.Up2Date
+D:\View360 Repo\EView360\EView360\obj\Debug\net7.0\EView360.genruntimeconfig.cache
+D:\View360 Repo\EView360\EView360\obj\Debug\net7.0\ref\EView360.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\obj\Debug\net7.0\EView360.csproj.AssemblyReference.cache
+D:\View360\Repository - View360 Depart\EView360\EView360\obj\Debug\net7.0\rpswa.dswa.cache.json
+D:\View360\Repository - View360 Depart\EView360\EView360\obj\Debug\net7.0\EView360.GeneratedMSBuildEditorConfig.editorconfig
+D:\View360\Repository - View360 Depart\EView360\EView360\obj\Debug\net7.0\EView360.AssemblyInfoInputs.cache
+D:\View360\Repository - View360 Depart\EView360\EView360\obj\Debug\net7.0\EView360.AssemblyInfo.cs
+D:\View360\Repository - View360 Depart\EView360\EView360\obj\Debug\net7.0\EView360.csproj.CoreCompileInputs.cache
+D:\View360\Repository - View360 Depart\EView360\EView360\obj\Debug\net7.0\EView360.MvcApplicationPartsAssemblyInfo.cache
+D:\View360\Repository - View360 Depart\EView360\EView360\obj\Debug\net7.0\EView360.RazorAssemblyInfo.cache
+D:\View360\Repository - View360 Depart\EView360\EView360\obj\Debug\net7.0\EView360.RazorAssemblyInfo.cs
+D:\View360\Repository - View360 Depart\EView360\EView360\obj\Debug\net7.0\EView360.sourcelink.json
+D:\View360\Repository - View360 Depart\EView360\EView360\obj\Debug\net7.0\EView360.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\obj\Debug\net7.0\refint\EView360.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\obj\Debug\net7.0\EView360.pdb
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\web.config
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\appsettings.Development.json
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\appsettings.json
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\EView360.staticwebassets.runtime.json
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\EView360.staticwebassets.endpoints.json
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\EView360.exe
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\EView360.deps.json
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\EView360.runtimeconfig.json
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\EView360.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\EView360.pdb
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Azure.Core.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Azure.Identity.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\BitMiracle.LibTiff.NET.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Blazored.LocalStorage.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Blazored.SessionStorage.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Blazored.SessionStorage.TestExtensions.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Blazorise.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Blazorise.Bootstrap.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Blazorise.Charts.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Blazorise.Components.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Blazorise.DataGrid.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Blazorise.Icons.FontAwesome.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Blazorise.LoadingIndicator.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Blazorise.Snackbar.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Bunit.Core.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\ClosedXML.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\DocumentFormat.OpenXml.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Enums.NET.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\EPPlus.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\EPPlus.Interfaces.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\EPPlus.System.Drawing.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\ExcelNumberFormat.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\IronSoftware.Drawing.Common.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\SixLabors.Fonts.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\SixLabors.ImageSharp.Drawing.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\IronXL.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Irony.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\itextsharp.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Lambda2Js.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\MathNet.Numerics.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.Authorization.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.Components.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.Components.Forms.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.Components.Web.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.Connections.Abstractions.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.Http.Connections.Client.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.Http.Connections.Common.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.Metadata.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.SignalR.Client.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.SignalR.Client.Core.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.SignalR.Common.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.SignalR.Protocols.Json.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.Bcl.AsyncInterfaces.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.Data.SqlClient.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.Relational.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.SqlServer.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.Extensions.Caching.StackExchangeRedis.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.Extensions.Features.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.Extensions.Logging.Abstractions.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.Extensions.Options.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.Identity.Client.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.Identity.Client.Extensions.Msal.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.IdentityModel.Abstractions.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.IdentityModel.JsonWebTokens.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.IdentityModel.Logging.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.IdentityModel.Protocols.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.IdentityModel.Tokens.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.IO.RecyclableMemoryStream.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.JSInterop.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.SqlServer.Server.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Microsoft.Win32.SystemEvents.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Newtonsoft.Json.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\NPOI.OOXML.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\NPOI.OpenXml4Net.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\NPOI.OpenXmlFormats.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\NPOI.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Pipelines.Sockets.Unofficial.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\BouncyCastle.Crypto.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Serilog.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Serilog.Extensions.Logging.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Serilog.Extensions.Logging.File.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Serilog.Formatting.Compact.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Serilog.Sinks.Async.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Serilog.Sinks.File.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Serilog.Sinks.RollingFile.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\ICSharpCode.SharpZipLib.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\SixLabors.ImageSharp.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\StackExchange.Redis.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\System.Configuration.ConfigurationManager.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\System.Data.SqlClient.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\System.Diagnostics.PerformanceCounter.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\System.DirectoryServices.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\System.DirectoryServices.AccountManagement.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\System.DirectoryServices.Protocols.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\System.Drawing.Common.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\System.IdentityModel.Tokens.Jwt.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\System.IO.Packaging.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\System.Memory.Data.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\System.Runtime.Caching.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\System.Security.Cryptography.ProtectedData.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\System.Security.Permissions.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\System.Windows.Extensions.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\XLParser.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\runtimes\unix\lib\netcoreapp3.1\Microsoft.Data.SqlClient.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\netcoreapp3.1\Microsoft.Data.SqlClient.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\runtimes\win-arm\native\Microsoft.Data.SqlClient.SNI.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\net7.0\Microsoft.Win32.SystemEvents.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\runtimes\win-arm64\native\sni.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\runtimes\win-x64\native\sni.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\runtimes\win-x86\native\sni.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\runtimes\unix\lib\netcoreapp2.1\System.Data.SqlClient.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\netcoreapp2.0\System.Diagnostics.PerformanceCounter.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.DirectoryServices.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.DirectoryServices.AccountManagement.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\runtimes\linux\lib\net7.0\System.DirectoryServices.Protocols.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\runtimes\osx\lib\net7.0\System.DirectoryServices.Protocols.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.DirectoryServices.Protocols.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.Drawing.Common.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\netstandard2.0\System.Runtime.Caching.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.Security.Cryptography.ProtectedData.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.Windows.Extensions.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\ceTe.DynamicPDF.20.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Common.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Data Requestor.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\DataRequestorMiddleware.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Encryption.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\EView360Models.dll
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Data Requestor.pdb
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Data Requestor.dll.config
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\EView360Models.pdb
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Common.pdb
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\DataRequestorMiddleware.pdb
+D:\View360\Repository - View360 Depart\EView360\EView360\bin\Debug\net7.0\Encryption.pdb
+D:\View360\Repository - View360 Depart\EView360\EView360\obj\Debug\net7.0\rjimswa.dswa.cache.json
+D:\View360\Repository - View360 Depart\EView360\EView360\obj\Debug\net7.0\rjsmrazor.dswa.cache.json
+D:\View360\Repository - View360 Depart\EView360\EView360\obj\Debug\net7.0\rjsmcshtml.dswa.cache.json
+D:\View360\Repository - View360 Depart\EView360\EView360\obj\Debug\net7.0\scopedcss\Shared\MainLayout.razor.rz.scp.css
+D:\View360\Repository - View360 Depart\EView360\EView360\obj\Debug\net7.0\scopedcss\Shared\NavMenu.razor.rz.scp.css
+D:\View360\Repository - View360 Depart\EView360\EView360\obj\Debug\net7.0\scopedcss\bundle\EView360.styles.css
+D:\View360\Repository - View360 Depart\EView360\EView360\obj\Debug\net7.0\scopedcss\projectbundle\EView360.bundle.scp.css
+D:\View360\Repository - View360 Depart\EView360\EView360\obj\Debug\net7.0\staticwebassets.build.json
+D:\View360\Repository - View360 Depart\EView360\EView360\obj\Debug\net7.0\staticwebassets.build.json.cache
+D:\View360\Repository - View360 Depart\EView360\EView360\obj\Debug\net7.0\staticwebassets.development.json
+D:\View360\Repository - View360 Depart\EView360\EView360\obj\Debug\net7.0\staticwebassets.build.endpoints.json
+D:\View360\Repository - View360 Depart\EView360\EView360\obj\Debug\net7.0\staticwebassets.upToDateCheck.txt
+D:\View360\Repository - View360 Depart\EView360\EView360\obj\Debug\net7.0\EView360.csproj.Up2Date
+D:\View360\Repository - View360 Depart\EView360\EView360\obj\Debug\net7.0\EView360.genruntimeconfig.cache
+D:\View360\Repository - View360 Depart\EView360\EView360\obj\Debug\net7.0\ref\EView360.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\web.config
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\appsettings.Development.json
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\appsettings.json
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\EView360.staticwebassets.runtime.json
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\EView360.staticwebassets.endpoints.json
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\EView360.exe
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\EView360.deps.json
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\EView360.runtimeconfig.json
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\EView360.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\EView360.pdb
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Azure.Core.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Azure.Identity.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\BitMiracle.LibTiff.NET.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Blazored.LocalStorage.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Blazored.SessionStorage.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Blazored.SessionStorage.TestExtensions.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Blazorise.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Blazorise.Bootstrap.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Blazorise.Charts.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Blazorise.Components.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Blazorise.DataGrid.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Blazorise.Icons.FontAwesome.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Blazorise.LoadingIndicator.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Blazorise.Snackbar.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Bunit.Core.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\ClosedXML.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\DocumentFormat.OpenXml.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Enums.NET.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\EPPlus.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\EPPlus.Interfaces.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\EPPlus.System.Drawing.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\ExcelNumberFormat.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\IronSoftware.Drawing.Common.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\SixLabors.Fonts.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\SixLabors.ImageSharp.Drawing.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\IronXL.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Irony.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\itextsharp.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Lambda2Js.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\MathNet.Numerics.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.Authorization.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.Components.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.Components.Forms.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.Components.Web.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.Connections.Abstractions.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.Http.Connections.Client.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.Http.Connections.Common.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.Metadata.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.SignalR.Client.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.SignalR.Client.Core.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.SignalR.Common.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.AspNetCore.SignalR.Protocols.Json.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.Bcl.AsyncInterfaces.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.Data.SqlClient.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.Relational.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.SqlServer.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.Extensions.Caching.StackExchangeRedis.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.Extensions.Features.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.Extensions.Logging.Abstractions.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.Extensions.Options.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.Identity.Client.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.Identity.Client.Extensions.Msal.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.IdentityModel.Abstractions.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.IdentityModel.JsonWebTokens.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.IdentityModel.Logging.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.IdentityModel.Protocols.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.IdentityModel.Tokens.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.IO.RecyclableMemoryStream.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.JSInterop.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.SqlServer.Server.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Microsoft.Win32.SystemEvents.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Newtonsoft.Json.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\NPOI.OOXML.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\NPOI.OpenXml4Net.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\NPOI.OpenXmlFormats.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\NPOI.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Pipelines.Sockets.Unofficial.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\BouncyCastle.Crypto.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Serilog.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Serilog.Extensions.Logging.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Serilog.Extensions.Logging.File.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Serilog.Formatting.Compact.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Serilog.Sinks.Async.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Serilog.Sinks.File.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Serilog.Sinks.RollingFile.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\ICSharpCode.SharpZipLib.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\SixLabors.ImageSharp.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\StackExchange.Redis.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\System.Configuration.ConfigurationManager.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\System.Data.SqlClient.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\System.Diagnostics.PerformanceCounter.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\System.DirectoryServices.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\System.DirectoryServices.AccountManagement.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\System.DirectoryServices.Protocols.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\System.Drawing.Common.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\System.IdentityModel.Tokens.Jwt.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\System.IO.Packaging.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\System.Memory.Data.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\System.Runtime.Caching.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\System.Security.Cryptography.ProtectedData.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\System.Security.Permissions.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\System.Windows.Extensions.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\XLParser.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\runtimes\unix\lib\netcoreapp3.1\Microsoft.Data.SqlClient.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\netcoreapp3.1\Microsoft.Data.SqlClient.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\runtimes\win-arm\native\Microsoft.Data.SqlClient.SNI.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\net7.0\Microsoft.Win32.SystemEvents.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\runtimes\win-arm64\native\sni.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\runtimes\win-x64\native\sni.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\runtimes\win-x86\native\sni.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\runtimes\unix\lib\netcoreapp2.1\System.Data.SqlClient.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\netcoreapp2.0\System.Diagnostics.PerformanceCounter.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.DirectoryServices.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.DirectoryServices.AccountManagement.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\runtimes\linux\lib\net7.0\System.DirectoryServices.Protocols.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\runtimes\osx\lib\net7.0\System.DirectoryServices.Protocols.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.DirectoryServices.Protocols.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.Drawing.Common.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\netstandard2.0\System.Runtime.Caching.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.Security.Cryptography.ProtectedData.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.Windows.Extensions.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\ceTe.DynamicPDF.20.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Common.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Data Requestor.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\DataRequestorMiddleware.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Encryption.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\EView360Models.dll
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Data Requestor.pdb
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Data Requestor.dll.config
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\EView360Models.pdb
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Common.pdb
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\DataRequestorMiddleware.pdb
+D:\View360\View360-UI\EView360\EView360\bin\Debug\net7.0\Encryption.pdb
+D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\EView360.csproj.AssemblyReference.cache
+D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\rpswa.dswa.cache.json
+D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\EView360.GeneratedMSBuildEditorConfig.editorconfig
+D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\EView360.AssemblyInfoInputs.cache
+D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\EView360.AssemblyInfo.cs
+D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\EView360.csproj.CoreCompileInputs.cache
+D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\EView360.MvcApplicationPartsAssemblyInfo.cache
+D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\EView360.RazorAssemblyInfo.cache
+D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\EView360.RazorAssemblyInfo.cs
+D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\rjimswa.dswa.cache.json
+D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\rjsmrazor.dswa.cache.json
+D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\rjsmcshtml.dswa.cache.json
+D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\scopedcss\Shared\MainLayout.razor.rz.scp.css
+D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\scopedcss\Shared\NavMenu.razor.rz.scp.css
+D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\scopedcss\bundle\EView360.styles.css
+D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\scopedcss\projectbundle\EView360.bundle.scp.css
+D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\staticwebassets.build.json
+D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\staticwebassets.build.json.cache
+D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\staticwebassets.development.json
+D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\staticwebassets.build.endpoints.json
+D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\staticwebassets.upToDateCheck.txt
+D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\EView360.csproj.Up2Date
+D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\EView360.dll
+D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\refint\EView360.dll
+D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\EView360.pdb
+D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\EView360.genruntimeconfig.cache
+D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\ref\EView360.dll

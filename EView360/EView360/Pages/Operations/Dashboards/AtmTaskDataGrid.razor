@@ -1,0 +1,116 @@
+﻿@page "/AtmTaskDataGrid"
+@page "/AtmTaskDataGrid/{NoteSetTypeId}"
+@page "/AtmTaskDataGrid/{NoteSetTypeId}/{ArchiveYear}"
+@page "/AtmTaskDataGrid/{NoteSetTypeId}/{ArchiveYear}/{IsRegion:bool}/{FilterValues}"
+
+@layout EmptyLayout
+@using DataRequestor;
+@using EView360.Services.Operations.DashBoard;
+@using EView360.Common;
+@using EView360Models.Core;
+@using EView360Models.RequestModel;
+@using EView360Models.ViewModels;
+@using static EView360.Common.Constants;
+@inject AtmTaskDashboardService service
+@inject ILogger<AtmTaskDataGrid> logger
+@inject NavigationManager NavigationManager
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject IJSRuntime jsRuntime
+@inject CommonServices commonService
+
+@implements IDisposable
+
+<html>
+<head>
+    <!-- 'title' tag with content of 'Home' -->
+    <title>Atm Task Dashboard - Total No. of Records = @atmTaskViews?.Count  -  Data Generated At: @refreshCurrentTime - Next Refresh Countdown: @counter</title>
+</head>
+
+<body>
+    <div class="row content">
+        @if (showSpinner)
+        {
+            <div class="spinner spinner_Dashboard" style="z-index:4"></div>
+        }
+        <div class="col-sm-12 only-col text-left">
+
+            @if (showGrid)
+            {
+                 <DataGrid TItem="AtmTaskViewModel"
+                      Data="@_atmTaskViews"
+                      ReadData="@OnReadData"                      
+                      TotalItems="@atmTaskViews?.Count"
+                      Responsive
+                      Bordered
+                      Narrow="true"
+                      HeaderThemeContrast="@ThemeContrast.Light"
+                      FixedHeader
+                      SortMode="DataGridSortMode.Single"
+                      SortChanged="SortData"
+                      Virtualize
+                      VirtualizeOptions="@(new() { DataGridMaxHeight = "735px", DataGridHeight="735px"})">
+
+                    <DataGridColumn Field="@nameof(AtmTaskViewModel.AtmTitle)" Caption="Title" />
+                    <DataGridColumn Field="@nameof(AtmTaskViewModel.AtmType)" Caption="Type" />
+                    <DataGridColumn Field="@nameof(AtmTaskViewModel.CreationTime)" Caption="Creation Time" SortDirection="SortDirection.Descending" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" />
+                    <DataGridColumn Field="@nameof(AtmTaskViewModel.Status)" Caption="Status" />
+                    <DataGridColumn Field="@nameof(AtmTaskViewModel.FileTypeTitle)" Caption="File Type" />
+                    <DataGridColumn Field="@nameof(AtmTaskViewModel.TaskTypeName)" Caption="Task Type" />
+                    <DataGridColumn Field="@nameof(AtmTaskViewModel.LastInvoked)" Caption="Last Invoked" SortDirection="SortDirection.Descending" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" />
+                    <DataGridColumn Field="@nameof(AtmTaskViewModel.EndTime)" Caption="End Time" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" />
+                    <DataGridNumericColumn Field="@nameof(AtmTaskViewModel.RetryRemaining)" Caption="Retry" />
+                    <DataGridColumn Field="@nameof(AtmTaskViewModel.FailureReason)" Caption="Reason" />
+                </DataGrid> 
+              
+            }
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+<style>
+
+    .only-col {
+        padding-right: 0px !important;
+        padding-left: 0px !important;
+    }
+    .table-primary .showAnimation {
+        animation: spin 1200ms linear infinite;
+    }
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        width: 170px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+
+</style>
+
+

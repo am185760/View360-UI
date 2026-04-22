@@ -1,0 +1,29 @@
+﻿@page "/default"
+@using EView360.Services;
+@inject UserService userService
+@inject NavigationManager NavigationManager
+
+
+
+<center>
+    <div class="col-8 card" style="margin-top: 47px; font-weight:bold; color:green; font-size:x-large";>
+        Please wait while we check your autherization
+        <div class="spinner" style="margin-top: 47px; margin-left:150px">   </div>
+    </div>
+</center>
+
+
+
+@code {
+    bool isValidUser = false;
+    protected override void OnInitialized()
+    {
+        if (userService._isSecurityWebServiceEnabled == "1")
+        {
+            isValidUser = userService.ValidateWithNBESecurityModule();
+            
+            if (isValidUser)
+                NavigationManager.NavigateTo("/index");
+        }
+    }
+}

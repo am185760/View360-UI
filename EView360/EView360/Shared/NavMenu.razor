@@ -1,0 +1,781 @@
+﻿﻿@using EView360.Data;
+@using EView360.Services;
+@using EView360Models.Core;
+@using static EView360.Data.Enumerations;
+@using EView360Models.ViewModels;
+@using global::Common.ViewModel;
+@inherits LayoutComponentBase
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject UserManagementService userService;
+@inject IJSRuntime jsRuntime
+@inject ATMTreeViewRepository atmRepository
+@inject NotifyService notifyService
+@inject ILogger<NavMenu> logger
+
+<AuthorizeView>
+    <Authorized>
+        <nav class="navbar navbar-expand-sm navbar-dark bg-dark logo-navBar" style="align-content:center">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="">
+                    <img src="css/NBE_logo_1-NoBg.png" width="150px" />
+                </a>
+                <div class="collapse navbar-collapse" id="mynavbar">
+                    <ul class="navbar-nav">
+                        <button style="display:block !important" type="button" class="navbar-toggler collapsed" data-toggle="tooltip" data-placement="top" title="Collapse Atm Tree" onclick="atmTreeCollapsed();">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div onclick="handleCollapsed(); " style="display:none">
+                            <div class='collapseIcon'></div>
+                            <div class='collapseIcon'></div>
+                            <div class='collapseIcon'></div>
+                        </div>
+                        <li class="nav-item dropdown Home_DropDown">
+                            <a class="nav-link" href="">Home</a>
+                            <ul class="dropdown-menu Summary-Content">
+                                <li><a class="dropdown-item" @onclick="@(() => HandleClick("Summary"))">Summary</a></li>
+                            </ul>
+                        </li>
+                        @if (adminPermission)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Administration</a>
+                                <ul class="dropdown-menu">
+                                    @if (CheckPermission((int)Permissions.ViewNoteSetType))
+                                    {
+                                        <li><a class="dropdown-item" @onclick="@(() => HandleClick("NoteSetType"))">Note Set Type Setup</a></li>
+                                    }
+                                    @*@if (CheckPermission((int)Permissions.ViewOrganization))
+                                {
+                                <li><a class="dropdown-item" href="#">Organization Setup</a></li>
+                                }*@
+                                    @if (CheckPermission((int)Permissions.ViewATMsList))
+                                    {
+                                        <li><a class="dropdown-item" @onclick="@(() => HandleClick("AtmSetup"))">ATM Setup</a></li>
+                                    }
+                                    @if (CheckPermission((int)Permissions.ViewUserList))
+                                    {
+                                        <li><a class="dropdown-item" @onclick="@(() => HandleClick("UserManagement"))">Users</a></li>
+                                    }
+                                    @if (CheckPermission((int)Permissions.ViewGroupList))
+                                    {
+                                        <li><a class="dropdown-item" @onclick="@(() => HandleClick("GroupManagement"))">Groups</a></li>
+                                    }
+                                    @if (CheckPermission((int)Permissions.ViewConfiguration))
+                                    {
+                                        <li><a class="dropdown-item" @onclick="@(() => HandleClick("ApplicationConfiguration"))">Application Configuration</a></li>
+                                    }
+                                    @*@if (CheckPermission((int)Permissions.ScheduleFileDownload))
+                                {
+                                <li><a class="dropdown-item" href="#">ATM Push Configuration</a></li>
+                                }*@
+                                    @if (CheckPermission((int)Permissions.ViewAuditLog))
+                                    {
+                                        <li><a class="dropdown-item" href="AuditLog">Activity Log</a></li>
+                                    }
+                                    @if (CheckPermission((int)Permissions.ViewDailyFeedSchedule))
+                                    {
+                                        <li><a class="dropdown-item" @onclick="@(() => HandleClick("RecreateDailyFeed"))">Recreate Daily Feed</a></li>
+                                    }
+                                    @if (CheckPermission((int)Permissions.ViewAlertTemplate))
+                                    {
+                                        <li><a class="dropdown-item" href="AlertTemplate">Alert Template</a></li>
+                                    }
+                                    @*@if (CheckPermission((int)Permissions.ViewConfigureDailyFeed))
+                                {
+                                <li><a class="dropdown-item" href="#">Configure Daily Feed Generation</a></li>
+                                }*@
+                                    @if (CheckPermission((int)Permissions.ViewScheduleReports))
+                                    {
+                                        <li><a class="dropdown-item" href="ScheduleReportGeneration">Schedule Report</a></li>
+                                    }
+                                    @*@if (CheckPermission((int)Permissions.ViewFileType))
+                                {
+                                <li><a class="dropdown-item" href="#">File Type</a></li>
+                                }*@
+
+                                </ul>
+                            </li>
+                        }
+                        @if (operationPermission)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Operations </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item" href="#">General &raquo</a>
+                                        <ul class="dropdown-menu dropdown-submenu">
+                                            @if (CheckPermission((int)Permissions.AlertMonitoringHistory))
+                                            {
+                                                <li><a class="dropdown-item" @onclick="@(() => HandleClick("AlertMonitoring"))">Alert Monitoring (History)</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.TaskStatusMonitoringHistory))
+                                            {
+                                                <li> <a class="dropdown-item" @onclick="@(() => HandleClick("AtmTask"))">Task Status Monitoring (History)</a></li>
+                                            }
+                                            <li> <a class="dropdown-item" @onclick="@(() => HandleClick("AtmPendingFiles"))">Atm Pending Files</a></li>
+                                            @if (CheckPermission((int)Permissions.ViewOrderDownloadAndDailyFeedStatus))
+                                            {
+                                                <li><a class="dropdown-item" @onclick="@(() => HandleClick("DailyFeedStatus"))">Order Download And Daily Feed Status (History)</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.ViewOrderDownloadAndDailyFeedStatusDashBoard))
+                                            {
+                                                <li><a class="dropdown-item" @onclick="@(() => NavigateToWindow("/OrderDownloadDashboardDataGrid"))">Order Download And Daily Feed Dashboard</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.ViewTaskDashBoard))
+                                            {
+                                                <li> <a class="dropdown-item" @onclick="@(() => HandleClick("AtmTaskDashboard"))">Task Dashboard</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.ViewDepositDashboard))
+                                            {
+                                                <li> <a class="dropdown-item" href="BNATransactionDashboard">BNA Deposit Dashboard</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.ViewMinThresholdDashboard))
+                                            {
+                                                <li> <a class="dropdown-item" @onclick="@(() => OpenDashboard("/MinimumThresholdDashboardDataGrid"))">Minimum Threshold Dashboard</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.ReportTaskMonitoring))
+                                            {
+                                                <li> <a class="dropdown-item" @onclick="@(() => HandleClick("ReportTask"))">Report Task Monitoring</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.ViewTransactionsHourlyAnalysis))
+                                            {
+                                                <li> <a class="dropdown-item" @onclick="@(() => HandleClick("TransactionsHourlyAnalysis"))">Transaction Hourly Analysis</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.ATMNetworkInfo))
+                                            {
+                                                <li> <a class="dropdown-item" @onclick="@(() => HandleClick("ATMNetworkInfo"))">ATM Network Information</a></li>
+                                            }
+                                        </ul>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item" href="#">Currency And Cash Monitoring System  &raquo</a>
+                                        <ul class="dropdown-menu dropdown-submenu">
+                                            @if (CheckPermission((int)Permissions.ViewOutOfBalanceInvestigation))
+                                            {
+                                                <li> <a class="dropdown-item" @onclick="@(() => HandleClick("BalanceInvestigation"))">Balance Investigation</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.ViewCashPositionsDashBoard))
+                                            {
+                                                <li> <a class="dropdown-item" @onclick="@(() => HandleClick("CashPositionDashboard"))">Cash Position Dashboard</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.ViewCashPositionsDashBoard))
+                                            {
+                                                <li> <a class="dropdown-item" @onclick="@(() => HandleClick("CashPositionDashboard/0/true"))">Recycler Cash Position Dashboard</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.ViewTransactions))
+                                            {
+                                                <li> <a class="dropdown-item" @onclick="@(() => HandleClick("WithdrawalTransaction"))">Withdrawal Transaction (History)</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.ViewCashPositions))
+                                            {
+                                                <li> <a class="dropdown-item" @onclick="@(() => HandleClick("CashPosition"))">Cash Position (History)</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.ViewCashPositions))
+                                            {
+                                                <li> <a class="dropdown-item" @onclick="@(() => HandleClick("CashPosition/0/true"))">Recycler Cash Position (History)</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.ViewCashPositionVsDFF))
+                                            {
+                                                <li> <a class="dropdown-item" href="#">Cash Position vs DFF (History)</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.ViewBNATransactions))
+                                            {
+                                                <li> <a class="dropdown-item" @onclick="@(() => HandleClick("BnaTransaction"))">BNA Transactions (History)</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.ViewCPMTransactions))
+                                            {
+                                                <li> <a class="dropdown-item" href="#">CPM Transactions (History)</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.ViewReplenishments))
+                                            {
+                                                <li><a class="dropdown-item" @onclick="@(() => HandleClick("Replenishment"))">Replenishments</a></li>
+                                            }
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        @if (reportPermission)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Reports</a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item" href="#">General &raquo</a>
+                                        <ul class="dropdown-menu dropdown-submenu">
+                                            @if (CheckPermission((int)Permissions.CashOrderReport))
+                                            {
+                                                <li> <a class="dropdown-item" href="#">Cash Order Report</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.TaskStatusReport))
+                                            {
+                                                <li> <a class="dropdown-item" href="TaskStatusReport">Task Status Report</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.AlertMonitoringReport))
+                                            {
+                                                <li> <a class="dropdown-item" @onclick="@(() => HandleClick("AlertMonitoringReport"))">Alert Monitoring Report</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.OutOfCashReport))
+                                            {
+                                                <li> <a class="dropdown-item" @onclick="@(() => HandleClick("OutOfCashReport"))">Out of Cash Report</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.ATMSummaryReport))
+                                            {
+                                                <li> <a class="dropdown-item" @onclick="@(() => HandleClick("AtmSummaryReport"))">ATM Summary Report</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.DeadATMsReport))
+                                            {
+                                                <li> <a class="dropdown-item" href="DeadAtmReport">Dead ATM Report</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.LowBalanceReport))
+                                            {
+                                                <li> <a class="dropdown-item" @onclick="@(() => HandleClick("LowBalanceReport"))">Low Balance Report</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.PurgeBinAlertsReport))
+                                            {
+                                                <li> <a class="dropdown-item" href="PurgeBinThresholdReport">Purge Bin Alert Report</a></li>
+                                            }
+                                            <li> <a class="dropdown-item" @onclick="@(() => HandleClick("CashDepositDenomationReport"))">Cash Deposit Denomination Report</a></li>
+
+                                            <li> <a class="dropdown-item" href="UserReport">User List Report</a></li>
+
+                                            <li> <a class="dropdown-item" @onclick="@(() => HandleClick("GroupReport"))">Group List Report</a></li>
+
+                                            <li> <a class="dropdown-item" @onclick="@(() => HandleClick("AuditLogReport"))">Audit Log Report</a></li>
+                                        </ul>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item" href="#">Currency And Cash Monitoring System  &raquo</a>
+                                        <ul class="dropdown-menu dropdown-submenu">
+                                            @if (CheckPermission((int)Permissions.EJReplenishmentReport))
+                                            {
+                                                <li> <a class="dropdown-item" @onclick="@(() => HandleClick("ReplenishmentReport"))">Replenishment Report</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.ViewCashPositionReport))
+                                            {
+                                                <li> <a class="dropdown-item" href="CashPositionsReport">Cash Position Report</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.ViewCashPositionReport))
+                                            {
+                                                <li> <a class="dropdown-item" href="CashPositionsReport/0/true">Recycler Cash Position Report</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.CashUtilizationReport))
+                                            {
+                                                <li> <a class="dropdown-item" @onclick="@(() => HandleClick("CashUtilizationReport"))">Cash Utilization Report</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.BNACounterReport))
+                                            {
+                                                <li> <a class="dropdown-item" @onclick="@(() => HandleClick("BnaCounterReport"))">BNA Counter Report</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.CPMCounterReport))
+                                            {
+                                                <li> <a class="dropdown-item" href="CPMCounterReport">CPM Counter Report</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.CashWithdrawalReport))
+                                            {
+                                                <li> <a class="dropdown-item" @onclick="@(() => HandleClick("CashWithdrawalReport"))">Cash Withdrawal Report</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.ATMWithoutTransaction24Hour))
+                                            {
+                                                <li> <a class="dropdown-item" href="ATMWithoutTransaction24Hour">ATM Without Transaction 24hr</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.ReplenishmentReturnedReport))
+                                            {
+                                                <li> <a class="dropdown-item" @onclick="@(() => HandleClick("ReplenishmentReturnReport"))">Replenishment Return Report</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.NoCashWithdrawalReport))
+                                            {
+                                                <li> <a class="dropdown-item" @onclick="@(() => HandleClick("NoCashWithdrawalReport"))">No Cash Withdrawal Report</a></li>
+                                            }
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+
+                        @if (archivePermission)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Archive</a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item" data-bs-toggle="dropdown">Operations &raquo</a>
+                                        <ul class="dropdown-menu dropdown-submenu">
+                                            <li>
+                                                <a class="dropdown-item" href="#">General &raquo</a>
+                                                <ul class="dropdown-menu dropdown-submenu">
+                                                    @if (CheckPermission((int)Permissions.ViewAlertMonitoringHistoryArchive))
+                                                    {
+                                                        <li> <a class="dropdown-item" @onclick="@(() => HandleClick("AlertMonitoring/Archive"))">Alert Monitoring (History)</a></li>
+                                                    }
+                                                    @if (CheckPermission((int)Permissions.ViewTaskStatusMonitoringHistoryArchive))
+                                                    {
+                                                        <li> <a class="dropdown-item" @onclick="@(() => HandleClick("AtmTask/Archive"))">Task Status Monitoring (History)</a></li>
+                                                    }
+                                                    @* @if (CheckPermission((int)Permissions.ViewTaskDashboardArchive))
+                                                {
+                                                <li> <a class="dropdown-item" @onclick="@(() => HandleClick("AtmTaskDashboard/Archive"))">Task Dashboard</a></li>
+                                                } *@
+                                                </ul>
+                                            </li>
+
+                                            <li>
+                                                <a class="dropdown-item" href="#">Currency And Cash Monitoring System  &raquo</a>
+                                                <ul class="dropdown-menu dropdown-submenu">
+                                                    @if (CheckPermission((int)Permissions.ViewBalanceInvestigationArchive))
+                                                    {
+                                                        <li> <a class="dropdown-item" @onclick="@(() => HandleClick("BalanceInvestigation/Archive"))">Balance Investigation</a></li>
+                                                    }
+                                                    @* @if (CheckPermission((int)Permissions.ViewCashPositionDashboardArchive))
+                                                {
+                                                <li> <a class="dropdown-item" @onclick="@(() => HandleClick("CashPositionDashboard/Archive"))">Cash Position Dashboard</a></li>
+                                                } *@
+                                                    @* @if (CheckPermission((int)Permissions.ViewCashPositionDashboardArchive))
+                                                {
+                                                <li> <a class="dropdown-item" @onclick="@(() => HandleClick("CashPositionDashboard/Archive/true"))">Recycler Cash Position Dashboard</a></li>
+                                                } *@
+                                                    @if (CheckPermission((int)Permissions.ViewWithdrawalTransactionHistoryArchive))
+                                                    {
+                                                        <li> <a class="dropdown-item" @onclick="@(() => HandleClick("WithdrawalTransaction/Archive"))">Withdrawal Transaction (History)</a></li>
+                                                    }
+                                                    @if (CheckPermission((int)Permissions.ViewCashPositionHistoryArchive))
+                                                    {
+                                                        <li> <a class="dropdown-item" @onclick="@(() => HandleClick("CashPosition/Archive"))">Cash Position (History)</a></li>
+                                                    }
+                                                    @if (CheckPermission((int)Permissions.ViewRecyclerCashPositionHistoryArchive))
+                                                    {
+                                                        <li> <a class="dropdown-item" @onclick="@(() => HandleClick("CashPosition/Archive/true"))">Recycler Cash Position (History)</a></li>
+                                                    }
+                                                    @if (CheckPermission((int)Permissions.ViewBNATransactionHistoryArchive))
+                                                    {
+                                                        <li> <a class="dropdown-item" @onclick="@(() => HandleClick("BnaTransaction/Archive"))">BNA Transactions (History)</a></li>
+                                                    }
+                                                    @if (CheckPermission((int)Permissions.ViewCPMTransactionHistoryArchive))
+                                                    {
+                                                        <li> <a class="dropdown-item" href="#">CPM Transactions (History)</a></li>
+                                                    }
+                                                    @if (CheckPermission((int)Permissions.ViewReplenishmentHistoryArchive))
+                                                    {
+                                                        <li> <a class="dropdown-item" @onclick="@(() => HandleClick("Replenishment/Archive"))">Replenishments (History)</a></li>
+                                                    }
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" data-bs-toggle="dropdown">Reports &raquo</a>
+                                        <ul class="dropdown-menu dropdown-submenu">
+                                            <li>
+                                                <a class="dropdown-item" href="#">General &raquo</a>
+                                                <ul class="dropdown-menu dropdown-submenu">
+                                                    @* @if (CheckPermission((int)Permissions.ViewCashOrderReportArchive))
+                                                {
+                                                <li> <a class="dropdown-item" href="#">Cash Order Report</a></li>
+                                                } *@
+                                                    @if (CheckPermission((int)Permissions.ViewTaskStatusReportArchive))
+                                                    {
+                                                        <li> <a class="dropdown-item" href="TaskStatusReport/Archive">Task Status Report</a></li>
+                                                    }
+                                                    @if (CheckPermission((int)Permissions.ViewAlertMonitoringReportArchive))
+                                                    {
+                                                        <li><a class="dropdown-item" @onclick="@(() => HandleClick("AlertMonitoringReport/Archive"))">Alert Monitoring Report</a></li>
+
+                                                    }
+                                                    @if (CheckPermission((int)Permissions.ViewOutOfCashReportArchive))
+                                                    {
+                                                        <li> <a class="dropdown-item" @onclick="@(() => HandleClick("OutOfCashReport/Archive"))">Out of Cash Report</a></li>
+                                                    }
+                                                    @*@if (CheckPermission((int)Permissions.ATMSummaryReport))
+                                                {
+                                                <li> <a class="dropdown-item" href="AtmSummaryReport/Archive">ATM Summary Report</a></li>
+                                                }*@
+                                                    @if (CheckPermission((int)Permissions.ViewLowBalanceReportArchive))
+                                                    {
+                                                        <li> <a class="dropdown-item" @onclick="@(() => HandleClick("LowBalanceReport/Archive"))">Low Balance Report</a></li>
+                                                    }
+                                                    @if (CheckPermission((int)Permissions.ViewPurgeBinAlertsReportArchive))
+                                                    {
+                                                        <li> <a class="dropdown-item" href="PurgeBinThresholdReport/Archive">Purge Bin Alert Report</a></li>
+                                                    }
+                                                </ul>
+                                            </li>
+
+                                            <li>
+                                                <a class="dropdown-item" href="#">Currency And Cash Monitoring System  &raquo</a>
+                                                <ul class="dropdown-menu dropdown-submenu">
+                                                    @if (CheckPermission((int)Permissions.ViewReplenishmentReturnReportArchive))
+                                                    {
+                                                        <li><a class="dropdown-item" @onclick="@(() => HandleClick("ReplenishmentReport/Archive"))">Replenishment Report</a></li>
+                                                    }
+                                                    @if (CheckPermission((int)Permissions.ViewCashPositionReportArchive))
+                                                    {
+                                                        <li> <a class="dropdown-item" href="CashPositionsReport/Archive">Cash Position Report</a></li>
+                                                    }
+                                                    @if (CheckPermission((int)Permissions.ViewRecyclerCashPositionReportArchive))
+                                                    {
+                                                        <li> <a class="dropdown-item" href="CashPositionsReport/Archive/true">Recycler Cash Position Report</a></li>
+                                                    }
+                                                    @if (CheckPermission((int)Permissions.ViewCashUtilizationReportArchive))
+                                                    {
+                                                        <li> <a class="dropdown-item" href="CashUtilizationReport/Archive">Cash Utilization Report</a></li>
+                                                    }
+                                                    @if (CheckPermission((int)Permissions.ViewBNACounterReportArchive))
+                                                    {
+                                                        <li> <a class="dropdown-item" @onclick="@(() => HandleClick("BnaCounterReport/Archive"))">BNA Counter Report</a></li>
+                                                    }
+                                                    @* @if (CheckPermission((int)Permissions.ViewCPMCounterReportArchive))
+                                                {
+                                                <li> <a class="dropdown-item" href="#">CPM Counter Report</a></li>
+                                                } *@
+                                                    @if (CheckPermission((int)Permissions.ViewCashWithdrawalReportArchive))
+                                                    {
+                                                        <li><a class="dropdown-item" @onclick="@(() => HandleClick("CashWithdrawalReport/Archive"))">Cash Withdrawal Report</a></li>
+                                                    }
+                                                    @if (CheckPermission((int)Permissions.ViewReplenishmentReturnReportArchive))
+                                                    {
+                                                        <li> <a class="dropdown-item" @onclick="@(() => HandleClick("ReplenishmentReturnReport/Archive"))">Replenishment Return Report</a></li>
+                                                    }
+                                                    @if (CheckPermission((int)Permissions.ViewNoCashWithdrawalReportArchive))
+                                                    {
+                                                        <li><a class="dropdown-item" @onclick="@(() => HandleClick("NoCashWithdrawalReport/Archive"))">No Cash Withdrawal Report</a></li>
+                                                    }
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+
+                        @if (analyticPermission)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Others</a>
+                                <ul class="dropdown-menu">
+                                    <li>
+
+                                        <a class="dropdown-item" href="#">Graph &raquo</a>
+                                        <ul class="dropdown-menu dropdown-submenu">
+                                            @if (CheckPermission((int)Permissions.ViewReplenishmentAnalysisGraph))
+                                            {
+                                                <li> <a class="dropdown-item" @onclick="@(() => HandleClick("ReplenishmentAnalysis"))">Replenishment Analysis</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.ViewTransactionAnalysisGraph))
+                                            {
+                                                <li> <a class="dropdown-item" @onclick="@(() => HandleClick("TransactionAnalytics"))">Transaction Analytics</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.ViewCashUtilizationAnalysisGraph))
+                                            {
+                                                <li> <a class="dropdown-item" @onclick="@(() => HandleClick("CashUtilization"))">Cash Utilization Analysis</a></li>
+                                            }
+                                            @if (CheckPermission((int)Permissions.ViewDenominationUtilizationGraph))
+                                            {
+                                                <li> <a class="dropdown-item" @onclick="@(() => HandleClick("DenominationUtilizationAnalysis"))">Denomination Utilization Analysis</a></li>
+                                            }
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+
+                    </ul>
+                </div>
+
+                <div class="search-box">
+
+                    <Autocomplete TItem="AutoCompletePageViewModel"
+                                  TValue="string"
+                                  Data="@autoCompletePageList"
+                                  TextField="@(( item ) => item.PageName)"
+                                  ValueField="@(( item ) => item.PageUrl)"
+                    @bind-SelectedText="@searchValue"
+                                  SelectedValueChanged="@HandleClick"
+                                  Placeholder="Search..."
+                                  Filter="AutocompleteFilter.Contains">
+                        <NotFoundContent Context="PageName"> Sorry @PageName was not found! </NotFoundContent>
+                    </Autocomplete>
+                </div>
+
+                <div class="logut-class" style="margin-right: 5%;">
+                    <ul class="navbar-nav ml-5">
+                        <li class="nav-link" style="cursor: default !important">
+                            <strong>
+                                Last Logged In:@appUser?.UserLastLoginTime.Value.ToString("dd-MMM-yy HH:mm:ss")
+                            </strong>
+                        </li>
+                        <li class="nav-item dropdown Logout_DropDown">
+                            <a class="nav-link" href="">
+                                Welcome, @appUser?.UserFullName
+                                <i class="fas fa-chevron-circle-down fa-lg"></i>
+                            </a>
+                            <ul class="dropdown-menu Logout-Content">
+                                <li><a class="dropdown-item" href="ChangePassword">Change Password</a></li>
+                                <li><a class="dropdown-item" @onclick="(() => Logout())">Logout</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </Authorized>
+</AuthorizeView>
+
+
+@code {
+    [Inject] INotificationService NotificationService { get; set; }
+
+    Dictionary<int, string> userRight;
+    AppUser appUser;
+    RightsViewModel rights = new();
+    bool adminPermission, operationPermission, reportPermission, archivePermission, analyticPermission;
+    private DotNetObjectReference<NavMenu>? objRef;
+    private List<AutoCompletePageViewModel> autoCompletePageList = new List<AutoCompletePageViewModel>();
+    string searchValue = string.Empty;
+
+
+    [JSInvokable]
+    public async Task Logout()
+    {
+        await ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsLoggedOut();
+        atmRepository.ClearAtmSessionValues();
+        NavigationManager.NavigateTo("");
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            objRef = DotNetObjectReference.Create(this);
+            await jsRuntime.InvokeVoidAsync("initializeInactivityTimer", objRef);
+            appUser = await localStorage.GetItemAsync<AppUser>("AppUser");
+            var permissions = await localStorage.GetItemAsync<Dictionary<int, string>>("userRights");
+            if (permissions is not null)
+            {
+                userRight = permissions;
+            }
+
+            rights = await userService.GetRightsByType();
+            adminPermission = CheckAdminViewPermission();
+            operationPermission = CheckOperationViewPermission();
+            reportPermission = CheckReportViewPermission();
+            archivePermission = CheckArchiveViewPermission();
+            analyticPermission = CheckPermission((int)Permissions.ViewGraphList);
+            InitializePageList();
+            await this.InvokeAsync(() => this.StateHasChanged());
+        }
+        catch(Exception ex)
+        {
+            logger.LogError($"Exception at Index, CheckPermission as: {ex.Message}");
+
+            NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+    
+    private bool CheckPermission(int right)
+    {
+        try
+        {
+            if (userRight is not null)
+                return userRight.ContainsKey(right);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at Index, CheckPermission as: {ex.Message}");
+
+            NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+        return false;
+    }
+
+    private bool CheckAdminViewPermission()
+    {
+        try
+        {
+            foreach (int id in userRight.Keys)
+            {
+                if (rights.AdminRights.Contains(id))
+                    return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at Index, CheckAdminViewPermission as: {ex.Message}");
+
+            NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+        return false;
+    }
+
+    private bool CheckOperationViewPermission()
+    {
+        try
+        {
+            foreach (int id in userRight.Keys)
+            {
+                if (rights.OperationRights.Contains(id))
+                    return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at NavMenu, CheckOperationViewPermission as: {ex.Message}");
+
+            NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+        return false;
+    }
+
+    private bool CheckReportViewPermission()
+    {
+        try
+        {
+            foreach (int id in userRight.Keys)
+            {
+                if (rights.ReportRights.Contains(id))
+                    return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at NavMenu, CheckReportViewPermission as: {ex.Message}");
+
+            NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+        return false;
+    }
+
+    private bool CheckArchiveViewPermission()
+    {
+        try
+        {
+            foreach (int id in userRight.Keys)
+            {
+                if (rights.ArchiveRights.Contains(id))
+                    return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at NavMenu, CheckArchiveViewPermission as: {ex.Message}");
+
+            NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+        return false;
+    }
+
+    public async Task NavigateToWindow(string url)
+    {
+        string baseurl = $"{NavigationManager.BaseUri}{url}";
+        await jsRuntime.InvokeVoidAsync("open", baseurl, "_blank", "location=yes,height=1000,width=5000,scrollbars=yes,status=yes");
+    }
+
+    private void HandleClick(string pageName)
+    {
+        NavigationManager.NavigateTo($"{NavigationManager.BaseUri}/EmptyPage");
+        NavigationManager.NavigateTo(pageName, false);
+    }
+
+    public async Task OpenDashboard(string url)
+    {
+        List<string> atmIDs = new();
+        List<string> regionIDs = new();
+        string filter = string.Empty;
+
+        string baseurl = $"{NavigationManager.BaseUri}{url}";
+        (atmIDs, regionIDs) = await atmRepository.GetSelectedAtmOrRegionList();
+        if (regionIDs?.Count > 0)
+        {
+            filter = "(" + string.Join(",", regionIDs) + ")";
+            baseurl += $"/true/{filter}";
+        }
+        else
+        {
+            filter = "(" + string.Join(",", atmIDs) + ")";
+            baseurl += $"/false/{filter}";
+        }
+        await jsRuntime.InvokeVoidAsync("open", baseurl, "_blank", "location=yes,height=1000,width=5000,scrollbars=yes,status=yes");
+    }
+
+    public void InitializePageList()
+    {
+        autoCompletePageList.AddRange(new List<AutoCompletePageViewModel>
+       {
+           new AutoCompletePageViewModel { PageUrl = "NoteSetType", PageName = "Note Set Type Setup" },
+           new AutoCompletePageViewModel { PageUrl = "AtmSetup", PageName = "Atm Setup" },
+           new AutoCompletePageViewModel { PageUrl = "UserManagement", PageName = "Users" },
+           new AutoCompletePageViewModel { PageUrl = "GroupManagement", PageName = "Groups" },
+           new AutoCompletePageViewModel { PageUrl = "ApplicationConfiguration", PageName = "Application Configuration" },
+           new AutoCompletePageViewModel { PageUrl = "AuditLog", PageName = "Activity Log" },
+           new AutoCompletePageViewModel { PageUrl = "RecreateDailyFeed", PageName = "Recreate Daily Feed" },
+           new AutoCompletePageViewModel { PageUrl = "AlertTemplate", PageName = "Alert Template" },
+           new AutoCompletePageViewModel { PageUrl = "ScheduleReportGeneration", PageName = "Schedule Report" },
+           new AutoCompletePageViewModel { PageUrl = "AlertMonitoring", PageName = "Alert Monitoring (History)" },
+           new AutoCompletePageViewModel { PageUrl = "AtmTask", PageName = "Task Status Monitoring (History)" },
+           new AutoCompletePageViewModel { PageUrl = "DailyFeedStatus", PageName = "Order Download And Daily Feed Status (History)" },
+           new AutoCompletePageViewModel { PageUrl = "OrderDownloadDashboardDataGrid", PageName = "Order Download And Daily Feed Dashboard" },
+           new AutoCompletePageViewModel { PageUrl = "AtmTaskDashboard", PageName = "Task Dashboard" },
+           new AutoCompletePageViewModel { PageUrl = "BNATransactionDashboard", PageName = "BNA Deposit Dashboard" },
+           new AutoCompletePageViewModel { PageUrl = "MinimumThresholdDashboardDataGrid", PageName = "Minimum Threshold Dashboard" },
+           new AutoCompletePageViewModel { PageUrl = "ReportTask", PageName = "Report Task Monitoring" },
+           new AutoCompletePageViewModel { PageUrl = "TransactionsHourlyAnalysis", PageName = "Transaction Hourly Analysis" },
+           new AutoCompletePageViewModel { PageUrl = "ATMNetworkInfo", PageName = "ATM Network Information" },
+           new AutoCompletePageViewModel { PageUrl = "BalanceInvestigation", PageName = "Balance Investigation" },
+           new AutoCompletePageViewModel { PageUrl = "CashPositionDashboard", PageName = "Cash Position Dashboard" },
+           new AutoCompletePageViewModel { PageUrl = "CashPositionDashboard/0/true", PageName = "Recycler Cash Position Dashboard" },
+           new AutoCompletePageViewModel { PageUrl = "WithdrawalTransaction", PageName = "Withdrawal Transaction (History)" },
+           new AutoCompletePageViewModel { PageUrl = "CashPosition", PageName = "Cash Position (History)" },
+           new AutoCompletePageViewModel { PageUrl = "CashPosition/0/true", PageName = "Recycler Cash Position (History)" },
+           new AutoCompletePageViewModel { PageUrl = "#", PageName = "Cash Position vs DFF (History)" },
+           new AutoCompletePageViewModel { PageUrl = "BnaTransaction", PageName = "BNA Transactions (History)" },
+           new AutoCompletePageViewModel { PageUrl = "#", PageName = "CPM Transactions (History)" },
+           new AutoCompletePageViewModel { PageUrl = "Replenishment", PageName = "Replenishment" },
+           new AutoCompletePageViewModel { PageUrl = "TaskStatusReport", PageName = "Task Status Report" },
+           new AutoCompletePageViewModel { PageUrl = "AlertMonitoringReport", PageName = "Alert Monitoring Report" },
+           new AutoCompletePageViewModel { PageUrl = "OutOfCashReport", PageName = "Out of Cash Report" },
+           new AutoCompletePageViewModel { PageUrl = "AtmSummaryReport", PageName = "Atm Summary Report" },
+           new AutoCompletePageViewModel { PageUrl = "DeadAtmReport", PageName = "Dead ATM Report" },
+           new AutoCompletePageViewModel { PageUrl = "LowBalanceReport", PageName = "Low Balance Report" },
+           new AutoCompletePageViewModel { PageUrl = "PurgeBinThresholdReport", PageName = "Purge Bin Alert Report" },
+           new AutoCompletePageViewModel { PageUrl = "UserReport", PageName = "User List Report" },
+           new AutoCompletePageViewModel { PageUrl = "GroupReport", PageName = "Group List Report" },
+           new AutoCompletePageViewModel { PageUrl = "AuditLogReport", PageName = "Audit Log Report" },
+           new AutoCompletePageViewModel { PageUrl = "ReplenishmentReport", PageName = "Replenishment Report" },
+           new AutoCompletePageViewModel { PageUrl = "CashPositionsReport", PageName = "Cash Positions Report" },
+           new AutoCompletePageViewModel { PageUrl = "CashUtilizationReport", PageName = "Cash Utilization Report" },
+           new AutoCompletePageViewModel { PageUrl = "BnaCounterReport", PageName = "BNA Counter Report" },
+           new AutoCompletePageViewModel { PageUrl = "CPMCounterReport", PageName = "CPM Counter Report" },
+           new AutoCompletePageViewModel { PageUrl = "CashWithdrawalReport", PageName = "Cash Withdrawal Report" },
+           new AutoCompletePageViewModel { PageUrl = "ATMWithoutTransaction24Hour", PageName = "ATM Without Transaction 24hr" },
+           new AutoCompletePageViewModel { PageUrl = "ReplenishmentReturnReport", PageName = "Replenishment Return Report" },
+           new AutoCompletePageViewModel { PageUrl = "NoCashWithdrawalReport", PageName = "No Cash Withdrawal Report" },
+           new AutoCompletePageViewModel { PageUrl = "ReplenishmentAnalysis", PageName = "Replenishment Analysis" },
+           new AutoCompletePageViewModel { PageUrl = "TransactionAnalytics", PageName = "Transaction Analytics" },
+           new AutoCompletePageViewModel { PageUrl = "CashUtilization", PageName = "Cash Utilization Analysis" },
+           new AutoCompletePageViewModel { PageUrl = "DenominationUtilizationAnalysis", PageName = "Denomination Utilization Analysis" },
+       });
+    }
+
+}

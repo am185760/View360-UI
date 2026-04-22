@@ -1,0 +1,210 @@
+﻿@page "/CashPosition"
+@page "/CashPosition/{mode}"
+@page "/CashPosition/{mode}/{IsRecycler:bool?}"
+
+@using EView360.Services.Operations;
+@using EView360.Common;
+@using EView360.Services;
+@using EView360Models.Core;
+@using EView360Models.RequestModel;
+@using EView360Models.ViewModels;
+@inject CashPositionService service
+@inject ILogger<CashPositions> logger
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject ATMTreeViewRepository atmRepository 
+ @inject NotifyService notifyService
+@inject IConfiguration _configuration
+@inject IJSRuntime jsRuntime
+@inject CommonServices common
+
+@implements IDisposable
+
+<div class="row content">
+    <div class="col-sm-2 filter_bar border-right-2">
+        <form style="margin-top: 20px;">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <h5>Filters: </h5>
+                </div>
+            </div>
+            @if (isArchive)
+            {
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label>Archive Year: </label>
+                        <Select TValue="int" SelectedValue="@ArchiveYear" class="form-control" SelectedValueChanged="@DateChanged">
+                            @foreach (int year in archiveYears)
+                            {
+                                <SelectItem Value=year>@year</SelectItem>
+                            }
+                        </Select>
+                    </div>
+                </div>
+            }
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label for="inputEmail4">From Date: </label>
+                    @if (isArchive)
+                    {
+                        <DatePicker TValue="DateTime" @ref="@dateRef" DisplayFormat="dd/MM H:m" InputMode="DateInputMode.DateTime" TimeAs24hr="true" Placeholder="Selete Date" @bind-Date="@fromDate"></DatePicker>
+                    }
+                    else
+                    {
+                        <DatePicker TValue="DateTime" @ref="@dateRef" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" TimeAs24hr="true" Placeholder="Selete Date" @bind-Date="@fromDate"></DatePicker>
+                    }
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label for="inputEmail4">To Date: </label>
+                    @if (isArchive)
+                    {
+                        <DatePicker TValue="DateTime" @ref="@dateRef" DisplayFormat="dd/MM H:m" InputMode="DateInputMode.DateTime" TimeAs24hr="true" Placeholder="Selete Date" @bind-Date="@toDate"></DatePicker>
+                    }
+                    else
+                    {
+                        <DatePicker TValue="DateTime" @ref="@dateRef" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" TimeAs24hr="true" Placeholder="Selete Date" @bind-Date="@toDate"></DatePicker>
+                    }
+                </div>
+            </div>
+            @if (noteSetTypes?.Count > 0)
+            {
+                <fieldset class="form-group">
+                    <div class="row">
+                        <legend class="col-form-label col-sm-3 pt-0">Group:</legend>
+                        <div class="col-sm-10">
+                            @foreach (NoteSetTypeViewModel noteSetType in noteSetTypes)
+                            {
+                                <div class="form-check">
+                                    <Check TValue="bool?" @bind-Checked="@noteSetType.IsSelected">@noteSetType.NoteSetTypeName</Check>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </fieldset>
+            }
+            <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@LoadData" value="Search">
+            <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@ResetFilter" value="Reset">
+        </form>
+    </div>
+
+
+    <div class="col-sm-10 text-left" style="margin-top:1%">
+        <div class="form-group">
+            <b><h2 style="font-family:montserrat; font-weight:bold">@((IsRecycler.HasValue && IsRecycler.Value) ? "Recycler " : "")Cash Positions ( History ) @(isArchive ? "- Archive" : "")</h2></b>
+        </div>
+
+        @if (showSpinner)
+        {
+            <div class="spinner" style="z-index:4"></div>
+        }
+
+        @if (showGrid)
+        {
+            <DataGrid @ref="@dataGridRef"
+                  TItem="CashPositionViewModel"
+                  Data="@filteredCashPositions"
+                            Editable
+                  Responsive="true"
+                       SortChanged="SortData"
+                  ShowPager="false"
+                            Bordered
+                  PageSize="50"
+                            FixedHeader
+                  FixedHeaderDataGridHeight="570px"
+                  FixedHeaderDataGridMaxHeight="570px"
+                  Narrow="true"
+                            Sortable  SortMode="DataGridSortMode.Single"
+                  HeaderThemeContrast="@ThemeContrast.Light">
+
+
+            <DataGridColumn Field="@nameof(CashPositionViewModel.AtmTitle)" Caption="Atm Title" />
+            <DataGridColumn Field="@nameof(CashPositionViewModel.Ip)" Caption="IP" />
+            <DataGridColumn Field="@nameof(CashPositionViewModel.Location)" Caption="Location" />
+            <DataGridColumn Field="@nameof(CashPositionViewModel.NoteSetTypeName)" Caption="Group" />
+            <DataGridDateColumn Field="@nameof(CashPositionViewModel.LastTrxnAt)" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" Caption="Last Transaction" />
+            <DataGridDateColumn Field="@nameof(CashPositionViewModel.LastReplenishmentAt)" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" Caption="Last Replenished" />
+
+            <DataGridNumericColumn Field="@nameof(CashPositionViewModel.DenominationType1)" Caption="Type1" />
+            <DataGridNumericColumn Field="@nameof(CashPositionViewModel.Cassette1Denomination)" Caption="Remaining" />
+            <DataGridNumericColumn Field="@nameof(CashPositionViewModel.PurgeCassette1Notes)" Caption="Purged" />
+
+            <DataGridNumericColumn Field="@nameof(CashPositionViewModel.DenominationType2)" Caption="Type2" />
+            <DataGridNumericColumn Field="@nameof(CashPositionViewModel.Cassette2Denomination)" Caption="Remaining" />
+            <DataGridNumericColumn Field="@nameof(CashPositionViewModel.PurgeCassette2Notes)" Caption="Purged" />
+
+            <DataGridNumericColumn Field="@nameof(CashPositionViewModel.DenominationType3)" Caption="Type3" />
+            <DataGridNumericColumn Field="@nameof(CashPositionViewModel.Cassette3Denomination)" Caption="Remaining" />
+            <DataGridNumericColumn Field="@nameof(CashPositionViewModel.PurgeCassette3Notes)" Caption="Purged" />
+
+            <DataGridNumericColumn Field="@nameof(CashPositionViewModel.DenominationType4)" Caption="Type4" />
+            <DataGridNumericColumn Field="@nameof(CashPositionViewModel.Cassette4Denomination)" Caption="Remaining" />
+            <DataGridNumericColumn Field="@nameof(CashPositionViewModel.PurgeCassette4Notes)" Caption="Purged" />
+
+            @*<DataGridNumericColumn Field="@nameof(CashPositionViewModel.DenominationType5)" Caption="Type5" />
+            <DataGridNumericColumn Field="@nameof(CashPositionViewModel.Cassette5Denomination)" Caption="Remaining" />
+            <DataGridNumericColumn Field="@nameof(CashPositionViewModel.PurgeCassette5Notes)" Caption="Purged" />
+
+            <DataGridNumericColumn Field="@nameof(CashPositionViewModel.DenominationType6)" Caption="Type6" />
+            <DataGridNumericColumn Field="@nameof(CashPositionViewModel.Cassette6Denomination)" Caption="Remaining" />
+            <DataGridNumericColumn Field="@nameof(CashPositionViewModel.PurgeCassette6Notes)" Caption="Purged" />
+
+            <DataGridNumericColumn Field="@nameof(CashPositionViewModel.DenominationType7)" Caption="Type7" />
+            <DataGridNumericColumn Field="@nameof(CashPositionViewModel.Cassette7Denomination)" Caption="Remaining" />
+            <DataGridNumericColumn Field="@nameof(CashPositionViewModel.PurgeCassette7Notes)" Caption="Purged" />*@
+
+            <DataGridNumericColumn Field="@nameof(CashPositionViewModel.TotalRemaining)" Caption="Total Remaining" />
+            <DataGridNumericColumn Field="@nameof(CashPositionViewModel.TotalPurgedCashBalance)" Caption="Total Purged" />
+            @if (!IsRecycler == null || !IsRecycler.Value)
+                {
+                    <DataGridNumericColumn Field="@nameof(CashPositionViewModel.Amount)" Caption="Amount" />
+                }
+            </DataGrid>
+            <EView360.Pages.Pagination pageNo="pageNo" maxPageNo="maxPageNo" totalRecords="totalRecords" OnSubmitCallback="GetDataByPageNo" />
+        }
+    </div>
+</div>
+
+
+
+<style>
+
+    .table-primary .showAnimation {
+        animation: spin 1200ms linear infinite;
+    }
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        margin-top: 20px;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        width: 170px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+
+</style>
+
+

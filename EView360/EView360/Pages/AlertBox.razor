@@ -1,0 +1,38 @@
+﻿@if (show)
+{
+    <div class="alert @alertType alert-dismissible fade show" role="alert" style="@style">
+        <strong>@title</strong> @message
+        <button type="button" class="close" onclick="@CloseAlert" aria-label="Close">
+            <span aria-hidden="true">×</span>
+        </button>
+    </div>
+}
+
+<style>
+    .alert {
+        position:fixed !important;
+    }
+</style>
+
+@code {
+    private bool show = false;
+    [Parameter] public string? alertType { get; set; }
+    [Parameter] public string? title { get; set; }
+    [Parameter] public string? message { get; set; }
+    [Parameter] public string? style { get; set; }
+
+
+    public async Task Show()
+    {
+        show = true;
+        this.InvokeAsync(() => this.StateHasChanged());        
+        await Task.Delay(4000);
+        show = false;
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+    public void CloseAlert()
+    {
+        show = false;
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+}

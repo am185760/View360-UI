@@ -1,0 +1,132 @@
+﻿@using EView360.Common;
+@using EView360.Services;
+@using EView360.Services.Summary;
+@using global::Common.ViewModel;
+@inject ATMTreeViewRepository atmRepository
+@inject AtmSummaryService atmSummaryService
+@inject CommonServices common
+
+<div class="row">
+    @if (showSpinner)
+    {
+        <div class="spinner" style="z-index:4"></div>
+    }
+    <div class="col-sm-6">
+        <DataGrid @ref="@dataGridRef"
+                  TItem="Top10AtmViewModel"
+                  Data="@top10TransactionAtms"
+                        Editable
+                  Responsive="true"
+                        Bordered
+                  PageSize="10"
+                        FixedHeader
+                  FixedHeaderDataGridHeight="280px"
+                  FixedHeaderDataGridMaxHeight="280px"
+                  Narrow="true"
+                        Sortable  SortMode="DataGridSortMode.Single"
+                  HeaderThemeContrast="@ThemeContrast.Light">
+
+
+            <DataGridColumn Field="@nameof(Top10AtmViewModel.Tittle)" Caption="High Transacting" />
+            <DataGridColumn Field="@nameof(Top10AtmViewModel.Total)" Caption="Total" />
+        </DataGrid>
+    </div>
+    <div class="col-sm-6">
+        <DataGrid @ref="@dataGridRef"
+                  TItem="Top10AtmViewModel"
+                  Data="@top10LowTransactionAtms"
+                        Editable
+                  Responsive="true"
+                        Bordered
+                  PageSize="10"
+                        FixedHeader
+                  FixedHeaderDataGridHeight="280px"
+                  FixedHeaderDataGridMaxHeight="280px"
+                  Narrow="true"
+                        Sortable  SortMode="DataGridSortMode.Single"
+                  HeaderThemeContrast="@ThemeContrast.Light">
+
+
+            <DataGridColumn Field="@nameof(Top10AtmViewModel.Tittle)" Caption="Low Transacting" />
+            <DataGridColumn Field="@nameof(Top10AtmViewModel.Total)" Caption="Total" />
+        </DataGrid>
+    </div>
+</div>
+
+
+
+<style>
+
+    form {
+        max-width: 100%;
+    }
+
+    .table-primary .showAnimation {
+        animation: spin 1200ms linear infinite;
+    }
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        width: 170px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    .modal-body {
+        height: 70vh;
+        overflow-y: auto;
+    }
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+
+</style>
+@code {
+    public List<Top10AtmViewModel> top10LowTransactionAtms = new();
+    public List<Top10AtmViewModel> top10TransactionAtms = new();
+    private DataGrid<Top10AtmViewModel>? dataGridRef;
+    private bool showSpinner = false;
+    private bool showGrid = false;
+    [Inject]
+    INotificationService NotificationService { get; set; }
+    public async Task LoadData()
+    {        
+        showSpinner = true;
+        showGrid = false;
+        await this.InvokeAsync(() => this.StateHasChanged());
+        await common.TaskDelay();
+        top10TransactionAtms = await atmSummaryService.GetTop10TransactionAtms();
+        top10LowTransactionAtms = await atmSummaryService.GetTop10LowTransactionAtms();
+        if (top10TransactionAtms.Count ==0 && top10LowTransactionAtms.Count ==0)
+        {
+            await NotificationService.Success("No record found.", "Succes", (options) =>
+               {
+                   options.IntervalBeforeClose = 4000;
+               });
+        }
+        showSpinner = false;
+        showGrid = true;
+        await this.InvokeAsync(() => this.StateHasChanged());
+    }
+}

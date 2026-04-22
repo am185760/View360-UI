@@ -1,0 +1,527 @@
+﻿@page "/AtmTask"
+@page "/AtmTask/{mode}"
+
+@using DataRequestorMiddleware.Services.Operations;
+@using EView360.Controllers;
+@using EView360.Services.Operations;
+@using EView360.Common;
+@using EView360.Services;
+@using EView360Models.Core;
+@using EView360Models.ViewModels;
+@using Microsoft.AspNetCore.Http.Connections;
+@using Microsoft.AspNetCore.SignalR.Client;
+@using System.Text.RegularExpressions;
+@using System.Text;
+@using System.Data;
+@using System.Collections.Concurrent;
+@using iTextSharp.text;
+@using iTextSharp.text.pdf;
+@using static EView360.Data.Enumerations;
+@inject AtmTaskService service
+@inject ApplicationConfigurationServices appConfService
+@inject ILogger<AtmTask> logger
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject NavigationManager NavigationManager
+@inject IJSRuntime jsRuntime
+@inject ATMTreeViewRepository atmRepository
+@inject NotifyService notifyService
+@inject UserManagementService userManagementService
+@inject AtmSetupService atmSetupService
+@inject IConfiguration _configuration
+@inject NavigationManager NavigationManager
+@inject CommonServices common
+@inject TaskService taskService
+@implements IDisposable
+
+
+<div class="row content">
+    <div class="col-sm-2 filter_bar border-right-2">
+        <form style="margin-top: 10px;">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <h5>Filters: </h5>
+                </div>
+            </div>
+            @if (isArchive)
+            {
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label>Archive Year: </label>
+                        <Select TValue="int" SelectedValue="@ArchiveYear" class="form-control form-control-sm" SelectedValueChanged="@DateChanged">
+                            @foreach (int year in archiveYears)
+                            {
+                                <SelectItem Value=year>@year</SelectItem>
+                            }
+                        </Select>
+                    </div>
+                </div>
+            }
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label for="inputEmail4">From Date: </label>
+                    @if (!string.IsNullOrEmpty(mode) && mode.Equals("Archive"))
+                    {
+                        <DatePicker TValue="DateTime" Class="custom-select-sm" @ref="@dateRef" DisplayFormat="dd/MM H:m" InputMode="DateInputMode.DateTime" TimeAs24hr="true" Placeholder="Selete Date" @bind-Date="@fromDate"></DatePicker>
+                    }
+                    else
+                    {
+                        <DatePicker TValue="DateTime" Class="custom-select-sm" @ref="@dateRef" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" TimeAs24hr="true" Placeholder="Selete Date" @bind-Date="@fromDate"></DatePicker>
+                    }
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label for="inputEmail4">To Date: </label>
+
+                    @if (!string.IsNullOrEmpty(mode) && mode.Equals("Archive"))
+                    {
+                        <DatePicker TValue="DateTime" Class="custom-select-sm" @ref="@dateRef" DisplayFormat="dd/MM H:m" InputMode="DateInputMode.DateTime" TimeAs24hr="true" Placeholder="Selete Date" @bind-Date="@toDate"></DatePicker>
+                    }
+                    else
+                    {
+                        <DatePicker TValue="DateTime" Class="custom-select-sm" @ref="@dateRef" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" TimeAs24hr="true" Placeholder="Selete Date" @bind-Date="@toDate"></DatePicker>
+                    }
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label class="float-left" for="CreatedByName">Task Types:</label>
+                    <Select @bind-SelectedValue="@filterView.filterTaskTypes" Class="custom-select-sm">
+                        <SelectItem Value="-1">Any</SelectItem>
+                        @foreach (TaskTypeViewModel token in taskTypes)
+                        {
+                            <SelectItem Value="@token.TaskTypeId">@token.TaskTypeName</SelectItem>
+                        }
+                    </Select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label class="float-left" for="CreatedByName">User:</label>
+                    <Select @bind-SelectedValue="@filterView.filterUser" Class="custom-select-sm">
+                        <SelectItem Value="-1">Any</SelectItem>
+                        @foreach (AppUserDropdownViewModel appUser in appUsers)
+                        {
+                            <SelectItem Value="@appUser.UserId">@appUser.UserLogin</SelectItem>
+                        }
+                    </Select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label class="float-left" for="CreatedByName">Task Status:</label>
+                    <Select @bind-SelectedValue="@filterView.filterTaskStatus" Class="custom-select-sm">
+                        <SelectItem Value="-1">Any</SelectItem>
+                        @foreach (string token in taskStatusList)
+                        {
+                            <SelectItem Value="@token">@token</SelectItem>
+                        }
+                    </Select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label class="float-left" for="CreatedByName">File Type:</label>
+                    <Select @bind-SelectedValue="@filterView.filterFileType" Class="custom-select-sm">
+                        <SelectItem Value="-1">Any</SelectItem>
+                        @foreach (FileTypeViewModel token in fileTypes)
+                        {
+                            <SelectItem Value="@token.FileTypeId">@token.FileTypeTitle</SelectItem>
+                        }
+                    </Select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label class="float-left" for="CreatedByName">Atm Type:</label>
+                    <Select @bind-SelectedValue="@filterView.filterAtmType" Class="custom-select-sm">
+                        <SelectItem Value="-1">Any</SelectItem>
+                        @foreach (string token in atmTypeList)
+                        {
+                            <SelectItem Value="@token">@token</SelectItem>
+                        }
+                    </Select>
+                </div>
+            </div>
+            <input class="btn btn-success btn-sm" disabled="@IsDisabled" type="button" @onclick="@(e => LoadData())" value="Search">
+            <input class="btn btn-success btn-sm" disabled="@IsDisabled" type="button" onclick="@ResetFilter" value="Reset">
+            <br />
+            @if (!isArchive)
+            {
+                @if (CheckPermission((int)Permissions.ScheduleFileDownload))
+                {
+                    <button style="margin-top: 5%;" type="button" disabled="@IsDisabled" class="btn btn-success btn-sm" @onclick="(() => ShowDwnldFileModal())">
+                        <span class="btn-label Dwnld_File" style="margin-right: 0.5em;">
+                            <i class="fas fa fa-download" style="color:darkviolet;"></i>
+                        </span>Download a new file
+                    </button>
+                    <br />
+                }
+
+                @if (CheckPermission((int)Permissions.ScheduleConfiguration))
+                {
+                    <button style="margin-top: 2%;" type="button" disabled="@IsDisabled" class="btn btn-success btn-sm" @onclick="(() => ScheduleConfiguration())">
+                        <span class="btn-label Scddl_Conf" style="margin-right: 0.5em;">
+                            <i class="fas fa fa-gear text-warning"></i>
+                        </span>Schedule Configuration
+                    </button>
+                    <br />
+                }                
+            }
+            <button style="margin-top: 2%;" type="button" disabled="@IsDisabled" class="btn btn-success btn-sm" @onclick="(() => MergeAsText())">
+                <span class="btn-label Merge_txt" style="margin-right: 0.5em;">
+                    <i class="fas fa fa-sticky-note" style="color:darkslategrey;"></i>
+                </span>Merge Result As Text
+            </button>
+            <br />
+            <button style="margin-top: 2%;" type="button" disabled="@IsDisabled" class="btn btn-success btn-sm" @onclick="(() => MergeAsPdf())">
+                <span class="btn-label Merge_pdf" style="margin-right: 0.5em;">
+                    <i class="fas fa fa-file-pdf-o text-danger"></i>
+                </span>Merge Result As Pdf
+            </button>
+        </form>
+    </div>
+
+
+    <div class="col-sm-10 text-left" style="margin-top:1%">
+        <div class="form-group">
+            <b><h2 style="font-family:montserrat; font-weight:bold">Task Status Monitoring ( History ) @(isArchive ? "- Archive" : "")</h2></b>
+        </div>
+
+        @if (showSpinner)
+        {
+            <div class="spinner" style="z-index:4"></div>
+        }
+
+        @if (showGrid)
+        {
+            <DataGrid @ref="@dataGridRef"
+                      TItem="AtmTaskViewModel"
+                      Data="@filteredAtmTasks"
+                      Editable
+                      Responsive="true"
+                      ShowPager="false"
+                      Bordered
+                      SortChanged="SortData"
+                      PageSize="50"
+                      FixedHeader
+                      FixedHeaderDataGridHeight="570px"
+                      FixedHeaderDataGridMaxHeight="570px"
+                      Narrow="true"
+                      Sortable
+                      SortMode="DataGridSortMode.Single"
+                      HeaderThemeContrast="@ThemeContrast.Light">
+
+
+                 <DataGridColumn Field="@nameof(AtmTaskViewModel.AtmTitle)" Caption="Title" />
+                 <DataGridColumn Field="@nameof(AtmTaskViewModel.AtmIP)" Caption="IP" />
+                 <DataGridColumn Field="@nameof(AtmTaskViewModel.Location)" Caption="Location" />
+                 <DataGridColumn Field="@nameof(AtmTaskViewModel.AtmType)" Caption="Type" />
+                 <DataGridColumn Field="@nameof(AtmTaskViewModel.CreationTime)" Caption="Creation Time" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" />
+                 <DataGridColumn Field="@nameof(AtmTaskViewModel.EndTime)" Caption="End Time" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" />
+                 <DataGridColumn Field="@nameof(AtmTaskViewModel.BytesTransferred)" Caption="Bytes Transferred" />
+                 <DataGridColumn Field="@nameof(AtmTaskViewModel.Status)" Sortable="false" Caption="Status" />
+                 <DataGridColumn Field="@nameof(AtmTaskViewModel.TaskTypeName)" Caption="Task Type" />
+                 <DataGridColumn Field="@nameof(AtmTaskViewModel.FileTypeTitle)" Caption="File Type" />
+                 <DataGridColumn Field="@nameof(AtmTaskViewModel.FailureReason)" Sortable="false" Caption="Failure Reason" />
+                 <DataGridColumn TItem="AtmTaskViewModel" Field="@nameof(AtmTaskViewModel.TaskId)" Caption="Details" Sortable="false">
+                     <DisplayTemplate>
+                         <Button Clicked="@(()=>GetTaskDetail(context))">
+                             <Icon Name="@("fa-newspaper-o")" TextColor="TextColor.Success" />
+                         </Button>
+                     </DisplayTemplate>
+                 </DataGridColumn>
+                 <DataGridColumn TItem="AtmTaskViewModel" Field="@nameof(AtmTaskViewModel.TaskId)" Caption="View File" Sortable="false">
+
+                     <DisplayTemplate>
+                         @{
+                            if ((context.TaskTypeId == 1 || context.TaskTypeId == 2 || context.TaskTypeId == 25)
+                            && context.DataFileCount > 0)
+                            {
+                                <Button Class="ViewTask" Clicked="@(()=>ViewTask(context))">
+                                    <Icon Name="@("fa-eye")" TextColor="TextColor.Secondary" />
+                                </Button>
+                            }
+                        }
+
+                    </DisplayTemplate>
+                </DataGridColumn>
+                <DataGridColumn TItem="AtmTaskViewModel" Field="@nameof(AtmTaskViewModel.TaskId)" Caption="Save as text" Sortable="false">
+                    <DisplayTemplate>
+                        @{
+                            if ((context.TaskTypeId == 1 || context.TaskTypeId == 2 || context.TaskTypeId == 25)
+                            && context.DataFileCount > 0)
+                            {
+                                <Button Class="SaveAsText" Clicked="@(()=>SaveAsText(context))">
+                                    <Icon Name="@("fa-sticky-note")" TextColor="TextColor.Info" />
+                                </Button>
+                            }
+                        }
+                    </DisplayTemplate>
+                </DataGridColumn>
+                <DataGridColumn TItem="AtmTaskViewModel" Field="@nameof(AtmTaskViewModel.TaskId)" Caption="Save as PDF" Sortable="false">
+                    <DisplayTemplate>
+                        @{
+                            if ((context.TaskTypeId == 1 || context.TaskTypeId == 2 || context.TaskTypeId == 25)
+                            && context.DataFileCount > 0)
+                            {
+                                <Button Class="SaveAsPdf" Clicked="@(()=>SaveAsPdf(context))">
+                                    <Icon Name="@("fa-file-pdf-o")" TextColor="TextColor.Danger" />
+                                </Button>
+                            }
+                        }
+                    </DisplayTemplate>
+                </DataGridColumn>
+                <DataGridColumn TItem="AtmTaskViewModel" Field="@nameof(AtmTaskViewModel.TaskId)" Caption="Reparse" Sortable="false">
+                    <DisplayTemplate>
+                        @{
+                            if ((context.TaskTypeId == 1 || context.TaskTypeId == 2 || context.TaskTypeId == 25)
+                            && context.DataFileCount > 0)
+                            {
+                                <Button Class="Reparse" Clicked="@(()=>Reparse(context.TaskId, context.AtmId))">
+                                    <Icon Name="@("fa-gears")" TextColor="TextColor.Warning" />
+                                </Button>
+                            }
+                        }
+                    </DisplayTemplate>
+                </DataGridColumn>
+            </DataGrid>
+
+            <EView360.Pages.Pagination pageNo="pageNo" maxPageNo="maxPageNo" totalRecords="totalRecords" OnSubmitCallback="GetDataByPageNo" />
+        }
+
+        <Modal @ref="modalRef" Class="ViewDetailsModal">
+            <ModalContent Centered Size="ModalSize.Large">
+                 <ModalHeader>
+                     <ModalTitle>Task Details</ModalTitle>
+                     <CloseButton />
+                 </ModalHeader>
+                 <ModalBody>
+                     <form>
+                         <div class="form-group row">
+                             <div class="form-group col-md-4">
+                                 <b><label for="inputEmail3" class="col-sm-8 col-form-label">Creation Time:</label></b>
+                                 <div class="col-sm-10">
+                                     <span>@taskDetail.CreationTime.ToString("dd/MM/yyyy H:m")</span>
+                                 </div>
+                             </div>
+                             <div class="form-group col-md-4">
+                                 <b><label for="inputEmail3" class="col-sm-8 col-form-label">Retries Remaining:</label></b>
+                                 <div class="col-sm-10">
+                                     <span>@taskDetail.RetryRemaining</span>
+                                 </div>
+                             </div>
+                             <div class="form-group col-md-4">
+                                 <b><label for="inputEmail3" class="col-sm-8 col-form-label">Status:</label></b>
+                                 <div class="col-sm-10">
+                                     <span>@taskDetail.Status</span>
+                                 </div>
+                             </div>
+                         </div>
+                         <div class="form-group row">
+                             <div class="form-group col-md-4">
+                                 <b><label for="inputEmail3" class="col-sm-8 col-form-label">Last Invoked:</label></b>
+                                 <div class="col-sm-10">
+                                     <span>@(taskDetail.LastInvoked.HasValue ? taskDetail.LastInvoked.Value.ToString("dd/MM/yyyy H:m") : "")</span>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <b><label for="inputEmail3" class="col-sm-8 col-form-label">Bytes Transferred:</label></b>
+                                <div class="col-sm-10">
+                                    <span>@taskDetail.BytesTransferred</span>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <b><label for="inputEmail3" class="col-sm-8 col-form-label">Duration:</label></b>
+                                <div class="col-sm-10">
+                                    <span>@duration</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="form-group col-md-4">
+                                <b><label for="inputEmail3" class="col-sm-8 col-form-label">Job Finished Time:</label></b>
+                                <div class="col-sm-10">
+                                    <span>@(taskDetail.EndTime.HasValue ? taskDetail.EndTime.Value.ToString("dd/MM/yyyy H:m") : "")</span>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <b><label for="inputEmail3" class="col-sm-8 col-form-label">Last Attempt Failed Reason:</label></b>
+                                <div class="col-sm-10">
+                                    <span>@taskDetail.FailureReasonFull</span>
+                                </div>
+                            </div>
+
+                            @if (taskDetail.TaskTypeId == 1)
+                            {
+                                <div class="form-group col-md-4">
+                                    <b><label for="inputEmail3" class="col-sm-8 col-form-label">File Type:</label></b>
+                                    <div class="col-sm-10">
+                                        <span>@taskDetail.FileTypeTitle</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        @if (taskDetail.TaskTypeId == 1)
+                        {
+                            <div class="form-group row">
+                                <div class="form-group col-md-4">
+                                    <b><label for="inputEmail3" class="col-sm-8 col-form-label">Zipped File Size:</label></b>
+                                    <div class="col-sm-10">
+                                        <span>@taskDetail.ZippedFileSize</span>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <b><label for="inputEmail3" class="col-sm-8 col-form-label">Unzipped File Size:</label></b>
+                                    <div class="col-sm-10">
+                                        <span>@taskDetail.UnZippedFileSize</span>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <b><label for="inputEmail3" class="col-sm-8 col-form-label">Parsed:</label></b>
+                                    <div class="col-sm-10">
+                                        <span>@taskDetail.Parsed</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="form-group col-md-4">
+                                    <b><label for="inputEmail3" class="col-sm-8 col-form-label">File Name:</label></b>
+                                    <div class="col-sm-10">
+                                        <span>@taskDetail.ServerFilepath</span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </form>
+                </ModalBody>
+                <ModalFooter>
+                    <Button Color="Color.Secondary" Clicked="@HideModal">Close</Button>
+                    @if (showCancelBtn && !isArchive)
+                    {
+                        <Button Color="Color.Danger" Clicked="@(()=>OnCancelTask(taskDetail.TaskId, taskDetail.FileTypeId, taskDetail.AtmId))">@cancelButtonText</Button>
+                    }
+                </ModalFooter>
+            </ModalContent>
+        </Modal>
+
+        <Modal @ref="DwnldFilemodalRef">
+            <ModalContent Centered Size="ModalSize.Default">
+                 <ModalHeader>
+                     <ModalTitle>Download a new file</ModalTitle>
+                     <CloseButton />
+                 </ModalHeader>
+                 <ModalBody>
+                     <form>
+                         <div class="form-row">
+                             <div class="form-group col-md-12">
+                                 <label class="float-left" for="CreatedByName">File Type:</label>
+                                 <select @bind="fileType" class="form-control">
+                                     @foreach (string token in fileTypes.Select(x => x.FileTypeTitle).ToList().Distinct())
+                                    {
+                                        <option value="@token">@token</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-12">
+                                <b><label for="inputEmail3" class="col-form-label">Selected Atm:</label></b>
+                                <span>@selectedAtmText</span>
+                            </div>
+                        </div>
+                    </form>
+                </ModalBody>
+                <ModalFooter>
+                    <Alert Color="Color.Info" @bind-Visible="@visible">
+                        <AlertDescription>
+                            @alertText
+                        </AlertDescription>
+                        <CloseButton />
+                    </Alert>
+                    <Button Color="Color.Success" Clicked="@DownloadFileTask">Download</Button>
+                    <Button Color="Color.Secondary" Clicked="@HideDwnldFileModal">Cancel</Button>
+                </ModalFooter>
+            </ModalContent>
+        </Modal>
+
+        <Modal @ref="ViewTaskModalRef">
+            <ModalContent Centered Size="ModalSize.Fullscreen">
+                 <ModalHeader>
+                     <ModalTitle>@viewFileHeading</ModalTitle>
+                     <CloseButton />
+                 </ModalHeader>
+                 <ModalBody>
+
+                     <pre>
+                         @((MarkupString)dataFile)                        
+                    </pre>
+                </ModalBody>
+            </ModalContent>
+        </Modal>
+    </div>
+</div>
+
+@if (mode is not null)
+{
+    <style>
+        .flatpickr-prev-month, .flatpickr-month .numInputWrapper, .flatpickr-next-month {
+            visibility: hidden;
+        }
+
+        .flatpickr-month {
+            font-size: large;
+        }
+    </style>
+}
+
+<style>
+
+    .full-width-grid {
+        width: 100%;
+    }
+
+    .table-primary .showAnimation {
+        animation: spin 1200ms linear infinite;
+    }
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        margin-top: 20px;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        width: 170px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    .ViewDetailsModal .modal-body {
+        height: 70vh;
+        overflow-y: auto;
+    }
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+
+</style>
+
+

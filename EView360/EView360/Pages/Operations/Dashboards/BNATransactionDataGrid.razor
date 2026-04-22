@@ -1,0 +1,207 @@
+﻿@page "/BNATransactionDataGrid/{NoteSetTypeId:int?}"
+@page "/BNATransactionDataGrid/{NoteSetTypeId:int?}/{ArchiveYear:int?}"
+@page "/BNATransactionDataGrid/{NoteSetTypeId:int}/{IsRegion:bool}/{FilterValues}"
+@layout EmptyLayout
+@using EView360.Services.Operations;
+@using EView360.Common;
+@using EView360.Services;
+@using EView360Models.Core;
+@using EView360Models.RequestModel;
+@using EView360Models.ViewModels;
+@using static EView360.Common.Constants;
+@inject BnaTranactionsService service
+@inject ATMTreeViewRepository treeService
+@inject ILogger<BNATransactionDataGrid> logger
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject CommonServices common;
+@implements IDisposable;
+@inject IJSRuntime jsRuntime;
+<html>
+<head>
+    <!-- 'title' tag with content of 'Home' -->
+    <title>BNA Deposit Dashboard - Total No. of Records = @bNATransactionDashboard?.Count  -  Data Generated At: @refreshCurrentTime - Next Refresh Countdown: @counter</title>
+</head>
+
+<body>
+    <div class="row content">
+        @if (showSpinner)
+        {
+            <div class="spinner" style="z-index:4"></div>
+        }
+        <div class="col-sm-12 text-left">
+
+            @if (showGrid)
+            {
+                <DataGrid @ref="@dataGridRef"
+                      TItem="BnaTransactionDashboardViewModel"
+                      Data="@_bNATransactionDashboard"
+                      ReadData="@OnReadData"
+                      TotalItems="@bNATransactionDashboard.Count"
+                          SortChanged="SortData"
+                                    Editable
+                      Responsive="true"
+                      ShowPager="false"
+                                    Bordered
+                                    FixedHeader
+                      Narrow="true"
+                                    Sortable SortMode="DataGridSortMode.Single"
+                                    Resizable
+                      HeaderThemeContrast="@ThemeContrast.Light"
+                                    Virtualize
+                      VirtualizeOptions="@(new() { DataGridMaxHeight = "735px", DataGridHeight="735px"})">
+
+
+                     <DataGridColumn Field="@nameof(BnaTransactionDashboardViewModel.ATM)" Caption="ATM" Sortable="true" />
+                     <DataGridColumn Field="@nameof(BnaTransactionDashboardViewModel.Region)" Caption="Region" Sortable="true" />
+                     <DataGridColumn Field="@nameof(BnaTransactionDashboardViewModel.IP)" Caption="IP" Sortable="true" />
+                     <DataGridColumn Field="@nameof(BnaTransactionDashboardViewModel.Location)" Caption="Location" Sortable="true" />
+                <DataGridColumn TItem="BnaTransactionDashboardViewModel" TextAlignment="TextAlignment.Center" Field="@nameof(BnaTransactionDashboardViewModel.Cassette1)" Caption="Cassette1" Sortable="true">
+                    <DisplayTemplate>
+                        @{
+                                var atm = Atms.FirstOrDefault(a => a.AtmId == context.AtmId);
+                                @context.Cassette1
+                                ;
+                                if (context.Cassette1 >= atm?.CcdmCassette1Threshold)
+                                {
+                                    <Icon Name="@("fa-exclamation-triangle")" TextColor="TextColor.Warning" />
+                                }
+                                if (context.Cassette1 >= 2000)
+                                {
+                                    <Icon Name="@("fa-exclamation-triangle")" TextColor="TextColor.Danger" />
+                                }
+                            }
+
+                        </DisplayTemplate>
+                    </DataGridColumn>
+                    <DataGridColumn TItem="BnaTransactionDashboardViewModel" TextAlignment="TextAlignment.Center" Field="@nameof(BnaTransactionDashboardViewModel.Cassette2)" Caption="Cassette2" Sortable="true">
+                        <DisplayTemplate>
+                            @{
+                                var atm = Atms.FirstOrDefault(a => a.AtmId == context.AtmId);
+                                @context.Cassette2
+                                ;
+                                if (context.Cassette2 >= atm?.CcdmCassette2Threshold)
+                                {
+                                    <Icon Name="@("fa-exclamation-triangle")" TextColor="TextColor.Warning" />
+                                }
+                                if (context.Cassette2 >= 2000)
+                                {
+                                    <Icon Name="@("fa-exclamation-triangle")" TextColor="TextColor.Danger" />
+                                }
+                            }
+
+                        </DisplayTemplate>
+
+                    </DataGridColumn>
+
+                    <DataGridColumn TItem="BnaTransactionDashboardViewModel" TextAlignment="TextAlignment.Center" Field="@nameof(BnaTransactionDashboardViewModel.Cassette3)" Caption="Cassette3" Sortable="true">
+                        <DisplayTemplate>
+                            @{
+
+                                var atm = Atms.FirstOrDefault(a => a.AtmId == context.AtmId);
+                                @context.Cassette3
+                                ;
+                                if (context.Cassette3 >= atm?.CcdmCassette3Threshold)
+                                {
+                                    <Icon Name="@("fa-exclamation-triangle")" TextColor="TextColor.Warning" />
+                                }
+                                if (context.Cassette3 >= 2000)
+                                {
+                                    <Icon Name="@("fa-exclamation-triangle")" TextColor="TextColor.Danger" />
+                                }
+                            }
+
+                        </DisplayTemplate>
+                    </DataGridColumn>
+
+                    <DataGridColumn TItem="BnaTransactionDashboardViewModel" TextAlignment="TextAlignment.Center" Field="@nameof(BnaTransactionDashboardViewModel.Cassette4)" Caption="Cassette4" Sortable="true">
+                        <DisplayTemplate>
+                            @{
+                                var atm = Atms.FirstOrDefault(a => a.AtmId == context.AtmId);
+                                @context.Cassette4
+                                ;
+                                if (context.Cassette4 >= atm?.CcdmCassette4Threshold)
+                                {
+                                    <Icon Name="@("fa-exclamation-triangle")" TextColor="TextColor.Warning" />
+                                }
+                                if (context.Cassette4 >= 2000)
+                                {
+                                    <Icon Name="@("fa-exclamation-triangle")" TextColor="TextColor.Danger" />
+                                }
+                            }
+                        </DisplayTemplate>
+                    </DataGridColumn>
+                    <DataGridColumn TItem="BnaTransactionDashboardViewModel" TextAlignment="TextAlignment.Center" Field="@nameof(BnaTransactionDashboardViewModel.Cassette5)" Caption="Cassette5" Sortable="true">
+                        <DisplayTemplate>
+                            @{
+                                var atm = Atms.FirstOrDefault(a => a.AtmId == context.AtmId);
+                                @context.Cassette5
+                                ;
+                                if (context.Cassette5 >= atm?.CcdmCassette5Threshold)
+                                {
+                                    <Icon Name="@("fa-exclamation-triangle")" TextColor="TextColor.Warning" />
+                                }
+                                if (context.Cassette5 >= 2000)
+                                {
+                                    <Icon Name="@("fa-exclamation-triangle")" TextColor="TextColor.Danger" />
+                                }
+                            }
+                        </DisplayTemplate>
+                    </DataGridColumn>
+
+                    <DataGridColumn Field="@nameof(BnaTransactionDashboardViewModel.Total)" Caption="Total" Sortable="true" />
+                    <DataGridColumn Field="@nameof(BnaTransactionDashboardViewModel.LastBNADeposit)" Caption="Last BNA Deposit At" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" Sortable="true" />
+                    <DataGridColumn Field="@nameof(BnaTransactionDashboardViewModel.LastBNAClearedAt)" Caption="Last BNA Cleared At" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" Sortable="true" />
+                </DataGrid>
+            }
+        </div>
+    </div>
+</body>
+</html>
+<style>
+
+    .col, .col-1, .col-10, .col-11, .col-12, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-auto, .col-lg, .col-lg-1, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-auto, .col-md, .col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-auto, .col-sm, .col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-auto, .col-xl, .col-xl-1, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-auto {
+        padding-right: 0px;
+        padding-left: 0px;
+    }
+
+    *, ::after, ::before {
+        box-sizing: content-box;
+    }
+
+    .table-primary .showAnimation {
+        animation: spin 1200ms linear infinite;
+    }
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        width: 170px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+
+</style>
+

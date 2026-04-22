@@ -1,0 +1,286 @@
+﻿@page "/AuditLogReport"
+
+@using EView360.Data;
+@using EView360.Services;
+@using EView360Models.Core;
+@using EView360Models.ViewModels;
+@using Microsoft.Extensions.Caching.Distributed;
+@using Microsoft.Extensions.Options;
+@using Newtonsoft.Json;
+@using System.Data;
+@using System.Text;
+@using global::Common.RequestModel;
+@inject ILogger<AuditLogReport> logger
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject HttpClient client
+@inject IJSRuntime jsRuntime
+@inject IOptions<ApiUrl> apiUrl
+@inject IConfiguration _configuration
+
+@inject UserManagementService userManagementService
+@inject GroupRepository groupService
+@inject AuditLogService auditLogService
+@inject NoteSetTypeService service
+@inject IDistributedCache _distributedCache
+<div class="row content">
+    @if (showSpinner)
+    {
+        <div class="spinner" style="z-index:4"></div>
+    }
+    <div class="col-sm-12">
+        <div class="form-group">
+            <b><h2 style="font-family:montserrat; font-weight:bold; margin-top: 1%;">Audit Log Report </h2></b>
+        </div>
+        <div class="card" style="border-width: medium;border-color: orange; margin-top:3%;">
+            <div class="card-body">
+                <form style="margin-top: 20px;">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <h5>Filters: </h5>
+                        </div>
+                    </div>
+
+                    @*                    @if (isArchive)
+                    {
+                    <div class="form-row">
+                    <div class="form-group col-md-12">
+                    <label>Archive Year: </label>
+                    <select class="form-control" @bind="ArchiveYear">
+                    <option value="2022">2022</option>
+                    <option value="2021">2021</option>
+                    <option value="2020">2020</option>
+                    <option value="2019">2019</option>
+                    <option value="2018">2018</option>
+
+                    </select>
+                    </div>
+                    </div>
+                    }*@
+
+                    <div class="form-row">
+                        <div class="form-group col-md-1">
+                            <label>From Date: </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <DatePicker TValue="DateTime?" @ref="@dateRef" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" Placeholder="Selete Date" @bind-Date="@fromDate" TimeAs24hr="true"></DatePicker>
+
+                        </div>
+                        <div class="form-group col-md-4 text-right">
+                            <label>To Date: </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <DatePicker TValue="DateTime?" @ref="@dateRef" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" Placeholder="Selete Date" @bind-Date="@toDate" TimeAs24hr="true"></DatePicker>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-1">
+                            <label class="float-left">Rights :</label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <select @bind="filterRights" class="form-control">
+                                <option value="">Any</option>
+                                @foreach (var right in rights.Select(x => new { x.RightId, x.Name }).Distinct())
+                                {
+                                    <option value="@right.RightId">@right.Name</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4 text-right">
+                            <label>Status : </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <select @bind="filterRights" class="form-control">
+                                <option value="">Any</option>
+                                @foreach (var right in rights.Select(x => new { x.RightId, x.Name }).Distinct())
+                                {
+                                    <option value="@right.RightId">@right.Name</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@GenerateReport" value="Generate Report">
+                    <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@ResetFilter" value="Reset">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+
+    form {
+        max-width: 100%;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+
+</style>
+
+@code {
+    private string filterCreatedBy = string.Empty;
+    private string filterRights = string.Empty;
+    DateTime? fromDate = DateTime.Now.Date;
+    DateTime? toDate = DateTime.Now.Date.AddDays(1).AddSeconds(-1);
+    public List<AppUserDropdownViewModel> appUsers { get; set; } = new List<AppUserDropdownViewModel>();
+    private bool showSpinner = false;
+    private bool showGrid = false;
+    private bool showModal = false;
+    public List<AuditLogViewModel> auditLogs = new();
+    public List<Right> rights = new();
+    private List<AuditLogViewModel> filteredAuditLogs = new();
+    [Inject] INotificationService NotificationService { get; set; }
+    [Inject] IMessageService MessageService { get; set; }
+    DatePicker<DateTime?> dateRef;
+    private DotNetObjectReference<AuditLogReport>? objRef;
+    private bool IsDisabled = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        objRef = DotNetObjectReference.Create(this);
+
+
+        if (appUsers is null || appUsers.Count == 0)
+        {
+            appUsers = await userManagementService.GetAllUsers();
+        }
+        if (rights is null || rights.Count == 0)
+        {
+            rights = await groupService.GetRightsAsync();
+        }
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeVoidAsync("handleDatePicker", objRef);
+
+            //LoadData();
+        }
+    }
+
+    public async void LoadData()
+    {
+        showSpinner = false;
+        int? rightId = filterRights == string.Empty ? 0 : Convert.ToInt32(filterRights);
+        int? userId = filterCreatedBy == string.Empty ? 0 : Convert.ToInt32(filterCreatedBy);
+
+        if (fromDate > toDate)
+        {
+            await NotificationService.Error("To date must be greater than from date.", "Validation", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+            return;
+        }
+
+        auditLogs = filteredAuditLogs = await auditLogService.GetAuditLog(fromDate, toDate, rightId, userId);
+        showSpinner = false;
+        showGrid = true;
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+    private void FilterSubmit()
+    {
+        filteredAuditLogs = auditLogs;
+
+        LoadData();
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private void ResetFilter()
+    {
+        filteredAuditLogs = auditLogs;
+        filterCreatedBy = string.Empty;
+        filterRights = string.Empty;
+        fromDate = DateTime.Now.Date;
+        toDate = DateTime.Now.Date.AddDays(1).AddSeconds(-1);
+
+        this.InvokeAsync(() => this.StateHasChanged());
+        LoadData();
+    }
+    private async void GenerateReport()
+    {
+        showSpinner = true;
+        IsDisabled = true;
+        AppUser appUser = await localStorage.GetItemAsync<AppUser>("AppUser");
+
+
+        int? rightId = filterRights == string.Empty ? 0 : Convert.ToInt32(filterRights);
+        int? userId = filterCreatedBy == string.Empty ? 0 : Convert.ToInt32(filterCreatedBy);
+
+        logger.LogWarning($"AuditLogReportPage:GenerateReport] going in GetAuditLogReport UI Service");
+        var data = await auditLogService.GetAuditLogReport(fromDate, toDate, rightId, userId);
+        logger.LogWarning($"AuditLogReportPage:GenerateReport] return from GetAuditLogReport UI Service");
+
+        logger.LogWarning($"AuditLogReportPage:GetAuditLogDetailReport] going in GetAuditLogDetailReport UI Service");
+        var SubReportdata = await auditLogService.GetAuditLogDetailReport(fromDate, toDate, rightId, userId);
+        logger.LogWarning($"AuditLogReportPage:GetAuditLogDetailReport] return from GetAuditLogDetailReport UI Service");
+
+        logger.LogWarning("[AuditLogReportPage:GenerateReport] Start Serializing Datatable Sub Report ");
+        string serializedDatatableSubReport = JsonConvert.SerializeObject(SubReportdata);
+        logger.LogWarning("[AuditLogReportPage:GenerateReport] End Serializing Datatable Sub Report");
+
+        logger.LogWarning("[AuditLogReportPage:GenerateReport] Start convering serialized Datatable Sub Report into bytes ");
+        byte[] SubReportbytes = Encoding.ASCII.GetBytes(serializedDatatableSubReport);
+        logger.LogWarning("[AuditLogReportPage:GenerateReport] End convering serialized Datatable Sub Report into bytes ");
+
+
+
+        logger.LogWarning("[AuditLogReportPage:GenerateReport] Start Serializing Datatable ");
+        string serializedDatatable = JsonConvert.SerializeObject(data);
+        logger.LogWarning("[AuditLogReportPage:GenerateReport] End Serializing Datatable ");
+
+        logger.LogWarning("[AuditLogReportPage:GenerateReport] Start convering serialized Datatable into bytes ");
+        byte[] bytes = Encoding.ASCII.GetBytes(serializedDatatable);
+        logger.LogWarning("[AuditLogReportPage:GenerateReport] End convering serialized Datatable into bytes ");
+
+        string redisKey = $"AuditLogReport_{appUser.UserId}";
+        string redisKeySubReport = $"AuditLogSubReport_{appUser.UserId}";
+
+        logger.LogWarning($"AuditLogReportPage: going to cache the  subreport data");
+        _distributedCache.Set(redisKeySubReport, SubReportbytes, new DistributedCacheEntryOptions()
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_configuration.GetValue<int>("RedisKeyExpirationTimeInMinutes"))
+            });
+        logger.LogWarning($"AuditLogReportPage: return from cache the subreport data");
+
+
+        logger.LogWarning($"AuditLogReportPage: going to cache the data");
+        _distributedCache.Set(redisKey, bytes, new DistributedCacheEntryOptions()
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_configuration.GetValue<int>("RedisKeyExpirationTimeInMinutes"))
+            });
+        logger.LogWarning($"AuditLogReportPage: return from cache the data");
+
+        var reports = new ReportsRequestModel()
+            {
+                redisKey = $"{redisKey}",
+                redisKeySubReport = $"{redisKeySubReport}",
+            };
+       
+        showSpinner = false;
+        IsDisabled = false;
+        await this.InvokeAsync(() => this.StateHasChanged());
+        if (data.Rows.Count > 0)
+        {
+            string url = $"{apiUrl.Value.ReportingProjectUrl}ReportPopup.aspx?Report=AuditLogRpt.rpt&ReportTitle=Audit Log Report&FromDate={fromDate.Value.Date.ToString("MM/dd/yyyy")}&ToDate={toDate.Value.Date.ToString("MM/dd/yyyy")}&GeneratedBy={appUser.UserLogin}&UserId={appUser.UserId}";
+            await jsRuntime.InvokeVoidAsync("openWindowWithPost", url, reports);
+        }
+
+    }
+}

@@ -1,0 +1,543 @@
+﻿@page "/AlertMonitoring"
+@page "/AlertMonitoring/{mode}"
+
+@using DataRequestor;
+@using EView360.Common;
+@using EView360.Services.Operations;
+@using EView360.Services;
+@using EView360Models.Core;
+@using EView360Models.RequestModel;
+@using EView360Models.ViewModels;
+@using System.Data;
+@using Microsoft.EntityFrameworkCore.Metadata;
+@using Microsoft.EntityFrameworkCore;
+@using static EView360.Data.Enumerations;
+@inject AlertMonitoringService service;
+@inject CommonServices common;
+@inject ILogger<AlertMonitoring> logger
+@inject ATMTreeViewRepository atmRepository
+@inject NotifyService notifyService
+@inject IJSRuntime jsRuntime
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@implements IDisposable
+@inject NavigationManager NavigationManager
+
+<div class="row content">
+    <div class="col-sm-2 filter_bar border-right-2">
+        <form style="margin-top: 20px;">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <h5>Filters: </h5>
+                </div>
+            </div>
+            @if (@mode is not null && mode.Equals("Archive"))
+            {
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label>Archive Year: </label>
+                        <Select TValue="int" SelectedValue="filter.ArchiveYear" class="form-control" SelectedValueChanged="@OnArchiveYearChange">
+                            @foreach (int year in archiveYears)
+                            {
+                                <SelectItem Value=year>@year</SelectItem>
+                            }
+                        </Select>
+                    </div>
+                </div>
+            }
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label>From Date: </label>
+                    @if (@mode is not null && mode.Equals("Archive"))
+                    {
+                        <DatePicker TValue="DateTime?" DisplayFormat="dd/MM H:m" InputMode="DateInputMode.DateTime" @bind-Date="@filter.fromDate" class="form-control" @oninput="ChangeToArchiveYear" TimeAs24hr="true" />
+                    }
+                    else
+                    {
+                        <DatePicker TValue="DateTime?" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" @bind-Date="@filter.fromDate" class="form-control" TimeAs24hr="true" />
+                    }
+
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label>To Date: </label>
+                    @if (@mode is not null && mode.Equals("Archive"))
+                    {
+                        <DatePicker TValue="DateTime?" DisplayFormat="dd/MM H:m" InputMode="DateInputMode.DateTime" @bind-Date="@filter.toDate" class="form-control" @oninput="ChangeToArchiveYear" TimeAs24hr="true" />
+                    }
+                    else
+                    {
+                        <DatePicker TValue="DateTime?" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" @bind-Date="@filter.toDate" class="form-control" TimeAs24hr="true" />
+                    }
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label>Type: </label>
+                    <select @bind="filter.type" class="form-control">
+                        <option value="*">Any</option>
+                        @foreach (var alertType in alertTypes.Distinct())
+                        {
+                            <option value="@alertType">@alertType</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@FilterSubmit" value="Search">
+            <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@ResetFilter" value="Reset">
+
+        </form>
+    </div>
+
+
+    <div class="col-sm-10 text-left" style="margin-top:1%">
+        <div class="form-group">
+            <b><h2 style="font-family:montserrat; font-weight:bold">Alert Monitoring ( History ) @(isArchive ? "- Archive" : "")</h2></b>
+        </div>
+
+        @if (showSpinner)
+        {
+            <div class="spinner" style="z-index:4"></div>
+        }
+
+        @if (showGrid)
+        {
+            <DataGrid @ref="@dataGridRef"
+                      TItem="AlertMonitoringViewModel"
+                      Data="@filteredAlerts"
+                            Editable
+                       Responsive="true"
+                       ShowPager="false"
+                            Bordered
+                       PageSize="50"
+                            FixedHeader
+                       FixedHeaderDataGridHeight="570px"
+                       FixedHeaderDataGridMaxHeight="570px"
+                       Narrow="true"
+                       Sortable="true"
+                       SortMode="DataGridSortMode.Single"
+                       SortChanged="SortData"
+                            Resizable
+                       HeaderThemeContrast="@ThemeContrast.Light">
+
+                 <DataGridDateColumn Field="@nameof(Atm.Title)" Caption="Title" />
+                 <DataGridNumericColumn Field="@nameof(Region.RegionName)" Caption="Region" />
+                 <DataGridColumn Field="@nameof(AlertType.AlertTypeName)" Caption="Type" />
+                 <DataGridNumericColumn Field="@nameof(AtmAlert.GeneratedAt)" Caption="GenerationTime" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" />
+                 <DataGridNumericColumn Field="@nameof(AtmAlert.ResolveAt)" Caption="ResolutionTime" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" />
+                 @* <DataGridNumericColumn Field="@nameof(AtmAlert.AlertMsg)" Caption="Message" /> *@
+
+             </DataGrid>
+            <EView360.Pages.Pagination pageNo="pageNo" maxPageNo="maxPageNo" totalRecords="totalRecords" OnSubmitCallback="GetDataByPageNo" />
+        }
+    </div>
+</div>
+
+<style>
+
+    form {
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .table-primary .showAnimation {
+        animation: spin 1200ms linear infinite;
+    }
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        margin-top: 20px;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        width: 170px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    .modal-body {
+        height: 70vh;
+        overflow-y: auto;
+    }
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+
+</style>
+
+@if (@mode is not null)
+{
+    <style>
+        .flatpickr-prev-month, .flatpickr-month .numInputWrapper, .flatpickr-next-month {
+            visibility: hidden;
+        }
+
+        .flatpickr-month {
+            font-size: large;
+        }
+    </style>
+}
+
+@code {
+    [Inject] INotificationService? NotificationService { get; set; }
+    [Inject] IMessageService? MessageService { get; set; }
+
+    private bool showGrid = true, showSpinner = false;
+    private bool IsDisabled = false;
+    private long? selectedTreeRegion;
+    private List<long>? selectedTreeAtm;
+    private List<string> alertTypes = new();
+    private List<AlertMonitoringViewModel>? alerts;
+    private List<AlertMonitoringViewModel>? _alerts;
+    private List<AlertMonitoringViewModel>? filteredAlerts;
+    private DataGrid<AlertMonitoringViewModel>? dataGridRef;
+    static DateTime currentTime = DateTime.Now;
+    private AlertMonitoringFilter filter = new AlertMonitoringFilter()
+        {
+            fromDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0),
+            toDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 0),
+            type = "*"
+        };
+
+    [Parameter]
+    public string? mode { get; set; }
+    private List<int> archiveYears = new();
+    bool isArchive = false;
+    private int pageNo { get; set; }
+    private int maxPageNo { get; set; }
+    private int totalRecords { get; set; }
+    private DotNetObjectReference<AlertMonitoring>? objRef;
+    Executor executor = new Executor();
+    IModel dbContextModel = new CoreContext().Model;
+    private SortDirection sortDirection = new();
+    private string sortField = string.Empty;
+    bool viewHistoryPermission = true;
+    bool viewArchivePermission = true;
+
+
+
+
+    protected async override void OnParametersSet()
+    {
+        if (viewHistoryPermission || viewArchivePermission)
+        {
+            if (mode is not null && mode.Equals("Archive"))
+            {
+                isArchive = true;
+                archiveYears = common.GetLastNYears();
+                filter.ArchiveYear = archiveYears.FirstOrDefault();
+                filter.fromDate = new DateTime(filter.ArchiveYear, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+                filter.toDate = new DateTime(filter.ArchiveYear, DateTime.Now.Month, DateTime.Now.Day, 23, 59, 0);
+            }
+            else
+            {
+                filter.fromDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+                filter.toDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 23, 59, 0);
+                filter.ArchiveYear = 0;
+                await this.InvokeAsync(() => this.StateHasChanged());
+            }
+            filter.type = "*";
+            filter.UserId = (await localStorage.GetItemAsync<EView360Models.Core.AppUser>("AppUser")).UserId;
+            filter.RowCount = common.GetRecordPerPage();
+            alerts = filteredAlerts = new();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        common.userRight = await localStorage.GetItemAsync<Dictionary<int, string>>("userRights");
+
+        if (mode is not null && mode.Equals("Archive"))
+        {
+            if (!common.CheckPermission((int)Permissions.ViewAlertMonitoringHistoryArchive))
+            {
+                NavigationManager.NavigateTo("404");
+                viewArchivePermission = false;
+            }
+        }
+        else
+        {
+            if (!common.CheckPermission((int)Permissions.AlertMonitoringHistory))
+            {
+                NavigationManager.NavigateTo("404");
+                viewHistoryPermission = false;
+            }
+        }
+        if (viewHistoryPermission || viewArchivePermission)
+        {
+            objRef = DotNetObjectReference.Create(this);
+            executor.RaiseCustomEvent += PopulateModel;
+
+            notifyService.OnAtmChange += AtmSelected;
+            notifyService.OnRegionChange += RegionSelected;
+
+            if (alerts is null || alerts.Count == 0)
+                alertTypes = await service.GetAlertTypes();
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender && (viewHistoryPermission || viewArchivePermission))
+            {
+                await jsRuntime.InvokeVoidAsync("handleDatePicker", objRef);
+                pageNo = 1;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at Alert Monitoring, OnAfterRenderAsync as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    private Task OnArchiveYearChange(int selectedYear)
+    {
+        filter.ArchiveYear = selectedYear;
+        filter.fromDate = new DateTime(filter.ArchiveYear, filter.fromDate.Value.Month, filter.fromDate.Value.Day, filter.fromDate.Value.Hour, filter.fromDate.Value.Minute, filter.fromDate.Value.Second);
+        filter.toDate = new DateTime(filter.ArchiveYear, filter.toDate.Value.Month, filter.toDate.Value.Day, filter.toDate.Value.Hour, filter.toDate.Value.Minute, filter.toDate.Value.Second);
+        this.InvokeAsync(() => this.StateHasChanged());
+        return Task.CompletedTask;
+    }
+
+    private Task ChangeToArchiveYear()
+    {
+        if (isArchive)
+        {
+            if (filter.fromDate != null && filter.fromDate.Value.Year != filter.ArchiveYear)
+                filter.fromDate = new DateTime(filter.ArchiveYear, filter.fromDate.Value.Month, filter.fromDate.Value.Day, filter.fromDate.Value.Hour, filter.fromDate.Value.Minute, filter.fromDate.Value.Second);
+
+            if (filter.toDate != null && filter.toDate.Value.Year != filter.ArchiveYear)
+                filter.toDate = new DateTime(filter.ArchiveYear, filter.toDate.Value.Month, filter.toDate.Value.Day, filter.toDate.Value.Hour, filter.toDate.Value.Minute, filter.toDate.Value.Second);
+        }
+        return Task.CompletedTask;
+    }
+
+    private async Task LoadData()
+    {
+        alerts = filteredAlerts = new();
+        showSpinner = IsDisabled = true;
+        showGrid = false;
+        totalRecords = 0;
+        await this.InvokeAsync(() => this.StateHasChanged());
+        await common.TaskDelay();
+        filter.Offset = common.GetDatabaseOffset(pageNo);
+        logger.LogWarning($"[AlertMonitoringPage:LoadData] going in GetAlerts ");
+        service.GetAlerts(executor, filter);
+        logger.LogWarning($"[AlertMonitoringPage:LoadData] returning from GetAlerts ");
+        //Add sorting direction icons via sort
+        await dataGridRef.Sort(sortField, sortDirection);
+    }
+
+    private async void SortData(DataGridSortChangedEventArgs e)
+    {
+        string sortedColumn = e.FieldName;
+        var sortedDirection = e.SortDirection;
+        string? orderby = string.Empty;
+
+        if (this.sortDirection != sortedDirection || !this.sortField.Equals(sortedColumn))
+        {
+            //For AlertType Fields
+            IEntityType? entityType = dbContextModel?.FindEntityType(typeof(AlertType));
+
+            if (sortedColumn.Equals(entityType?.FindProperty(nameof(AlertType.AlertTypeName))?.Name))
+                orderby = entityType?.FindProperty(nameof(AlertType.AlertTypeName))?.GetColumnName();
+
+            //For Atm Fields
+            entityType = dbContextModel?.FindEntityType(typeof(Atm));
+
+            if (sortedColumn.Equals(entityType?.FindProperty(nameof(Atm.Title))?.Name))
+                orderby = entityType?.FindProperty(nameof(Atm.Title))?.GetColumnName();
+
+            //For Region Fields
+            entityType = dbContextModel?.FindEntityType(typeof(Region));
+
+            if (sortedColumn.Equals(entityType?.FindProperty(nameof(Region.RegionName))?.Name))
+                orderby = entityType?.FindProperty(nameof(Region.RegionName))?.GetColumnName();
+
+            //For AtmAlert Fields
+            entityType = dbContextModel?.FindEntityType(typeof(AtmAlert));
+
+            if (sortedColumn.Equals(entityType?.FindProperty(nameof(AtmAlert.GeneratedAt))?.Name))
+                orderby = entityType?.FindProperty(nameof(AtmAlert.GeneratedAt))?.GetColumnName();
+
+            else if (sortedColumn.Equals(entityType?.FindProperty(nameof(AtmAlert.ResolveAt))?.Name))
+                orderby = entityType?.FindProperty(nameof(AtmAlert.ResolveAt))?.GetColumnName();
+
+            // --- If too many properties are to be fetched from a single table ---
+            // var properties = entityType.GetProperties();
+            // string x = properties.FirstOrDefault(s => s.Name.Equals(sortedColumn))?.GetColumnName();
+
+            // foreach (IProperty property in properties)
+            // {
+            //     if (property.Name.Equals(sortedColumn))
+            //     {
+            //         orderby = property.GetColumnName();
+            //         break;
+            //     }
+            // }
+
+            if (sortedDirection == SortDirection.Ascending && !string.IsNullOrEmpty(orderby))
+                orderby += " asc";
+
+            else if (sortedDirection == SortDirection.Descending && !string.IsNullOrEmpty(orderby))
+                orderby += " desc";
+
+            else if (sortedDirection == SortDirection.Default && !string.IsNullOrEmpty(orderby))
+                orderby = string.Empty;
+
+            filter.Orderby = orderby;
+
+            this.sortDirection = sortedDirection;
+            this.sortField = sortedColumn;
+            await LoadData();
+        }
+    }
+
+    private async void FilterSubmit()
+    {
+        await LoadData();
+    }
+
+    private void ResetFilter()
+    {
+        if (isArchive)
+        {
+            filter.ArchiveYear = archiveYears.FirstOrDefault();
+            filter.fromDate = new DateTime(filter.ArchiveYear, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+            filter.toDate = new DateTime(filter.ArchiveYear, DateTime.Now.Month, DateTime.Now.Day, 23, 59, 0);
+        }
+        else
+        {
+            filter.fromDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+            filter.toDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 23, 59, 0);
+            filter.ArchiveYear = 0;
+        }
+        filter.type = "*";
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private async void AtmSelected()
+    {
+        //selectedTreeAtm = await atmRepository.GetSelectedAtmId();
+        //filteredAlerts = alerts;
+        //filteredAlerts = filteredAlerts.Where(x => x.AtmId == selectedTreeAtm.First()).ToList();
+        // await this.InvokeAsync(() => this.StateHasChanged());
+        LoadData();
+    }
+
+    private async void RegionSelected()
+    {
+        //selectedTreeAtm = await atmRepository.GetSelectedAtmId();
+        //filteredAlerts = alerts;
+        //filteredAlerts = filteredAlerts.Where(x => selectedTreeAtm.Contains(x.AtmId)).ToList();
+        //await this.InvokeAsync(() => this.StateHasChanged());
+        LoadData();
+    }
+
+    public void Dispose()
+    {
+        objRef?.Dispose();
+        notifyService.OnAtmChange -= AtmSelected;
+        notifyService.OnRegionChange -= RegionSelected;
+    }
+
+    public async void PopulateModel(object sender, DataRequestor.CustomEventArgs args)
+    {
+        string error = string.Empty;
+
+        if (args?._data?.Rows?.Count > 0)
+        {
+            _alerts = BuildAlerts(args._data);
+
+            alerts.AddRange(_alerts);
+            filteredAlerts = alerts;
+            totalRecords += filteredAlerts.FirstOrDefault().RowCount;
+            maxPageNo = common.GetMaxPageNo(Convert.ToInt32(totalRecords));
+        }
+
+        if (args._exception != null && !string.IsNullOrEmpty(args._exception.Message))
+        {
+            logger.LogError($"Exception at AlertMonitoringHistory, PopulateModel as: {args._exception.Message}");
+            await common.RenderErrorBox(args._exception.Message);
+
+            if (args._exception.InnerException != null && !string.IsNullOrEmpty(args._exception.InnerException.Message))
+            {
+                logger.LogError($"Exception at AlertMonitoringHistory, PopulateModel as: {args._exception.InnerException.Message}");
+                await common.RenderErrorBox(args._exception.InnerException.Message);
+            }
+        }
+        else if (alerts is null || alerts.Count == 0)
+        {
+            await NotificationService.Info("Check Filter, if records are not appearing", "Information", (options) =>
+            {
+                options.IntervalBeforeClose = 5000;
+            });
+        }
+
+        IsDisabled = false;
+        if (!showGrid)
+        {
+            showGrid = true;
+            showSpinner = false;
+        }
+        await this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    public List<AlertMonitoringViewModel> BuildAlerts(DataTable dataTable)
+    {
+        List<AlertMonitoringViewModel> alerts = new();
+
+        if (dataTable != null)
+        {
+            foreach (DataRow row in dataTable.Rows)
+            {
+                AlertMonitoringViewModel alert = new()
+                    {
+                        RowCount = !DBNull.Value.Equals(row["row_count"]) ? Convert.ToInt32(row["row_count"]) : 0,
+                        AlertTypeName = !DBNull.Value.Equals(row["alert_type_name"]) ? row["alert_type_name"].ToString() : string.Empty,
+                        Title = !DBNull.Value.Equals(row["title"]) ? row["title"].ToString() : string.Empty,
+                        RegionName = !DBNull.Value.Equals(row["region_name"]) ? row["region_name"].ToString() : string.Empty,
+                        AlertMsg = !DBNull.Value.Equals(row["alert_msg"]) ? row["alert_msg"].ToString() : string.Empty,
+                        GeneratedAt = !DBNull.Value.Equals(row["generated_at"]) ? Convert.ToDateTime(row["generated_at"]) : null,
+                        ResolveAt = !DBNull.Value.Equals(row["resolve_at"]) ? Convert.ToDateTime(row["resolve_at"]) : null,
+                        AtmId = !DBNull.Value.Equals(row["ATM_id"]) ? Convert.ToInt64(row["ATM_id"]) : 0
+                    };
+                alerts.Add(alert);
+            }
+        }
+        return alerts;
+    }
+
+    private async Task GetDataByPageNo(int thisPageNo)
+    {
+        pageNo = thisPageNo;
+        await LoadData();
+    }
+
+}

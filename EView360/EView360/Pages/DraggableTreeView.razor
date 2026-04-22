@@ -1,0 +1,105 @@
+﻿@page "/TreeView"
+@inject IJSRuntime jsRuntime
+@using EView360.Services
+@using EView360.Data
+@inject BankRepository bankRepository
+
+
+<div class="spinner" style="z-index:4"></div>
+
+@if (bankList.Count > 0)
+{
+    <div class="container-fluid-tree" style="display:none;">
+        <div id="jstree">
+            <ul>
+                <li data-jstree='{"icon":"fa fa-globe"}'>
+                    All Organizations
+                    @foreach (Item bank in bankList)
+                    {
+                        <ul>
+                            <li data-jstree='{"icon":"fas fa-university"}' id="@bank.Id">
+                                @bank.Text
+                                @if (bank.Children?.Count > 0)
+                                {
+                                    @foreach (Item branch in bank.Children)
+                                    {
+                                        string branchId = $"{bank.Id}_{branch.Id}";
+                                        <ul>
+                                            <li data-jstree='{"icon":"fas fa-sitemap"}' id="@branchId">
+                                                @branch.Text
+                                                @if (branch.Children?.Count > 0)
+                                                {
+                                                    @foreach (Item parentRegion in branch.Children)
+                                                    {
+                                                        string parentRegionId = $"{bank.Id}_{branch.Id}_{parentRegion.Id}";
+                                                        <ul>
+                                                            <li data-jstree='{"icon":"fas fa-map-marker-alt"}' id="@parentRegionId">
+                                                                @parentRegion.Text
+                                                                @if (parentRegion.Children?.Count > 0)
+                                                                {
+                                                                    @foreach (Item childRegion in parentRegion.Children)
+                                                                    {
+                                                                        string childRegionId = $"{bank.Id}_{branch.Id}_{parentRegion.Id}_{childRegion.Id}";
+                                                                        <ul>
+                                                                            <li data-jstree='{"icon":"fas fa-map-marker-alt"}' id="@childRegionId">
+                                                                                @childRegion.Text
+                                                                                @if (childRegion.Children?.Count > 0)
+                                                                                {
+                                                                                    @foreach (Item atm in childRegion.Children)
+                                                                                    {
+                                                                                        string atmId = $"{bank.Id}_{branch.Id}_{parentRegion.Id}_{childRegion.Id}_{atm.Id}";
+                                                                                        <ul>
+                                                                                            <li data-jstree='{"icon":"fa fa-credit-card", "type":"atm"}' id="@atmId">
+                                                                                                @atm.Text
+                                                                                            </li>
+                                                                                        </ul>
+                                                                                    }
+                                                                                }
+                                                                            </li>
+                                                                        </ul>
+                                                                    }
+                                                                }
+                                                            </li>
+                                                        </ul>
+                                                    }
+                                                }
+                                            </li>
+                                        </ul>
+                                    }
+                                }
+                            </li>
+                        </ul>
+                    }
+                </li>
+            </ul>
+        </div>
+    </div>
+}
+
+
+
+@code {
+
+    private List<Item> bankList = new List<Item>();
+    private DotNetObjectReference<DraggableTreeView>? objRef;
+
+    protected override void OnInitialized()
+    {
+        objRef = DotNetObjectReference.Create(this);
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (bankList is null || bankList.Count == 0)
+        {
+            await LoadData();
+            await jsRuntime.InvokeVoidAsync("renderjQueryComponents", objRef);
+            await base.OnAfterRenderAsync(firstRender);           
+        }
+        
+    }
+    private async Task LoadData()
+    {
+        bankList = await bankRepository.GetBanksAsync();
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+}

@@ -1,0 +1,198 @@
+﻿@page "/Summary"
+@using EView360.Services;
+
+@inject NotifyService notifyService
+@implements IDisposable
+
+<div>
+    <b><h2 style="font-family:montserrat; font-weight:bold; margin-top:1%;">Summary</h2></b>
+</div>
+
+
+<div class="refresh-btn" style="
+    background-color: #54b948;
+    color: white;
+    text-align: center;
+    font-family: Arial;
+    font-size: 20px;
+    padding: 1px;">
+    <div>
+        <h4>@headerText<button disabled="@IsDisabled" onclick="@LoadAllData" class="btn btn-light" style="margin-left: 3%;">Refresh</button></h4>
+    </div>
+</div>
+
+<div>
+    <Tabs RenderMode="TabsRenderMode.LazyLoad" SelectedTab="@TabName" Style="margin-top: 1%;">
+        <Items>
+            <Tab Name="atmStatus" @onclick="@(e => SetTabPanel("atmStatus"))">Atm & Bna Status</Tab>
+            <Tab Name="todaysActivity" @onclick="@(e => SetTabPanel("todaysActivity"))">Today's Activity</Tab>
+            <Tab Name="top10Atms" @onclick="@(e => SetTabPanel("top10Atms"))">Top 10 Atms</Tab>
+            <Tab Name="remDenQty" @onclick="@(e => SetTabPanel("remDenQty"))">Remaining Denomination Quantity</Tab>
+            <Tab Name="currentLoggedInUsers" @onclick="@(e => SetTabPanel("currentLoggedInUsers"))">Current Logged In Users</Tab>
+            <Tab Name="alerts" @onclick="@(e => SetTabPanel("alerts"))">Alerts</Tab>
+        </Items>
+        <Content>
+            <TabPanel Name="atmStatus">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="card text-center" style="min-height:100%;max-height:100%;">
+                            <AtmStatus @ref="atmStatus" />
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="card text-center" style="min-height:100%;max-height:100%;">
+                            <BnaStatus @ref="bnaStatus" />
+                        </div>
+                    </div>
+                </div>                
+            </TabPanel>
+            <TabPanel Name="todaysActivity">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <TodaysActivity @ref="todaysActivity" />
+                    </div>
+                </div>
+            </TabPanel>
+            <TabPanel Name="top10Atms">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <Top10Atms @ref="top10Atms" />
+                    </div>
+                </div>
+            </TabPanel>
+            <TabPanel Name="remDenQty">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <RemDenQty @ref="remDenQty" />
+                    </div>
+                </div>
+            </TabPanel>
+            <TabPanel Name="currentLoggedInUsers">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <CurrentLoggedInUsers @ref="currentLoggedInUsers" />
+                    </div>
+                </div>
+            </TabPanel>
+            <TabPanel Name="alerts">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <CurrentDaySummary @ref="alerts" />
+                    </div>
+                </div>
+            </TabPanel>
+        </Content>
+     </Tabs>
+</div>
+
+
+
+<style>
+
+    .other-content {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+    }
+</style>
+
+@code {
+    private AtmStatus? atmStatus = new();
+    private BnaStatus? bnaStatus = new();
+    private RemDenQty? remDenQty = new();
+    private TodaysActivity? todaysActivity = new();
+    private Top10Atms? top10Atms = new();
+    private CurrentLoggedInUsers? currentLoggedInUsers = new();
+    private CurrentDaySummary? alerts = new();
+    private string headerText = "Click on refresh to generate Summary";
+    private bool IsDisabled = false;
+    private string? TabName = "atmStatus";
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            notifyService.OnAtmChange += AtmSelected;
+            notifyService.OnRegionChange += AtmSelected;
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     if (firstRender)
+    //     {
+    //         await LoadAllData();
+    //     }
+    // }
+
+    async void SetTabPanel(string tabName)
+    {
+        TabName = tabName;
+        await LoadAllData();
+    }
+
+
+    private async void AtmSelected()
+    {
+        await LoadAllData();
+    }
+
+    private async Task LoadAllData()
+    {
+        IsDisabled = true;
+        await this.InvokeAsync(() => this.StateHasChanged());
+        await Task.Delay(5);
+
+        if (TabName == "atmStatus")
+        {
+            Task.Run(async () =>
+            {
+                await atmStatus?.LoadData();
+
+            });
+            Task.Run(async () =>
+            {
+                await bnaStatus?.LoadData();
+
+            });            
+        }
+        else if (TabName == "remDenQty")
+        {
+            remDenQty.filterNoteSetTypeName = "Select";
+            await remDenQty?.LoadData();
+        }
+        else if (TabName == "todaysActivity")
+        {
+            await todaysActivity?.LoadData();
+        }
+        else if (TabName == "top10Atms")
+        {
+            await top10Atms?.LoadData();
+        }
+        else if (TabName == "currentLoggedInUsers")
+        {
+            await currentLoggedInUsers?.LoadData();
+        }
+        else if (TabName == "alerts")
+        {
+            await alerts?.LoadData();
+        }
+
+        IsDisabled = false;
+        headerText = "Home-Generation Completed At " + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+        await this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    public void Dispose()
+    {
+        if (notifyService != null)
+        {
+            notifyService.OnAtmChange -= AtmSelected;
+            notifyService.OnRegionChange -= AtmSelected;
+        }        
+    }
+}

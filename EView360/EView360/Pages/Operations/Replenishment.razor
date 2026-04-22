@@ -1,0 +1,728 @@
+﻿@page "/Replenishment"
+@page "/Replenishment/{mode}"
+@using DataRequestor;
+@using EView360.Services.Operations;
+@using EView360.Services;
+@using EView360Models.Cash;
+@using EView360Models.Core;
+@using EView360Models.RequestModel;
+@using EView360Models.ViewModels;
+@using EView360.Common;
+@using System.Data;
+@using Microsoft.EntityFrameworkCore.Metadata;
+@using Microsoft.EntityFrameworkCore;
+@using static EView360.Data.Enumerations;
+@inject ILogger<Replenishment> logger
+@inject ReplenishmentService service
+@inject CommonServices common;
+@inject ATMTreeViewRepository treeService
+@inject IJSRuntime jsRuntime
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject ATMTreeViewRepository atmRepository
+@inject NotifyService notifyService
+@implements IDisposable
+
+
+
+
+<div class="row content">
+    <div class="col-sm-2 filter_bar border-right-2">
+        <form style="margin-top: 20px;">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <h5>Filters: </h5>
+                </div>
+            </div>
+            @if (@mode is not null && mode.Equals("Archive"))
+            {
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label>Archive Year: </label>
+                        <Select TValue="int" SelectedValue="filter.ArchiveYear" class="form-control" SelectedValueChanged="@OnArchiveYearChange">
+                            @foreach (int year in archiveYears)
+                            {
+                                <SelectItem Value=year>@year</SelectItem>
+                            }
+                        </Select>
+                    </div>
+                </div>
+            }
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label for="inputEmail4">From Date: </label>
+                    @if (@mode is not null && mode.Equals("Archive"))
+                    {
+                        <DatePicker TValue="DateTime?" DisplayFormat="dd/MM H:m" InputMode="DateInputMode.DateTime" @bind-Date="@filter.fromDate" class="form-control" @oninput="ChangeToArchiveYear" TimeAs24hr="true" />
+                    }
+                    else
+                    {
+                        <DatePicker TValue="DateTime?" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" @bind-Date="@filter.fromDate" class="form-control" TimeAs24hr="true" />
+                    }
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label for="inputEmail4">To Date: </label>
+                    @if (@mode is not null && mode.Equals("Archive"))
+                    {
+                        <DatePicker TValue="DateTime?" DisplayFormat="dd/MM H:m" InputMode="DateInputMode.DateTime" @bind-Date="@filter.toDate" class="form-control" @oninput="ChangeToArchiveYear" TimeAs24hr="true" />
+                    }
+                    else
+                    {
+                        <DatePicker TValue="DateTime?" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" @bind-Date="@filter.toDate" class="form-control" TimeAs24hr="true" />
+                    }
+                </div>
+            </div>
+
+            <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@FilterSubmit" value="Search">
+            <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@ResetFilter" value="Reset">
+            <br /><br />
+            @if (CheckPermission((int)Permissions.PostReplenishment))
+            {
+                <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@ShowModal" value="Post Replenishment">
+            }
+
+        </form>
+    </div>
+
+
+    <div class="col-sm-10 text-left" style="margin-top:1%">
+        <div class="form-group">
+            <b><h2 style="font-family:montserrat; font-weight:bold">Replenishments ( History ) @(isArchive ? "- Archive" : "")</h2></b>
+        </div>
+
+        @if (showSpinner)
+        {
+            <div class="spinner" style="z-index:4"></div>
+        }
+
+        @if (showGrid)
+        {
+            <DataGrid @ref="@dataGridRef"
+                      TItem="ReplenishmentViewModel"
+                      Data="@filteredReplenishments"
+                            Editable
+                       Responsive="true"
+                       ShowPager="false"
+                            Bordered
+                       PageSize="50"
+                            FixedHeader
+                       FixedHeaderDataGridHeight="570px"
+                       FixedHeaderDataGridMaxHeight="570px"
+                       Narrow="true"
+                            Sortable
+                       SortMode="DataGridSortMode.Single"
+                       SortChanged="SortData"
+                            Resizable
+                       HeaderThemeContrast="@ThemeContrast.Light">
+
+
+                 <DataGridColumn Field="@nameof(ReplenishmentViewModel.Title)" Caption="Title" />
+                 <DataGridDateColumn Field="@nameof(ReplenishmentViewModel.RepDatetime)" Caption="Replenished At" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" />
+                 <DataGridNumericColumn Field="@nameof(ReplenishmentViewModel.CashAdded1)" Caption="Type 1" />
+                 <DataGridNumericColumn Field="@nameof(ReplenishmentViewModel.CashAdded2)" Caption="Type 2" />
+                 <DataGridNumericColumn Field="@nameof(ReplenishmentViewModel.CashAdded3)" Caption="Type 3" />
+                 <DataGridNumericColumn Field="@nameof(ReplenishmentViewModel.CashAdded4)" Caption="Type 4" />
+                 <DataGridNumericColumn Field="@nameof(ReplenishmentViewModel.RepAmount)" Caption="Amount" />
+                 <DataGridColumn Field="@nameof(ReplenishmentViewModel.RepStatus)" Caption="Status" />
+                 @*<DataGridNumericColumn Field="@nameof(ReplenishmentViewModel.LastTSN)" Caption="Last TSN" />*@
+                 <DataGridCheckColumn Field="@nameof(ReplenishmentViewModel.IsSwap)" Caption="Swap" />
+                 <DataGridCheckColumn Field="@nameof(ReplenishmentViewModel.IsBillDispenser)" Caption="Bill Dispenser" />
+                 <DataGridDateColumn Field="@nameof(ReplenishmentViewModel.GeneratedAt)" Caption="Generation Time" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" />
+                 <DataGridColumn Field="@nameof(ReplenishmentViewModel.UserFullName)" Caption="Generated By" />
+                 @*<DataGridDateColumn Field="@nameof(ReplenishmentViewModel.ModificationTime)" Caption="Modification Time" />*@
+
+             </DataGrid>
+            <EView360.Pages.Pagination pageNo="pageNo" maxPageNo="maxPageNo" totalRecords="totalRecords" OnSubmitCallback="GetDataByPageNo" />
+        }
+
+
+        <Modal @ref="postRepModalRef">
+            <ModalContent Centered>
+                <ModalHeader style="background-color:green;color:white;">
+                    <ModalTitle>Add New Replenishment</ModalTitle>
+                    <CloseButton />
+                </ModalHeader>
+                <EditForm id="EditReplenishmentModal" EditContext="editContext" OnValidSubmit=@Submit>
+
+                    <ModalBody>
+                        <DataAnnotationsValidator />
+                        <Microsoft.AspNetCore.Components.Forms.ValidationSummary />
+                        <Field Horizontal>
+                            <FieldLabel ColumnSize="ColumnSize.Is3">ATM ID :</FieldLabel>
+                            <FieldBody ColumnSize="ColumnSize.Is9"><TextEdit Placeholder="Please, select an ATM" Disabled @bind-Text="postRep.Title" /></FieldBody>
+                         </Field>
+                         <FieldLabel><h5>Selected ATM Denominations</h5></FieldLabel>
+
+                         <Field Horizontal>
+                            <FieldLabel ColumnSize="ColumnSize.Is6"> Denomination Value of Type 1:</FieldLabel>
+                            <FieldBody ColumnSize="ColumnSize.Is6"><NumericEdit Disabled TValue="int" @bind-Value=postRep.DenominationType1 /></FieldBody>
+                         </Field>
+                         <Field Horizontal>
+                            <FieldLabel ColumnSize="ColumnSize.Is6"> Denomination Value of Type 2:</FieldLabel>
+                            <FieldBody ColumnSize="ColumnSize.Is6"><NumericEdit Disabled TValue="int" @bind-Value=postRep.DenominationType2 /></FieldBody>
+                         </Field>
+                         <Field Horizontal>
+                            <FieldLabel ColumnSize="ColumnSize.Is6"> Denomination Value of Type 3:</FieldLabel>
+                            <FieldBody ColumnSize="ColumnSize.Is6"><NumericEdit Disabled TValue="int" @bind-Value=postRep.DenominationType3 /></FieldBody>
+                         </Field>
+                         <Field Horizontal>
+                            <FieldLabel ColumnSize="ColumnSize.Is6"> Denomination Value of Type 4:</FieldLabel>
+                            <FieldBody ColumnSize="ColumnSize.Is6"><NumericEdit Disabled TValue="int" @bind-Value=postRep.DenominationType4 /></FieldBody>
+                         </Field>
+                         <Field>
+                             <FieldLabel>Replenishment Date :</FieldLabel>
+                             <DatePicker TValue="DateTime?" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" @bind-Date="@postRep.RepDatetime" Placeholder="Select Date & Time" TimeAs24hr="true" />
+
+                         </Field>
+                         <Field>
+                             <FieldLabel>Counters for type 1:</FieldLabel>
+                             <NumericEdit TValue="int?" @bind-Value=postRep.CashAdded1 />
+                         </Field>
+                         <Field>
+                             <FieldLabel>Counters for type 2:</FieldLabel>
+                             <NumericEdit TValue="int?" @bind-Value=postRep.CashAdded2 />
+                         </Field>
+                         <Field>
+                             <FieldLabel>Counters for type 3:</FieldLabel>
+                             <NumericEdit TValue="int?" @bind-Value=postRep.CashAdded3 />
+                         </Field>
+                         <Field>
+                             <FieldLabel>Counters for type 4:</FieldLabel>
+                             <NumericEdit TValue="int?" @bind-Value=postRep.CashAdded4 />
+                         </Field>
+                         <Field>
+                             <FieldLabel>Is swap:</FieldLabel>
+                             <Check TValue="bool" @bind-Checked=postRep.IsSwap />
+                         </Field>
+                         <Field>
+                             <FieldLabel>Is Bill Dispenser:</FieldLabel>
+                             <Check TValue="bool" @bind-Checked=postRep.IsBillDispenser />
+                         </Field>
+                         <Field>
+                             <FieldLabel>Reason:</FieldLabel>
+                             <TextEdit @bind-Text=postRep.Reason />
+                         </Field>
+                     </ModalBody>
+                 </EditForm>
+
+                 <ModalFooter>
+                     <Button Color="Color.Secondary" Clicked="@HideModal">Close</Button>
+                     <input type="submit" form="EditReplenishmentModal" class="btn btn-success" value="Save" />
+
+                 </ModalFooter>
+             </ModalContent>
+         </Modal>
+
+     </div>
+ </div>
+
+
+ <style>
+
+     form {
+         max-width: 100%;
+         width: 100%;
+     }
+
+     .table-primary .showAnimation {
+         animation: spin 1200ms linear infinite;
+     }
+
+     .table-responsive {
+         border: 1px solid #dee2e6 !important;
+         margin-top: 20px;
+         width: 100%;
+         background-color: white;
+     }
+
+     .all_headers {
+         width: 170px;
+         overflow: hidden;
+         white-space: nowrap;
+     }
+
+     .btn-danger {
+         margin-left: 5px;
+     }
+
+     .modal-body {
+         height: 70vh;
+         overflow-y: auto;
+     }
+
+     tr:nth-child(even) {
+         background-color: #e9ecef;
+     }
+
+     .all_headers_form {
+         margin-left: 12px;
+         padding: 5px;
+     }
+
+     .filter_bar {
+         height: calc(100vh - 3.5rem);
+         overflow-y: auto;
+         background-color: white;
+     }
+
+ </style>
+
+ @if (@mode is not null)
+{
+    <style>
+        .flatpickr-prev-month, .flatpickr-month .numInputWrapper, .flatpickr-next-month {
+            visibility: hidden;
+        }
+
+        .flatpickr-month {
+            font-size: large;
+        }
+    </style>
+}
+
+@code
+{
+    [Inject] INotificationService? NotificationService { get; set; }
+    [Inject] IMessageService? MessageService { get; set; }
+    [Inject] AtmService? atmService { get; set; }
+
+    private bool showSpinner = false, showModal = false, showGrid = true;
+    private EView360Models.Core.AppUser? appUser;
+    private Modal? postRepModalRef;
+    private EditContext? editContext;
+    private ValidationMessageStore? messageStore;
+    private DataGrid<ReplenishmentViewModel>? dataGridRef;
+    private List<ReplenishmentViewModel>? replenishments;
+    private List<ReplenishmentViewModel>? _replenishments;
+    private List<ReplenishmentViewModel>? filteredReplenishments;
+    private ReplenishmentViewModel postRep = new();
+    static DateTime currentTime = DateTime.Now;
+    private ReplenishmentFilter filter = new ReplenishmentFilter()
+        {
+            fromDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0),
+            toDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 0)
+        };
+    private long? selectedTreeRegion;
+    private List<long>? selectedTreeAtm;
+    private DotNetObjectReference<Replenishment>? objRef;
+
+    [Parameter]
+    public string? mode { get; set; }
+    private List<int> archiveYears = new();
+    bool isArchive = false;
+    bool IsDisabled = false;
+    private int pageNo { get; set; }
+    private int maxPageNo { get; set; }
+    private int totalRecords { get; set; }
+    Executor executor = new Executor();
+    Dictionary<int, string> userRights;
+    IModel dbCoreContextModel = new CoreContext().Model;
+    IModel dbCashContextModel = new CashContext().Model;
+    private SortDirection sortDirection = new();
+    private string sortField = string.Empty;
+
+
+    protected async override void OnParametersSet()
+    {
+        if (mode is not null && mode.Equals("Archive"))
+        {
+            isArchive = true;
+            archiveYears = common.GetLastNYears();
+            filter.ArchiveYear = archiveYears.FirstOrDefault();
+            filter.fromDate = new DateTime(filter.ArchiveYear, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+            filter.toDate = new DateTime(filter.ArchiveYear, DateTime.Now.Month, DateTime.Now.Day, 23, 59, 0);
+        }
+        else
+        {
+            filter.fromDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+            filter.toDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 23, 59, 0);
+            filter.ArchiveYear = 0;
+        }
+        filter.UserId = (await localStorage.GetItemAsync<EView360Models.Core.AppUser>("AppUser")).UserId;
+        filter.RowCount = common.GetRecordPerPage();
+        replenishments = new();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            objRef = DotNetObjectReference.Create(this);
+
+            executor.RaiseCustomEvent += PopulateModel;
+
+            notifyService.OnAtmChange += AtmSelected;
+            notifyService.OnRegionChange += RegionSelected;
+            if (replenishments is null || replenishments.Count == 0)
+            {
+                editContext = new(postRep);
+                editContext.OnValidationRequested += CustomValidations;
+                messageStore = new(editContext);
+                appUser = await localStorage.GetItemAsync<EView360Models.Core.AppUser>("AppUser");
+                userRights = await localStorage.GetItemAsync<Dictionary<int, string>>("userRights");
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at Replenishment, OnInitializedAsync as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                await jsRuntime.InvokeVoidAsync("handleDatePicker", objRef);
+                pageNo = 1;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at Replenishment, OnAfterRenderAsync as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    private async void SortData(DataGridSortChangedEventArgs e)
+    {
+        string sortedColumn = e.FieldName;
+        var sortedDirection = e.SortDirection;
+        string? orderby = string.Empty;
+
+        if (this.sortDirection != sortedDirection || !this.sortField.Equals(sortedColumn))
+        {
+            //For Atm Fields
+            IEntityType? entityType = dbCoreContextModel?.FindEntityType(typeof(EView360Models.Core.Atm));
+
+            if (sortedColumn.Equals(entityType?.FindProperty(nameof(EView360Models.Core.Atm.Title))?.Name))
+                orderby = entityType?.FindProperty(nameof(EView360Models.Core.Atm.Title))?.GetColumnName();
+
+            entityType = dbCoreContextModel?.FindEntityType(typeof(AppUser));
+
+            //For AppUser Feilds
+            if (sortedColumn.Equals(entityType?.FindProperty(nameof(AppUser.UserFullName))?.Name))
+                orderby = entityType?.FindProperty(nameof(AppUser.UserFullName))?.GetColumnName();
+
+            //For Replenishment Fields
+            entityType = dbCashContextModel?.FindEntityType(typeof(EView360Models.Cash.Replenishment));
+
+            if (sortedColumn.Equals(entityType?.FindProperty(nameof(EView360Models.Cash.Replenishment.RepDatetime))?.Name))
+                orderby = entityType?.FindProperty(nameof(EView360Models.Cash.Replenishment.RepDatetime))?.GetColumnName();
+
+            else if (sortedColumn.Equals(entityType?.FindProperty(nameof(EView360Models.Cash.Replenishment.CashAdded1))?.Name))
+                orderby = entityType?.FindProperty(nameof(EView360Models.Cash.Replenishment.CashAdded1))?.GetColumnName();
+
+            else if (sortedColumn.Equals(entityType?.FindProperty(nameof(EView360Models.Cash.Replenishment.CashAdded2))?.Name))
+                orderby = entityType?.FindProperty(nameof(EView360Models.Cash.Replenishment.CashAdded2))?.GetColumnName();
+
+            else if (sortedColumn.Equals(entityType?.FindProperty(nameof(EView360Models.Cash.Replenishment.CashAdded3))?.Name))
+                orderby = entityType?.FindProperty(nameof(EView360Models.Cash.Replenishment.CashAdded3))?.GetColumnName();
+
+            else if (sortedColumn.Equals(entityType?.FindProperty(nameof(EView360Models.Cash.Replenishment.CashAdded4))?.Name))
+                orderby = entityType?.FindProperty(nameof(EView360Models.Cash.Replenishment.CashAdded4))?.GetColumnName();
+
+            else if (sortedColumn.Equals(entityType?.FindProperty(nameof(EView360Models.Cash.Replenishment.RepStatus))?.Name))
+                orderby = entityType?.FindProperty(nameof(EView360Models.Cash.Replenishment.RepStatus))?.GetColumnName();
+
+            else if (sortedColumn.Equals(entityType?.FindProperty(nameof(EView360Models.Cash.Replenishment.IsSwap))?.Name))
+                orderby = entityType?.FindProperty(nameof(EView360Models.Cash.Replenishment.IsSwap))?.GetColumnName();
+
+            else if (sortedColumn.Equals(entityType?.FindProperty(nameof(EView360Models.Cash.Replenishment.GeneratedAt))?.Name))
+                orderby = entityType?.FindProperty(nameof(EView360Models.Cash.Replenishment.GeneratedAt))?.GetColumnName();
+
+            //For Derived or Missing Feilds
+            if (sortedColumn.Equals("IsBillDispenser"))
+                orderby = "IsBillDispenser";
+
+            if (sortedColumn.Equals("RepAmount"))
+                orderby = "amt_text";
+
+            //Appending Sorting Direction
+            if (sortedDirection == SortDirection.Ascending && !string.IsNullOrEmpty(orderby))
+                orderby += " asc";
+
+            else if (sortedDirection == SortDirection.Descending && !string.IsNullOrEmpty(orderby))
+                orderby += " desc";
+
+            else if (sortedDirection == SortDirection.Default && !string.IsNullOrEmpty(orderby))
+                orderby = string.Empty;
+
+            filter.Orderby = orderby;
+
+            this.sortDirection = sortedDirection;
+            this.sortField = sortedColumn;
+            await LoadData();
+        }
+    }
+
+    private bool CheckPermission(int right)
+    {
+        try
+        {
+            if (userRights is not null)
+                return userRights.ContainsKey(right);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at RecreateDailyFeed, CheckPermission as: {ex.Message}");
+
+            NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+        return false;
+    }
+
+    private Task OnArchiveYearChange(int selectedYear)
+    {
+        filter.ArchiveYear = selectedYear;
+        filter.fromDate = new DateTime(filter.ArchiveYear, filter.fromDate.Value.Month, filter.fromDate.Value.Day, filter.fromDate.Value.Hour, filter.fromDate.Value.Minute, filter.fromDate.Value.Second);
+        filter.toDate = new DateTime(filter.ArchiveYear, filter.toDate.Value.Month, filter.toDate.Value.Day, filter.toDate.Value.Hour, filter.toDate.Value.Minute, filter.toDate.Value.Second);
+        this.InvokeAsync(() => this.StateHasChanged());
+        return Task.CompletedTask;
+    }
+
+    private Task ChangeToArchiveYear()
+    {
+        if (mode is not null && mode.Equals("Archive"))
+        {
+            if (filter.fromDate != null && filter.fromDate.Value.Year != filter.ArchiveYear)
+                filter.fromDate = new DateTime(filter.ArchiveYear, filter.fromDate.Value.Month, filter.fromDate.Value.Day, filter.fromDate.Value.Hour, filter.fromDate.Value.Minute, filter.fromDate.Value.Second);
+
+
+            if (filter.toDate != null && filter.toDate.Value.Year != filter.ArchiveYear)
+                filter.toDate = new DateTime(filter.ArchiveYear, filter.toDate.Value.Month, filter.toDate.Value.Day, filter.toDate.Value.Hour, filter.toDate.Value.Minute, filter.toDate.Value.Second);
+
+        }
+        return Task.CompletedTask;
+    }
+
+    private void CustomValidations(object? sender, ValidationRequestedEventArgs args)
+    {
+        try
+        {
+            messageStore?.Clear();
+
+            if (postRep.RepDatetime == null)
+            {
+                messageStore?.Add(() => postRep.CashAdded1, "Replenishment date & time is required");
+            }
+            if (postRep.CashAdded1 == null)
+            {
+                messageStore?.Add(() => postRep.CashAdded1, "Cash added in cassatte 1 is required");
+            }
+            if (postRep.CashAdded2 == null)
+            {
+                messageStore?.Add(() => postRep.CashAdded1, "Cash added in cassatte 2 is required");
+            }
+            if (postRep.CashAdded3 == null)
+            {
+                messageStore?.Add(() => postRep.CashAdded1, "Cash added in cassatte 3 is required");
+            }
+            if (postRep.CashAdded4 == null)
+            {
+                messageStore?.Add(() => postRep.CashAdded1, "Cash added in cassatte 4 is required");
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at NoteSetTypeForm, CheckName as: {ex.Message}");
+        }
+    }
+
+    private async Task LoadData()
+    {
+        replenishments = filteredReplenishments = new();
+        showSpinner = IsDisabled = true;
+        showGrid = false;
+        totalRecords = 0;
+        await this.InvokeAsync(() => this.StateHasChanged());
+        await common.TaskDelay();
+        filter.Offset = common.GetDatabaseOffset(pageNo);
+        logger.LogWarning($"[ReplenishmentPage:LoadData] going in GetReplenishments ");
+        service.GetReplenishments(executor, filter);
+        logger.LogWarning($"[ReplenishmentPage:LoadData] returning from GetReplenishments ");
+        //Add sorting direction icons via sort
+        await dataGridRef.Sort(sortField, sortDirection);
+    }
+
+    private async void FilterSubmit()
+    {
+        await LoadData();
+    }
+
+    private void ResetFilter()
+    {
+        if (isArchive)
+        {
+            filter.ArchiveYear = archiveYears.FirstOrDefault();
+            filter.fromDate = new DateTime(filter.ArchiveYear, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+            filter.toDate = new DateTime(filter.ArchiveYear, DateTime.Now.Month, DateTime.Now.Day, 23, 59, 0);
+        }
+        else
+        {
+            filter.fromDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+            filter.toDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 23, 59, 0);
+            filter.ArchiveYear = 0;
+        }
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private async Task ShowModal()
+    {
+        filter.SelectedAtmIds = (List<string>)(await atmService.GetMultipleSelectedAtms()).Data;
+        if (filter.SelectedAtmIds != null && filter.SelectedAtmIds.Count == 1)
+        {
+            postRep = await service.GetAtmNoteSetType(Int32.Parse(filter.SelectedAtmIds.FirstOrDefault()));
+            postRepModalRef.Show();
+        }
+        else
+        {
+            await NotificationService.Error("Please select a single ATM from left tree", "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    private Task HideModal()
+    {
+        return postRepModalRef.Hide();
+    }
+
+    private async void Submit()
+    {
+        await HideModal();
+        postRep.TaskId = 0;
+        postRep.AtmId = Int32.Parse(filter.SelectedAtmIds.First());
+        postRep.RepStatus = "Normal";
+        postRep.GeneratedAt = DateTime.Now;
+        postRep.GeneratedBy = appUser.UserId;
+        postRep.RepAmount = (postRep.DenominationType1 * postRep.CashAdded1) + (postRep.DenominationType2 * postRep.CashAdded2) + (postRep.DenominationType3 * postRep.CashAdded3) + (postRep.DenominationType4 * postRep.CashAdded4);
+        postRep.Reason = (postRep.Reason == null) ? string.Empty : postRep.Reason;
+        BaseModel result = await service.PostReplenishment(postRep);
+        if (result.IsSuccess)
+        {
+            await LoadData();
+        }
+    }
+
+    private async void AtmSelected()
+    {
+        //selectedTreeAtm = await atmRepository.GetSelectedAtmId();
+        //filteredReplenishments = replenishments;
+        //filteredReplenishments = replenishments.Where(x => x.AtmId == selectedTreeAtm.First()).ToList();
+        //await this.InvokeAsync(() => this.StateHasChanged());
+        await LoadData();
+    }
+
+    private async void RegionSelected()
+    {
+        //selectedTreeAtm = await atmRepository.GetSelectedAtmId();
+        //filteredReplenishments = replenishments;
+        //filteredReplenishments = replenishments.Where(x => selectedTreeAtm.Contains(x.AtmId)).ToList();
+        //await this.InvokeAsync(() => this.StateHasChanged());
+        await LoadData();
+    }
+
+    public void Dispose()
+    {
+        objRef?.Dispose();
+        notifyService.OnAtmChange -= AtmSelected;
+        notifyService.OnRegionChange -= RegionSelected;
+    }
+
+    public async void PopulateModel(object sender, DataRequestor.CustomEventArgs args)
+    {
+        string error = string.Empty;
+
+        if (args?._data?.Rows?.Count > 0)
+        {
+            _replenishments = BuildReplenishments(args._data);
+
+            replenishments.AddRange(_replenishments);
+            filteredReplenishments = replenishments;
+            totalRecords += filteredReplenishments.FirstOrDefault().RowCount;
+            maxPageNo = common.GetMaxPageNo(Convert.ToInt32(totalRecords));
+        }
+
+        if (args._exception != null && !string.IsNullOrEmpty(args._exception.Message))
+        {
+            logger.LogError($"Exception at ReplenishmentHistory, PopulateModel as: {args._exception.Message}");
+            await common.RenderErrorBox(args._exception.Message);
+
+            if (args._exception.InnerException != null && !string.IsNullOrEmpty(args._exception.InnerException.Message))
+            {
+                logger.LogError($"Exception at ReplenishmentsHistory, PopulateModel as: {args._exception.InnerException.Message}");
+                await common.RenderErrorBox(args._exception.InnerException.Message);
+            }
+        }
+        else if (replenishments is null || replenishments.Count == 0)
+        {
+            await NotificationService.Info("Check Filter, if records are not appearing", "Information", (options) =>
+            {
+                options.IntervalBeforeClose = 5000;
+            });
+        }
+
+        IsDisabled = false;
+        if (!showGrid)
+        {
+            showGrid = true;
+            showSpinner = false;
+        }
+        await this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    public List<ReplenishmentViewModel> BuildReplenishments(DataTable dataTable)
+    {
+        List<ReplenishmentViewModel> replenishments = new();
+
+        if (dataTable != null)
+        {
+            foreach (DataRow row in dataTable.Rows)
+            {
+                ReplenishmentViewModel replenishment = new()
+                    {
+                        RowCount = !DBNull.Value.Equals(row["row_count"]) ? Convert.ToInt32(row["row_count"]) : 0,
+                        AtmId = !DBNull.Value.Equals(row["atm_id"]) ? Convert.ToInt32(row["atm_id"]) : 0,
+                        RepAmount = !DBNull.Value.Equals(row["amt_text"]) ? Convert.ToInt32(row["amt_text"]) : 0,
+                        UserFullName = !DBNull.Value.Equals(row["user_full_name"]) ? row["user_full_name"].ToString() : string.Empty,
+                        GeneratedAt = !DBNull.Value.Equals(row["generated_at"]) ? Convert.ToDateTime(row["generated_at"]) : null,
+                        IsSwap = !DBNull.Value.Equals(row["is_swap"]) ? Convert.ToBoolean(row["is_swap"]) : false,
+                        LastTSN = !DBNull.Value.Equals(row["last_tsn"]) ? Convert.ToInt32(row["last_tsn"]) : 0,
+                        RepDatetime = !DBNull.Value.Equals(row["rep_datetime"]) ? Convert.ToDateTime(row["rep_datetime"]) : null,
+                        RepStatus = !DBNull.Value.Equals(row["rep_status"]) ? row["rep_status"].ToString() : string.Empty,
+                        Title = !DBNull.Value.Equals(row["title"]) ? row["title"].ToString() : string.Empty,
+                        CashAdded1 = !DBNull.Value.Equals(row["cash_added1"]) ? Convert.ToInt32(row["cash_added1"]) : 0,
+                        CashAdded2 = !DBNull.Value.Equals(row["cash_added2"]) ? Convert.ToInt32(row["cash_added2"]) : 0,
+                        CashAdded3 = !DBNull.Value.Equals(row["cash_added3"]) ? Convert.ToInt32(row["cash_added3"]) : 0,
+                        CashAdded4 = !DBNull.Value.Equals(row["cash_added4"]) ? Convert.ToInt32(row["cash_added4"]) : 0,
+                        IsBillDispenser = !DBNull.Value.Equals(row["IsBillDispenser"]) ? Convert.ToBoolean(row["IsBillDispenser"]) : false,
+                    };
+                replenishments.Add(replenishment);
+            }
+        }
+        return replenishments;
+    }
+
+    private async Task GetDataByPageNo(int thisPageNo)
+    {
+        pageNo = thisPageNo;
+        await LoadData();
+    }
+
+}

@@ -1,0 +1,315 @@
+﻿@page "/NoCashWithdrawalReport"
+@page "/NoCashWithdrawalReport/{mode}"
+
+@using EView360.Common;
+@using EView360.Data;
+@using EView360.Services;
+@using EView360.Services.Reports;
+@using Microsoft.Extensions.Caching.Distributed;
+@using Microsoft.Extensions.Options;
+@using Newtonsoft.Json;
+@using System.Text;
+@using global::Common.RequestModel;
+@using global::Common.ViewModel;
+@inject AtmService atmService
+@inject NoCashWIthdrawalReportService service
+@inject IJSRuntime jsRuntime
+@inject IOptions<ApiUrl> apiUrl
+@inject HttpClient client
+@inject ILogger<NoCashWithdrawalReport> logger
+@inject CommonServices common;
+@inject IConfiguration configuration;
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject IDistributedCache _distributedCache
+
+
+<div class="row content">
+    @if (showSpinner)
+    {
+        <div class="spinner" style="z-index:4"></div>
+    }
+
+    <div class="col-sm-12">
+        <div class="form-group">
+            <b><h2 style="font-family:montserrat; font-weight:bold; margin-top: 1%;">No Cash Withdrawal Report @(isArchive ? "- Archive" : "")</h2></b>
+        </div>
+
+        <div class="card" style="border-width: medium;border-color: orange; margin-top:2%;">
+            <div class="card-body">
+                <form style="margin-top: 20px;">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <h5>Filters: </h5>
+                        </div>
+                    </div>
+                    @if (@mode is not null && mode.Equals("Archive"))
+                    {
+                        <div class="form-row">
+                            <div class="form-group col-md-1">
+                                <label>Archive Year: </label>
+                            </div>
+                            <div class="form-group col-md-2">
+                                <Select TValue="int" SelectedValue="filter.ArchiveYear" class="form-control" SelectedValueChanged="@OnArchiveYearChange">
+                                    @foreach (int year in archiveYears)
+                                    {
+                                        <SelectItem Value=year>@year</SelectItem>
+                                    }
+                                </Select>
+                            </div>
+                        </div>
+                    }
+                    <div class="form-row">
+                        <div class="form-group col-md-1">
+                            <label>From Date: </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            @if (isArchive)
+                            {
+                                <DatePicker TValue="DateTime?" @bind-Date="@filter.fromDate" DisplayFormat="dd/MM H:m" InputMode="DateInputMode.DateTime" class="form-control" @oninput="ChangeToArchiveYear" TimeAs24hr="true" />
+                            }
+                            else
+                            {
+                                <DatePicker TValue="DateTime?" @bind-Date="@filter.fromDate" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" class="form-control" TimeAs24hr="true" />
+                            }
+                        </div>
+                        <div class="form-group col-md-4 text-right">
+                            <label>To Date: </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            @if (isArchive)
+                            {
+                                <DatePicker TValue="DateTime?" @bind-Date="@filter.toDate" DisplayFormat="dd/MM H:m" InputMode="DateInputMode.DateTime" class="form-control" @oninput="ChangeToArchiveYear" TimeAs24hr="true" />
+                            }
+                            else
+                            {
+                                <DatePicker TValue="DateTime?" @bind-Date="@filter.toDate" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" class="form-control" TimeAs24hr="true" />
+                            }
+                        </div>
+                    </div>
+
+
+                    <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@FilterSubmit" value="Generate Report">
+                    <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@ResetFilter" value="Reset">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+
+    form {
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .table-primary .showAnimation {
+        animation: spin 1200ms linear infinite;
+    }
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        margin-top: 20px;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        width: 170px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    .modal-body {
+        height: 70vh;
+        overflow-y: auto;
+    }
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+
+</style>
+
+@if (@mode is not null)
+{
+    <style>
+        .flatpickr-prev-month, .flatpickr-month .numInputWrapper, .flatpickr-next-month {
+            visibility: hidden;
+        }
+
+        .flatpickr-month {
+            font-size: large;
+        }
+    </style>
+}
+
+@code {
+    private string userLogin = string.Empty;
+    static DateTime currentTime = DateTime.Now;
+    private NoCashWithdrawalReportRequestModel filter = new NoCashWithdrawalReportRequestModel()
+        {
+            fromDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0),
+            toDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 0)
+        };
+
+    [Parameter]
+    public string? mode { get; set; }
+    private List<int> archiveYears = new();
+    bool isArchive = false;
+    bool showSpinner = false;
+    bool IsDisabled = false;
+    private DotNetObjectReference<NoCashWithdrawalReport>? objRef;
+
+    [Inject] INotificationService? NotificationService { get; set; }
+
+    protected async override void OnParametersSet()
+    {
+        if (mode is not null && mode.Equals("Archive"))
+        {
+            archiveYears = common.GetLastNYears();
+            filter.ArchiveYear = archiveYears.FirstOrDefault();
+            filter.toDate = new DateTime(filter.ArchiveYear, currentTime.Month, currentTime.Day, 23, 59, 0);
+            filter.fromDate = new DateTime(filter.ArchiveYear, currentTime.Month, currentTime.Day, 0, 0, 0);
+            isArchive = true;
+        }
+        else
+        {
+            filter.fromDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0);
+            filter.toDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 0);
+            filter.ArchiveYear = 0;
+        }
+        filter.UserId = (await localStorage.GetItemAsync<EView360Models.Core.AppUser>("AppUser")).UserId;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        objRef = DotNetObjectReference.Create(this);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                await jsRuntime.InvokeVoidAsync("handleDatePicker", objRef);
+                userLogin = (await localStorage.GetItemAsync<EView360Models.Core.AppUser>("AppUser")).UserLogin;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at NoCashWithdrawalReport, OnAfterRenderAsync as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    private void ResetFilter()
+    {
+        currentTime = DateTime.Now;
+
+        if (isArchive)
+        {
+            filter.ArchiveYear = archiveYears.FirstOrDefault();
+            filter.fromDate = new DateTime(filter.ArchiveYear, currentTime.Month, currentTime.Day, 0, 0, 0);
+            filter.toDate = new DateTime(filter.ArchiveYear, currentTime.Month, currentTime.Day, 23, 59, 0);
+        }
+        else
+        {
+            filter.fromDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0);
+            filter.toDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 0);
+            filter.ArchiveYear = 0;
+        }
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private Task OnArchiveYearChange(int selectedYear)
+    {
+        filter.ArchiveYear = selectedYear;
+        filter.fromDate = new DateTime(filter.ArchiveYear, currentTime.Month, currentTime.Day, 0, 0, 0);
+        filter.toDate = new DateTime(filter.ArchiveYear, currentTime.Month, currentTime.Day, 23, 59, 0);
+        this.InvokeAsync(() => this.StateHasChanged());
+        return Task.CompletedTask;
+    }
+
+    private Task ChangeToArchiveYear()
+    {
+        if (isArchive)
+        {
+            if (filter.fromDate != null && filter.fromDate.Value.Year != filter.ArchiveYear)
+                filter.fromDate = new DateTime(filter.ArchiveYear, filter.fromDate.Value.Month, filter.fromDate.Value.Day, filter.fromDate.Value.Hour, filter.fromDate.Value.Month, filter.fromDate.Value.Second);
+
+            if (filter.toDate != null && filter.toDate.Value.Year != filter.ArchiveYear)
+                filter.toDate = new DateTime(filter.ArchiveYear, filter.toDate.Value.Month, filter.toDate.Value.Day, filter.toDate.Value.Hour, filter.toDate.Value.Month, filter.toDate.Value.Second);
+        }
+        return Task.CompletedTask;
+    }
+
+    private async void FilterSubmit()
+    {
+        showSpinner = IsDisabled = true;
+        await this.InvokeAsync(() => this.StateHasChanged());
+        await common.TaskDelay();
+
+        var selectAtmResponse = await atmService.GetMultipleSelectedAtms();
+        if (!selectAtmResponse.IsSuccess)
+        {
+            await NotificationService.Error($"{selectAtmResponse.Message}", "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+        else
+        {
+            filter.isDeadATMExcluded = configuration.GetValue<bool>("isDeadATMExcluded");
+            filter.SelectedAtmIds = ((List<string>)selectAtmResponse.Data);
+
+            logger.LogWarning($"[NoCashWithdrawalReportPage:FilterSubmit] going in GetNoCashWIthdrawalReport ");
+            var data = await service.GetNoCashWIthdrawalReport(filter);
+            logger.LogWarning($"[NoCashWithdrawalReportPage:FilterSubmit] returning from GetNoCashWIthdrawalReport ");
+
+            logger.LogWarning("[NoCashWithdrawalReportPage:FilterSubmit] Start Serializing Datatable ");
+            string serializedDatatable = JsonConvert.SerializeObject(data);
+            logger.LogWarning("[NoCashWithdrawalReportPage:FilterSubmit] End Serializing Datatable ");
+
+            logger.LogWarning("[NoCashWithdrawalReportPage:FilterSubmit] Start convering serialized Datatable into bytes ");
+            byte[] bytes = Encoding.ASCII.GetBytes(serializedDatatable);
+            logger.LogWarning("[NoCashWithdrawalReportPage:FilterSubmit] End convering serialized Datatable into bytes ");
+
+            string redisKey = $"NoCashWithdrawalReport_{filter.UserId}";
+            _distributedCache.Set(redisKey, bytes);
+
+            var reports = new ReportsRequestModel()
+                {
+                    redisKey = $"{redisKey}",
+                };
+
+            if (data.Rows.Count > 0)
+            {
+                string url = $"{apiUrl.Value.ReportingProjectUrl}ReportPopup.aspx?Report=NoCashWithdrawals.rpt&ReportTitle=No%20Cash%20Withdrawals%20Report&FromDate={filter.fromDate.Value.Date.ToString("MM/dd/yyyy")}&ToDate={filter.toDate.Value.Date.ToString("MM/dd/yyyy")}&GeneratedBy={userLogin}";
+                await jsRuntime.InvokeVoidAsync("openWindowWithPost", url, reports);
+            }
+        }
+        showSpinner = IsDisabled = false;
+        await this.InvokeAsync(() => this.StateHasChanged());
+    }
+}

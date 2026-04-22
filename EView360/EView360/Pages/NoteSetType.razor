@@ -1,0 +1,440 @@
+﻿@page "/NoteSetType"
+@using EView360.Services;
+@using EView360Models.ViewModels;
+@using static EView360.Data.Enumerations;
+@inject NoteSetTypeService service
+@inject ILogger<NoteSetType> logger
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject UserManagementService userManagementService
+
+
+<div class="row content">
+    <div class="col-sm-2 filter_bar border-right-2">
+        <form style="margin-top: 20px;">
+
+
+
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <h5>Filters: </h5>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label class="float-left" for="CreatedByName">Created By:</label>
+                    <select @bind="filterCreatedBy" class="form-control">
+                        <option value="*">Any</option>
+                        @foreach (var user in appUsers.Select(x => new { x.UserId, x.UserLogin }).Distinct())
+                        {
+                            <option value="@user.UserId">@user.UserLogin</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label for="inputEmail4">Name: </label>
+                    <input type="email" class="form-control" @bind="filteredNoteSetTypeName" id="searchNoteSetType" placeholder="Search name..">
+                </div>
+            </div>
+            <button type="button" class="btn btn-success" onclick="@FilterSubmit">Search</button>
+            <button type="button" class="btn btn-success" onclick="@ResetFilter">Reset</button>
+            @if (CheckPermission((int)Permissions.CreateNoteSetType))
+            {
+                <button type="button" class="btn btn-success" style="margin-left: 2%;" onclick="@Add">Add</button>
+            }
+
+
+        </form>
+    </div>
+
+
+    <div class="col-sm-10 text-left" style="margin-top:1%">
+        <div>
+            <b><h2 style="font-family:montserrat; font-weight:bold">Note Set Type Management</h2></b>
+        </div>
+
+        @if (showSpinner)
+        {
+            <div class="spinner" style="z-index:4"></div>
+        }
+
+        @if (showGrid)
+        {
+            <DataGrid @ref="@dataGridRef"
+                      TItem="EView360Models.Core.NoteSetType"
+                      Data="@filteredNoteSetTypes"
+            @bind-SelectedRow="@selectedNoteSetType"
+                            Editable
+                       Responsive="true"
+                            ShowPager
+                       RowRemoving="@OnRowRemoving"
+                       RowRemoved="@OnRowRemoved"
+                            UseValidation
+                       ShowValidationsSummary="false"
+                            ShowValidationFeedback
+                       PopupSize="ModalSize.Small"
+                            Bordered
+                       PageSize="50"
+                            FixedHeader
+                       Narrow="true"
+                            Sortable SortMode="DataGridSortMode.Single"
+                       HeaderThemeContrast="@ThemeContrast.Light">
+
+
+                 <DataGridColumn Field="@nameof(EView360Models.Core.NoteSetType.NoteSetTypeName)" Caption="Name" />
+
+                 <DataGridColumn Field="@nameof(EView360Models.Core.NoteSetType.CreationTime)" Caption="Creation Time" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" />
+
+                 <DataGridColumn Field="@nameof(EView360Models.Core.NoteSetType.CreatedByName)" Caption="Created By" />
+
+                 <DataGridNumericColumn Field="@nameof(EView360Models.Core.NoteSetType.DenominationType1Title)" Caption="Type 1" />
+
+                 <DataGridCheckColumn Field="@nameof(EView360Models.Core.NoteSetType.IsType1Recycler)" Caption="Is Recycler" />
+
+                 <DataGridNumericColumn Field="@nameof(EView360Models.Core.NoteSetType.DenominationType2Title)" Caption="Type 2" />
+                 <DataGridCheckColumn Field="@nameof(EView360Models.Core.NoteSetType.IsType2Recycler)" Caption="Is Recycler" />
+
+                 <DataGridNumericColumn Field="@nameof(EView360Models.Core.NoteSetType.DenominationType3Title)" Caption="Type 3" />
+                 <DataGridCheckColumn Field="@nameof(EView360Models.Core.NoteSetType.IsType3Recycler)" Caption="Is Recycler" />
+
+                 <DataGridNumericColumn Field="@nameof(EView360Models.Core.NoteSetType.DenominationType4Title)" Caption="Type 4" />
+                 <DataGridCheckColumn Field="@nameof(EView360Models.Core.NoteSetType.IsType4Recycler)" Caption="Is Recycler" />
+
+                 <DataGridCommandColumn CellClass="@((item)=> "all_headers")" ClearFilterCommandAllowed="false">
+                     <NewCommandTemplate>
+                     </NewCommandTemplate>
+
+                     <EditCommandTemplate>
+                         @if (CheckPermission((int)Permissions.ModifyNoteSetType))
+                        {
+                            <Button Clicked="@(()=>OnCustomEditCommand(context))" title="Edit">
+                                <Icon Name="IconName.Edit" TextColor="TextColor.Success" IconSize=IconSize.Small />
+                            </Button>
+                        }
+                    </EditCommandTemplate>
+                    <DeleteCommandTemplate>
+                        @if (CheckPermission((int)Permissions.DeleteNoteSetType))
+                        {
+                            <Button Clicked="@context.Clicked" title="Delete"><Icon Name="IconName.Delete" TextColor="TextColor.Danger" IconSize=IconSize.Small /></Button>
+                        }                        
+                    </DeleteCommandTemplate>
+                    <CancelCommandTemplate>
+                        <Button Color="Color.Secondary" Clicked="@context.Clicked">Cancel</Button>
+                    </CancelCommandTemplate>
+                    <SaveCommandTemplate>
+                        <Button Color="Color.Success" Clicked="@context.Clicked">Save</Button>
+                    </SaveCommandTemplate>
+                </DataGridCommandColumn>
+            </DataGrid>
+        }
+
+        @if (showModal)
+        {
+            <NoteSetTypeForm OnSubmitCallback="SubmitHandler" OnCancelCallback="HideModal" thisNoteSetType="thisNoteSetType" isEdit="isEdit" noteSetTypes="noteSetTypes" modalTitle="Edit Form" />
+        }
+
+    </div>
+</div>
+
+
+
+<style>
+
+
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        margin-top: 20px;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    .modal-body {
+        max-height: 75vh;
+        overflow-y: auto;
+    }
+
+
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    /* .all_headers_form {
+                margin-left: 12px;
+                padding: 5px;
+            }
+        */
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+</style>
+
+@code {
+    private bool showSpinner = true;
+    private bool showGrid = false;
+    private bool showModal = false;
+    public List<EView360Models.Core.NoteSetType> noteSetTypes = new();
+    private List<EView360Models.Core.NoteSetType> filteredNoteSetTypes = new();
+    private EView360Models.Core.NoteSetType selectedNoteSetType;
+    private DataGrid<EView360Models.Core.NoteSetType>? dataGridRef;
+    string? selectedUser;
+    private string filteredNoteSetTypeName = string.Empty;
+    private string filterCreatedBy = "*";
+    private EView360Models.Core.NoteSetType thisNoteSetType { get; set; }
+    private string modalTitle = string.Empty;
+    private bool isEdit = false;
+    NoteSetTypeForm? noteSetTypeForm;
+    [Inject] INotificationService NotificationService { get; set; }
+    [Inject] IMessageService MessageService { get; set; }
+    Dictionary<int, string> userRights;
+    public List<AppUserDropdownViewModel> appUsers { get; set; } = new List<AppUserDropdownViewModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        service.UserId = (await localStorage.GetItemAsync<EView360Models.Core.AppUser>("AppUser")).UserId;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender && (noteSetTypes is null || noteSetTypes.Count == 0))
+            {
+                userRights = await localStorage.GetItemAsync<Dictionary<int, string>>("userRights");
+                await LoadData();
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at NoteSetType, OnAfterRenderAsync as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    private bool CheckPermission(int right)
+    {
+        try
+        {
+            if (userRights is not null)
+                return userRights.ContainsKey(right);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at NoteSetType, CheckPermission as: {ex.Message}");
+
+            NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+        return false;
+    }
+
+    private async Task SubmitHandler(EView360Models.Core.NoteSetType responseNoteSetType)
+    {
+        try
+        {
+            showSpinner = true;
+            showGrid = false;
+            string response = string.Empty;
+            HideModal();
+            if (isEdit)
+            {
+                thisNoteSetType = responseNoteSetType;
+                this.InvokeAsync(() => this.StateHasChanged());
+                response = await service.UpdateNoteSetType(responseNoteSetType);
+            }
+            else
+            {
+                responseNoteSetType.CreationTime = DateTime.Now;
+                filteredNoteSetTypes.Add(responseNoteSetType);
+                this.InvokeAsync(() => this.StateHasChanged());
+                thisNoteSetType.CreationTime = DateTime.Now;
+                thisNoteSetType.CreatedBy = service.UserId;
+                response = await service.InsertNoteSetType(thisNoteSetType);
+            }
+
+            if (response != "success")
+            {
+                await NotificationService.Error(response, "Error", (options) =>
+                {
+                    options.IntervalBeforeClose = 4000;
+                });
+            }
+            else
+            {
+                await NotificationService.Success("Row changes completed successfully.", "Success", (options) =>
+                    {
+                        options.IntervalBeforeClose = 4000;
+                    });
+            }
+            await Task.Delay(300);
+            await LoadData();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at NoteSetType, SubmitHandler as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    private async Task LoadData()
+    {
+        if (appUsers is null || appUsers.Count == 0)
+        {
+            appUsers = await userManagementService.GetAllUsers();
+        }
+        noteSetTypes = filteredNoteSetTypes = await service.GetNoteSetTypeListAsync();
+
+        if (appUsers?.Count > 0)
+        {
+            noteSetTypes.Select(c => { c.CreatedByName = appUsers.FirstOrDefault(x => x.UserId == c.CreatedBy)?.UserLogin; return c; }).ToList();
+        }
+        
+
+        showSpinner = false;
+        showGrid = true;
+        this.InvokeAsync(() => this.StateHasChanged());
+
+        if (noteSetTypes is null || noteSetTypes.Count == 0)
+        {
+            await NotificationService.Error("No record found..", "Information", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    async Task OnCustomEditCommand(EditCommandContext<EView360Models.Core.NoteSetType> context)
+    {
+        isEdit = true;
+        thisNoteSetType = context.Item;
+        showModal = true;
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    async Task Add()
+    {
+        thisNoteSetType = new();
+        isEdit = false;
+        showModal = true;
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    async Task OnCustomNewCommand(NewCommandContext<EView360Models.Core.NoteSetType> context)
+    {
+        thisNoteSetType = new();
+        isEdit = false;
+        showModal = true;
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private void HideModal()
+    {
+        showModal = false;
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private string HeaderCellClass()
+    {
+        return "tableHeader";
+    }
+
+    private void FilterSubmit()
+    {
+        filteredNoteSetTypes = noteSetTypes;
+
+        //created By dropDown
+        if (filterCreatedBy != "*")
+        {
+            filteredNoteSetTypes = noteSetTypes.Where(x => x.CreatedBy.ToString() == filterCreatedBy).ToList();
+        }
+        //note set type name
+        if (!string.IsNullOrEmpty(filteredNoteSetTypeName))
+        {
+            filteredNoteSetTypes = filteredNoteSetTypes.Where(x => x.NoteSetTypeName.Trim().ToLower().Contains(filteredNoteSetTypeName.Trim().ToLower())).ToList();
+        }
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private void ResetFilter()
+    {
+        filteredNoteSetTypes = noteSetTypes;
+        filterCreatedBy = "*";
+        filteredNoteSetTypeName = string.Empty;
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    async Task OnRowRemoving(CancellableRowChange<EView360Models.Core.NoteSetType> cancellableRow)
+    {
+        if (await MessageService.Confirm("Are you sure you want to delete note set type?", "Confirmation", (options) => { options.ConfirmButtonColor = Color.Success; }))
+        {
+            string response = await service.IfAtmExistForNoteSetType(cancellableRow.Item.NoteSetTypeId);
+            if (response == "true")
+            {
+                cancellableRow.Cancel = true;
+                await RenderErrorBox("Error", "Cannot delete “NOTE SET TYPE” as “ATMs” are assigned to this type");
+            }
+            else if (response.Contains("Error"))
+            {
+                await NotificationService.Error(response, "Error", (options) =>
+                {
+                    options.IntervalBeforeClose = 4000;
+                });
+            }
+        }
+        else
+        {
+            cancellableRow.Cancel = true;
+        }
+    }
+
+    async Task OnRowRemoved(EView360Models.Core.NoteSetType noteSetType)
+    {
+        string response = await service.DeleteNoteSetType(noteSetType.NoteSetTypeId, noteSetType.NoteSetTypeName);
+        if (response != "success")
+        {
+            await NotificationService.Error(response, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+        else
+        {
+            await NotificationService.Success("Noteset type deleted successfully.", "Success", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+        await LoadData();
+    }
+
+    public async Task RenderErrorBox(string title, string message)
+    {
+        await NotificationService.Error(message, title, (options) =>
+        {
+            options.IntervalBeforeClose = 4000;
+        });
+    }
+}

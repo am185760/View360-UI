@@ -1,0 +1,246 @@
+﻿@page "/AtmPendingFiles"
+
+@using DataRequestorMiddleware.Services.Operations;
+@using EView360.Services;
+@using EView360Models.ViewModels;
+@inject ATMTreeViewRepository treeService
+@inject AtmPendingFileService service 
+@inject ILogger<AtmPendingFiles> logger
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject NotifyService notifyService
+@implements IDisposable
+
+
+<div class="row content">
+    <div class="col-sm-2 filter_bar border-right-2">
+        <form style="margin-top: 20px;">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <h5>Filters: </h5>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label for="inputEmail4">Atm IP: </label>
+                    <input type="email" class="form-control" @bind="filterAtmIp" id="searchNoteSetType" placeholder="Search IP..">
+                </div>
+            </div>
+            <input class="btn btn-success" type="button" @onclick="@(e => LoadData(false))" value="Filter">
+            <input class="btn btn-success" type="button" onclick="@ResetFilter" value="Reset">
+        </form>
+    </div>
+    <div class="col-sm-10 text-left" style="margin-top:1%">
+        <div>
+            <b><h2 style="font-family:montserrat; font-weight:bold">Atm Backlog</h2></b>
+        </div>
+
+        @if (showSpinner)
+        {
+            <div class="spinner" style="z-index:4"></div>
+        }
+        @if (showGrid)
+        {
+            <DataGrid @ref="@dataGridRef"
+                  TItem="AtmPendingFileViewModel"
+                  Data="@filterAtmPendingFiles"
+                  Responsive="true"
+                  ShowPager
+                  Bordered
+                  PageSize="20"
+                  FixedHeader
+                  Narrow="true"
+                  Sortable  SortMode="DataGridSortMode.Single"                  
+                  FixedHeaderDataGridHeight="570px"
+                  FixedHeaderDataGridMaxHeight="570px"
+                  HeaderThemeContrast="@ThemeContrast.Light">
+
+
+                <DataGridColumn Field="@nameof(AtmPendingFileViewModel.AtmTitle)" Caption="Title" />
+                <DataGridColumn Field="@nameof(AtmPendingFileViewModel.AtmIP)" Caption="IP" />
+                 <DataGridColumn Field="@nameof(AtmPendingFileViewModel.Location)" Caption="Location" />
+                 <DataGridNumericColumn Field="@nameof(AtmPendingFileViewModel.PendingFilesCount)" Caption="Pending Files Count" />
+                <DataGridColumn Field="@nameof(AtmPendingFileViewModel.LastInvoked)" Caption="Last Invoked" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" />
+                <DataGridColumn Field="@nameof(AtmPendingFileViewModel.IsAtm)" Caption="ATM" />
+                <DataGridColumn Field="@nameof(AtmPendingFileViewModel.IsCdm)" Caption="BNA" />
+                 <DataGridColumn Field="@nameof(AtmPendingFileViewModel.IsRecycler)" Caption="Recycler" />
+                 <DataGridColumn Field="@nameof(AtmPendingFileViewModel.AtmType)" Caption="Atm Type" />
+                <DataGridColumn TItem="AtmPendingFileViewModel" Field="@nameof(AtmPendingFileViewModel.AtmTitle)" Caption="View Files">
+
+                    <DisplayTemplate>
+                        <Button Class="ViewTask" Clicked="@(()=>ViewTask(context))">
+                            <Icon Name="@("fa-newspaper-o")" TextColor="TextColor.Success" />
+                        </Button>
+                    </DisplayTemplate>
+                </DataGridColumn>
+            </DataGrid>
+        }
+    </div>
+</div>
+
+<Modal @ref="DetailsModalDataGridRef">
+    <ModalContent Centered Size="ModalSize.Default">
+        <ModalHeader>
+            <ModalTitle>
+                Files Information
+            </ModalTitle>
+            <CloseButton />
+        </ModalHeader>
+
+        <ModalBody>
+            <DataGrid @ref="@dataGridRef2"
+                      TItem="FileDetailViewModel"
+                      Data="@fileDetails"
+                      Editable
+                      Responsive="true"
+                      Bordered
+                      PageSize="@fileDetails.Count"
+                      FixedHeader
+                      FixedHeaderDataGridHeight="100%"
+                      FixedHeaderDataGridMaxHeight="100%"
+                      Narrow="true"
+                      Sortable  SortMode="DataGridSortMode.Single"
+                      HeaderThemeContrast="@ThemeContrast.Light">
+
+                <DataGridColumn Field="@nameof(FileDetailViewModel.FileName)" Caption="File Name" />
+                <DataGridColumn Field="@nameof(FileDetailViewModel.FileCreationDateTime)" Caption="File Creation Time" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" />
+                <DataGridColumn Field="@nameof(FileDetailViewModel.FileSize)" Caption="File Size" />
+            </DataGrid>
+        </ModalBody>
+    </ModalContent>
+</Modal>
+
+
+<style>
+
+
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        margin-top: 20px;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    .modal-body {
+        max-height: 75vh;
+        overflow-y: auto;
+    }
+
+
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    /* .all_headers_form {
+                margin-left: 12px;
+                padding: 5px;
+            }
+        */
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+</style>
+
+ @code {
+    private bool showSpinner = false;
+    private bool showGrid = false;
+    private bool showModal = false;
+    public List<AtmPendingFileViewModel> atmPendingFiles = new();
+    public List<AtmPendingFileViewModel> filterAtmPendingFiles = new();
+    private DataGrid<AtmPendingFileViewModel>? dataGridRef;
+    [Inject] INotificationService NotificationService { get; set; }
+
+    private Modal? DetailsModalDataGridRef;
+    private DataGrid<FileDetailViewModel>? dataGridRef2;
+    public List<FileDetailViewModel> fileDetails = new();
+    private string filterAtmIp = string.Empty;
+    private bool treeSelection { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        notifyService.OnAtmChange += AtmSelected;
+        notifyService.OnRegionChange += AtmSelected;
+    }
+
+    private async void AtmSelected()
+    {
+        await LoadData(true);
+    }
+
+    private async Task ViewTask(AtmPendingFileViewModel model)
+    {
+        fileDetails = model.fileDetails;
+        DetailsModalDataGridRef?.Show();
+    }
+
+    private async Task LoadData(bool? treeSelection = false)
+    {
+        logger.LogWarning($"Atm PendingFiles:  **LoadData**  : {DateTime.Now.ToString()}");
+        string error = string.Empty;
+        showSpinner = true;
+        showGrid = false;
+        await this.InvokeAsync(() => this.StateHasChanged());
+        await Task.Delay(5);
+
+        atmPendingFiles = filterAtmPendingFiles = service.GetAtmPendingFiles(treeService.SelectedAtmIds.ConvertAll(x => x.ToString()), treeService.AtmList, ref error);
+
+        if (treeSelection.HasValue && treeSelection.Value)
+        {
+            List<long>? selectedAtmIds = await treeService?.GetSelectedAtmId();
+            if (selectedAtmIds?.Count > 0)
+            {
+                filterAtmPendingFiles = filterAtmPendingFiles.Where(x => selectedAtmIds.Any(y => y == x.AtmId)).ToList();
+            }
+        }
+
+        if (!string.IsNullOrEmpty(filterAtmIp))
+        {
+            filterAtmPendingFiles = filterAtmPendingFiles.Where(x => x.AtmIP.Trim().Contains(filterAtmIp.ToLower())).ToList();
+        }
+
+        showSpinner = false;
+        showGrid = true;
+        await this.InvokeAsync(() => this.StateHasChanged());
+
+
+        if ((atmPendingFiles is null || atmPendingFiles.Count == 0) && !string.IsNullOrEmpty(error))
+        {
+            await NotificationService.Error(error, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+        else if ((atmPendingFiles is null || atmPendingFiles.Count == 0) && string.IsNullOrEmpty(error))
+        {
+            await NotificationService.Info("No pending files found", "Information", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    private void ResetFilter()
+    {
+        filterAtmPendingFiles = atmPendingFiles;
+        filterAtmIp = string.Empty;
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    public void Dispose()
+    {
+        notifyService.OnAtmChange -= AtmSelected;
+        notifyService.OnRegionChange -= AtmSelected;
+    }
+}

@@ -1,0 +1,1034 @@
+﻿@page "/AtmSetupForm"
+@using EView360.Services;
+@using EView360Models.Core;
+@using EView360Models.ViewModels;
+@using Newtonsoft.Json;
+@using static EView360.Common.Constants;
+@implements IDisposable
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject IJSRuntime jsRuntime
+@inject ILogger<AtmSetupForm> logger
+@inject AtmSetupService service
+@inject INotificationService NotificationService
+@inject ATMTreeViewRepository atmRepository
+@inject NotifyService notifyService
+
+@if (showSpinner)
+{
+    <div class="spinner" style="z-index:4"></div>
+}
+
+<Tabs RenderMode="TabsRenderMode.LazyLoad" SelectedTab="@selectedTab" SelectedTabChanged="@OnSelectedTabChanged">
+    <Items>
+        <Tab Name="General">General Configuration</Tab>
+        <Tab Name="Physical">ATM Physical Cassette Configuration</Tab>
+        <Tab Name="CashDeposite">Cash Deposite Module Configuration</Tab>
+        @*<Tab Name="ChequeDeposite">Cheque Deposite Module Configuration</Tab>*@
+
+
+    </Items>
+    <Content>
+        <TabPanel Name="General">
+            <br>
+
+
+            <EditForm EditContext="editContext" OnValidSubmit=@SubmitHandler id="AtmForm">
+                <DataAnnotationsValidator />
+                <Microsoft.AspNetCore.Components.Forms.ValidationSummary />
+                <div class="row content">
+                    <div class="col-sm-6 sidenav border-right-2">
+
+                        <table class="table-borderless">
+                            <div>
+                                <h5 class="card-title" style="font-weight:bold">Select parent region from tree</h5>
+                            </div>
+
+                            <tbody>
+                                @*<tr>
+                                <td>Region </td>
+                                <td <label class="disabled" @bind="selectedTreeRegion" />@selectedTreeRegion</td>
+                                </tr>*@
+                                <tr>
+                                    <td><i class="fa fa-asterisk" aria-hidden="true" style="font-size:xx-small;vertical-align:top; color:red"></i> ATM ID </td>
+                                    <td <InputText class="form-control" @bind-Value="thisAtm.Title" maxlength="8" /></td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fa fa-asterisk" aria-hidden="true" style="font-size:xx-small;vertical-align:top; color:red"></i> IP </td>
+                                    <td <InputText class="form-control" @bind-Value="thisAtm.Ip" /></td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fa fa-asterisk" aria-hidden="true" style="font-size:xx-small;vertical-align:top; color:red"></i> Vendor Type</td>
+                                    <td
+                                        <Select TValue="string" @bind-SelectedValue="@thisAtm.AtmType" class="form-control">
+                                            <SelectItem Disabled>Select</SelectItem>
+                                            @foreach (var vendor in vendors.Select(x => new { x.Name }).ToList().Distinct())
+                                            {
+                                                                    <SelectItem Value="@vendor.Name">@vendor.Name</SelectItem>
+                                            }
+                                        </Select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Status</td>
+                                    <td>
+                                        <RadioGroup TValue="bool" Name="Status" @bind-CheckedValue="@thisAtm.IsActive">
+                                            <Radio Value=true>Active</Radio>
+                                            <Radio Value=false>Inactive</Radio>
+                                        </RadioGroup>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>ATM Type</td>
+                                    <td>
+                                        <div>
+                                            <Field Horizontal>
+                                                <FieldLabel ColumnSize="ColumnSize.Is3"><Check TValue="bool?" @bind-Checked="@thisAtm.IsAtm">Atm</Check></FieldLabel>
+                                                <FieldLabel ColumnSize="ColumnSize.Is3"><Check TValue="bool?" @bind-Checked="@thisAtm.IsCdm">BNA</Check></FieldLabel>
+                                                @*<FieldLabel ColumnSize="ColumnSize.Is3"><Check TValue="bool?" @bind-Checked="@thisAtm.IsCcdm">CPM</Check></FieldLabel>*@
+                                                @*<Check TValue="bool" @bind-Checked="@thisAtm.IsSdm">SDM</Check>*@
+                                            </Field>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fa fa-asterisk" aria-hidden="true" style="font-size:xx-small;vertical-align:top; color:red"></i> Note Set Type ID</td>
+                                    <td>
+                                        <Select TValue="long" SelectedValue="@thisAtm.NoteSetTypeId" class="form-control" SelectedValueChanged="@LoadNoteSetType">
+                                            <SelectItem Value="-1" Disabled>Select</SelectItem>
+                                            @foreach (var noteset in noteSetTypes.Select(x => new { x.NoteSetTypeId, x.NoteSetTypeName }).ToList().Distinct())
+                                            {
+                                                <SelectItem Value="@noteset.NoteSetTypeId">@noteset.NoteSetTypeName</SelectItem>
+                                            }
+                                        </Select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Location</td>
+                                    <td <InputText class="form-control" @bind-Value="thisAtm.Location" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Recycler</td>
+                                    <td <Check TValue="bool?" Checked="@thisAtm.IsRecycler" CheckedChanged="@OnRecyclerCheckChanged"></Check></td>
+                                </tr>
+
+                                @if (thisAtm.IsRecycler == true)
+                                {
+                                    <tr>
+                                        <td>Physical Towers</td>
+                                        <RadioGroup TValue="NumberOfTower" Name="Physical Towers" CheckedValue="recylerTower" CheckedValueChanged="@OnRecyclerTowerChanged">
+                                            <Radio Value=NumberOfTower.OneTower>1-Tower</Radio>
+                                            <Radio Value=NumberOfTower.TwoTower>2-Tower</Radio>
+                                        </RadioGroup>
+                                    </tr>
+
+
+                                    @* 1-Tower *@
+                                    @if (this.recylerTower == NumberOfTower.OneTower)
+                                    {
+                                        <tr>
+                                            <td>Machine Type</td>
+                                            <RadioGroup TValue="RecyclerType" Name="Machine Type" CheckedValue="@recyclerType" CheckedValueChanged="@OnRecyclerTypeChanged">
+                                                <Radio Value="@(RecyclerType.ScalableRecycler)">Scalable Recyler</Radio>
+                                                <Radio Value="@(RecyclerType.BRM)">BRM</Radio>
+                                            </RadioGroup>
+                                            @* <Check TValue="bool" @bind-Checked="@thisAtm.IsScalableRecycler">Scalable Recyler</Check> *@
+                                        </tr>
+                                    }
+
+                                    @* 2-Tower *@
+                                    @if (this.recylerTower == NumberOfTower.TwoTower)
+                                    {
+                                        <tr>
+                                            <td>Machine Type</td>
+                                            <RadioGroup TValue="RecyclerType" Name="Machine Type" CheckedValue="@recyclerType" CheckedValueChanged="@OnRecyclerTypeChanged">
+                                                <Radio Value="@(RecyclerType.RecyclerAndDispenser)">Recycler & Dispenser</Radio>
+                                                <Radio Value="@(RecyclerType.DualDipenser)">Dual Dipenser</Radio>
+                                            </RadioGroup>
+                                        </tr>
+                                    }
+                                }
+
+                                @*ask InactivityPeriodNormalDays removed from atm in core*@
+
+                                @*<tr>
+                                <td>Allowed Inactivity Period</td>
+                                <td <InputNumber class="form-control" @bind-Value="thisAtm.InactivityPeriodNormalDays" /></td>
+                                </tr>*@
+
+                                @*<tr>
+                                <td>CIT</td>
+                                <td <select @bind="thisAtm.CitId" class="form-control">
+                                <option Disabled selected>Select</option>
+                                @foreach (var cit in cits.Select(x => new { x.CitInternalId, x.Name }).ToList().Distinct())
+                                {
+                                <option value="@cit.CitInternalId">@cit.Name</option>
+                                }
+                                </select>
+                                </td>
+                                </tr>*@
+                                @*<tr>
+                                <td>Description</td>
+                                <td <InputText class="form-control" @bind-Value="thisAtm.Description" /></td>
+                                </tr>*@
+                                <tr>
+                                    <td>Minimun Operating Balance</td>
+                                    <td <InputNumber class="form-control" @bind-Value="thisAtm.MinOperatingBalance" /></td>
+                                </tr>
+                                <tr>
+                                    <td>Out Of Cash Threshold</td>
+                                    <td <InputNumber class="form-control" @bind-Value="thisAtm.OutOfCashThreshold" /></td>
+                                </tr>
+                                @if (@isEdit)
+                                {
+                                    <tr>
+                                        <td>Message Processor ID</td>
+                                        <td> <InputNumber class="form-control" @bind-Value="thisAtm.MessageProcessorId" readonly /></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Assigned Server</td>
+                                        <td> <InputNumber class="form-control" @bind-Value="thisAtm.AssignedServer" readonly /></td>
+                                    </tr>
+                                }
+
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="col-sm-6 sidenav nav-scrollable">
+
+                        <table class="table">
+                            @*<div>
+                            <h5 class="card-title" style="font-weight:bold;align-content:center">Configure job retries</h5>
+                            </div>*@
+                            <tbody>
+                                <tr>
+
+                                    <td>
+                                        <h6>Assigned Users</h6>
+                                        <Switch TValue="bool" Style="margin-top: 2%" Checked="@toggle" CheckedChanged="@AllCheckChanged">Select All</Switch>
+                                        <ul class="list-group list-scroll">
+                                            @foreach (var x in @assignedUsers)
+                                            {
+                                                <li class="list-group-item">
+                                                    @if (@x.UserId == @userId)
+                                                    {
+                                                        x.isSelected = true;
+                                                        <Check TValue="bool" @bind-Checked="x.isSelected" Disabled>@x.UserFullName</Check>
+                                                    }
+                                                    else
+                                                    {
+                                                        <Check TValue="bool" @bind-Checked="x.isSelected">@x.UserFullName</Check>
+                                                    }
+
+                                                </li>
+                                            }
+                                        </ul>
+
+                                    </td>
+                                </tr>
+                                @*ask RetryCountAlert removed from atm in core*@
+                                @*<tr>
+                                <td>Number of retry for sending alert</td>
+                                <td<InputNumber class="form-control" @bind-Value="thisAtm.RetryCountAlert" /></td>
+
+                                </tr>
+                                @*<tr>
+                                <td>Number of retry for Cash Order Upload</td>
+                                <td<InputNumber class="form-control" @bind-Value="thisAtm.RetryCountCashOrderUpload" /></td>
+
+                                </tr>*@
+                                @*<tr>
+                                <td>Number of retry for Uploading Configuration</td>
+                                <td<InputNumber class="form-control" @bind-Value="thisAtm.RetryCountConfUpload" /></td>
+
+                                </tr>*@
+                                @*ask RetryCountCounterFile removed from atm in core*@
+                                @*<tr>
+                                <td>Number of retry for Downloading Counter File</td>
+                                <td<InputNumber class="form-control" @bind-Value="thisAtm.RetryCountCounterFile" /></td>
+
+                                </tr>*@
+                                @*<tr>
+                                <td>Number of retry for Executing Restart Schedule</td>
+                                <td<InputNumber class="form-control" @bind-Value="thisAtm.RetryCountRestartSchedule" /></td>
+
+                                </tr>
+                                <tr>
+                                <td>Number of retry for Executing DateTime Synce Schedule</td>
+                                <td<InputNumber class="form-control" @bind-Value="thisAtm.RetryCountDatetimeSchedule" /></td>
+
+                                </tr>*@
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </EditForm>
+
+
+            <div class="modal-footer">
+                <input type="submit" form="AtmForm" class="btn btn-success" value="Save" />
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="@OnCancelCallback">Close</button>
+            </div>
+        </TabPanel>
+        <TabPanel Name="Physical">
+
+            <EditForm EditContext="editContext" OnValidSubmit=@SubmitHandler id="AtmForm">
+                <Microsoft.AspNetCore.Components.Forms.ValidationSummary />
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Denominations</th>
+                            <th>Capacity</th>
+                            <th>Purge Bin Threshold</th>
+                            <th>Min Notes Threshold %</th>
+                            <th>Min Notes Threshold Value</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><b>Cassette1</b></td>
+                            <td>
+                                <div class="form-group">
+                                    <InputNumber class="form-control small-width" @bind-Value="thisAtm.Cassette1Denomination" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <InputNumber class="form-control small-width" @bind-Value="thisAtm.Cassette1Capacity" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+
+
+                                    <Field Horizontal>
+                                        <Field ColumnSize="ColumnSize.Is2"><Check TValue="bool?" @bind-Checked="thisAtm.IsPurge1ThresholdSelected"></Check></Field>
+                                        <Field ColumnSize="ColumnSize.Is10"><InputNumber class="form-control small-width" @bind-Value="thisAtm.Purge1Threshold" /></Field>
+                                    </Field>
+
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-check">
+                                    <InputNumber @bind-Value="thisAtm.Type1MinNotesThreshold" class="form-control small-width" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-check">
+                                    <InputNumber @bind-Value="thisAtm.Type1MinNotesThresholdValue" class="form-control small-width" />
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Cassette2</b></td>
+                            <td>
+                                <div class="form-group">
+                                    <InputNumber class="form-control small-width" @bind-Value="thisAtm.Cassette2Denomination" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <InputNumber class="form-control small-width" @bind-Value="thisAtm.Cassette2Capacity" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <Field Horizontal>
+                                        <Field ColumnSize="ColumnSize.Is2"><Check TValue="bool?" @bind-Checked="thisAtm.IsPurge2ThresholdSelected"></Check></Field>
+                                        <Field ColumnSize="ColumnSize.Is10"><InputNumber class="form-control small-width" @bind-Value="thisAtm.Purge2Threshold" /></Field>
+                                    </Field>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-check">
+                                    <InputNumber @bind-Value="thisAtm.Type2MinNotesThreshold" class="form-control small-width" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-check">
+                                    <InputNumber @bind-Value="thisAtm.Type2MinNotesThresholdValue" class="form-control small-width" />
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Cassette3</b></td>
+                            <td>
+                                <div class="form-group">
+                                    <InputNumber class="form-control small-width" @bind-Value="thisAtm.Cassette3Denomination" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <InputNumber class="form-control small-width" @bind-Value="thisAtm.Cassette3Capacity" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <Field Horizontal>
+                                        <Field ColumnSize="ColumnSize.Is2"><Check TValue="bool?" @bind-Checked="thisAtm.IsPurge3ThresholdSelected"></Check></Field>
+                                        <Field ColumnSize="ColumnSize.Is10"><InputNumber class="form-control small-width" @bind-Value="thisAtm.Purge3Threshold" /></Field>
+                                    </Field>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-check">
+                                    <InputNumber @bind-Value="thisAtm.Type3MinNotesThreshold" class="form-control small-width" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-check">
+                                    <InputNumber @bind-Value="thisAtm.Type3MinNotesThresholdValue" class="form-control small-width" />
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Cassette4</b></td>
+                            <td>
+                                <div class="form-group">
+                                    <InputNumber class="form-control small-width" @bind-Value="thisAtm.Cassette4Denomination" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <InputNumber class="form-control small-width" @bind-Value="thisAtm.Cassette4Capacity" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <Field Horizontal>
+                                        <Field ColumnSize="ColumnSize.Is2"><Check TValue="bool?" @bind-Checked="@thisAtm.IsPurge4ThresholdSelected"></Check></Field>
+                                        <Field ColumnSize="ColumnSize.Is10"><InputNumber class="form-control small-width" @bind-Value="thisAtm.Purge4Threshold" /></Field>
+                                    </Field>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-check">
+                                    <InputNumber @bind-Value="thisAtm.Type4MinNotesThreshold" class="form-control small-width" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-check">
+                                    <InputNumber @bind-Value="thisAtm.Type4MinNotesThresholdValue" class="form-control small-width" />
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Cassette5</b></td>
+                            <td>
+                                <div class="form-group">
+                                    <InputNumber class="form-control small-width" @bind-Value="thisAtm.Cassette5Denomination" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <InputNumber class="form-control small-width" @bind-Value="thisAtm.Cassette5Capacity" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <Field Horizontal>
+                                        <Field ColumnSize="ColumnSize.Is2"><Check TValue="bool?" @bind-Checked="@thisAtm.IsPurge5ThresholdSelected"></Check></Field>
+                                        <Field ColumnSize="ColumnSize.Is10"><InputNumber class="form-control small-width" @bind-Value="thisAtm.Purge5Threshold" /></Field>
+                                    </Field>
+
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-check">
+                                    <InputNumber @bind-Value="thisAtm.Type5MinNotesThreshold " class="form-control small-width" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-check">
+                                    <InputNumber @bind-Value="thisAtm.Type5MinNotesThresholdValue" class="form-control small-width" />
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Cassette6</b></td>
+                            <td>
+                                <div class="form-group">
+                                    <InputNumber class="form-control small-width" @bind-Value="thisAtm.Cassette6Denomination" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <InputNumber class="form-control small-width" @bind-Value="thisAtm.Cassette6Capacity" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <Field Horizontal>
+                                        <Field ColumnSize="ColumnSize.Is2"><Check TValue="bool?" @bind-Checked="@thisAtm.IsPurge6ThresholdSelected"></Check></Field>
+                                        <Field ColumnSize="ColumnSize.Is10"><InputNumber class="form-control small-width" @bind-Value="thisAtm.Purge6Threshold" /></Field>
+                                    </Field>
+
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-check">
+                                    <InputNumber @bind-Value="thisAtm.Type6MinNotesThreshold " class="form-control small-width" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-check">
+                                    <InputNumber @bind-Value="thisAtm.Type6MinNotesThresholdValue" class="form-control small-width" />
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Cassette7</b></td>
+                            <td>
+                                <div class="form-group">
+                                    <InputNumber class="form-control small-width" @bind-Value="thisAtm.Cassette7Denomination" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <InputNumber class="form-control small-width" @bind-Value="thisAtm.Cassette7Capacity" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <Field Horizontal>
+                                        <Field ColumnSize="ColumnSize.Is2"><Check TValue="bool?" @bind-Checked="@thisAtm.IsPurge7ThresholdSelected"></Check></Field>
+                                        <Field ColumnSize="ColumnSize.Is10"><InputNumber class="form-control small-width" @bind-Value="thisAtm.Purge7Threshold" /></Field>
+                                    </Field>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-check">
+                                    <InputNumber @bind-Value="thisAtm.Type7MinNotesThreshold " class="form-control small-width" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-check">
+                                    <InputNumber @bind-Value="thisAtm.Type7MinNotesThresholdValue" class="form-control small-width" />
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </EditForm>
+            <div class="modal-footer">
+                <input type="submit" form="AtmForm" class="btn btn-success" value="Save" />
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="@OnCancelCallback">Close</button>
+            </div>
+        </TabPanel>
+
+        <TabPanel Name="CashDeposite">
+            <EditForm EditContext="editContext" OnValidSubmit=@SubmitHandler id="AtmForm">
+                <Microsoft.AspNetCore.Components.Forms.ValidationSummary />
+
+                <table class="table">
+                    <thead>
+                    <th></th>
+                    <th style="position: relative; right: 250px">Capacity</th>
+                    <th style="position: relative; right: 440px">Threshold</th>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><b>Cassette 1</b></td>
+                            <td>
+                                <div class="form-group">
+                                    <InputNumber class="form-control postion-adjustment-capacity" @bind-Value="thisAtm.CdmCassette1Capacity" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <InputNumber class="form-control postion-adjustment-threshold" @bind-Value="thisAtm.CdmCassette1Threshold" />
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Cassette 2</b></td>
+                            <td>
+                                <div class="form-group">
+                                    <InputNumber class="form-control postion-adjustment-capacity" @bind-Value="thisAtm.CdmCassette2Capacity" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <InputNumber class="form-control postion-adjustment-threshold" @bind-Value="thisAtm.CdmCassette2Threshold" />
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Cassette 3</b></td>
+                            <td>
+                                <div class="form-group">
+                                    <InputNumber class="form-control postion-adjustment-capacity" @bind-Value="thisAtm.CdmCassette3Capacity" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <InputNumber class="form-control postion-adjustment-threshold" @bind-Value="thisAtm.CdmCassette3Threshold" />
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Cassette 4</b></td>
+                            <td>
+                                <div class="form-group">
+                                    <InputNumber class="form-control postion-adjustment-capacity" @bind-Value="thisAtm.CdmCassette4Capacity" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <InputNumber class="form-control postion-adjustment-threshold" @bind-Value="thisAtm.CdmCassette4Threshold" />
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Allowed Inactivity Period</b></td>
+                            <td>
+                                <div class="form-group">
+                                    <InputNumber class="form-control postion-adjustment-capacity" @bind-Value="thisAtm.AllowedInactivityPeriod" />
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </EditForm>
+            <div class="modal-footer">
+                <input type="submit" form="AtmForm" class="btn btn-success" value="Save" />
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="@OnCancelCallback">Close</button>
+            </div>
+        </TabPanel>
+
+        <TabPanel Name="ChequeDeposite">
+            <EditForm EditContext="editContext" OnValidSubmit=@SubmitHandler id="AtmForm">
+                <Microsoft.AspNetCore.Components.Forms.ValidationSummary />
+
+                <table class="table">
+                    <thead>
+                    <th></th>
+                    <th style="position: relative; right: 250px">Capacity</th>
+                    <th style="position: relative; right: 440px">Threshold</th>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><b>Bin 1</b></td>
+                            <td>
+                                <div class="form-group">
+                                    <InputNumber class="form-control postion-adjustment-capacity" @bind-Value="thisAtm.CcdmCassette1Capacity    " />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <InputNumber class="form-control postion-adjustment-threshold" @bind-Value="thisAtm.CcdmCassette1Threshold" />
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Bin 2</b></td>
+                            <td>
+                                <div class="form-group">
+                                    <InputNumber class="form-control postion-adjustment-capacity" @bind-Value="thisAtm.CcdmCassette2Capacity" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <InputNumber class="form-control postion-adjustment-threshold" @bind-Value="thisAtm.CcdmCassette2Threshold" />
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Bin 3</b></td>
+                            <td>
+                                <div class="form-group">
+                                    <InputNumber class="form-control postion-adjustment-capacity" @bind-Value="thisAtm.CcdmCassette3Capacity" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <InputNumber class="form-control postion-adjustment-threshold" @bind-Value="thisAtm.CcdmCassette3Threshold" />
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Bin 4</b></td>
+                            <td>
+                                <div class="form-group">
+                                    <InputNumber class="form-control postion-adjustment-capacity" @bind-Value="thisAtm.CcdmCassette4Capacity" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <InputNumber class="form-control postion-adjustment-threshold" @bind-Value="thisAtm.CcdmCassette4Threshold" />
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><b>Allowed Inactivity Period</b></td>
+                            <td>
+                                <div class="form-group">
+                                    <InputNumber class="form-control postion-adjustment-capacity" @bind-Value="thisAtm.ChequeAllowedInactivityPeriod" />
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </EditForm>
+            <div class="modal-footer">
+                <input type="submit" form="AtmForm" class="btn btn-success" value="Save" />
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="@OnCancelCallback">Close</button>
+            </div>
+        </TabPanel>
+    </Content>
+</Tabs>
+
+<style>
+
+    .small-width {
+        width: 100px;
+    }
+
+    .postion-adjustment-capacity {
+        width: 100px;
+        position: relative;
+        right: 250px;
+    }
+
+    .postion-adjustment-threshold {
+        width: 100px;
+        position: relative;
+        right: 440px;
+    }
+
+    .list-scroll {
+        max-height: 50vh;
+        overflow: auto;
+    }
+</style>
+@code {
+    private EView360Models.Core.AppUser appUser;
+    private DotNetObjectReference<AtmSetupForm>? objRef;
+    private RecyclerType recyclerType;
+    private NumberOfTower recylerTower;
+
+    private EditContext? editContext;
+    private ValidationMessageStore? messageStore;
+    string selectedTab = "General";
+    private bool toggle = false;
+    //private string beforeEditTitle = string.Empty;
+    private bool showSpinner = false;
+
+    [Parameter] public EView360Models.Core.Atm thisAtm { get; set; }
+    [Parameter] public EventCallback<EView360Models.Core.Atm> OnSubmitCallback { get; set; }
+    [Parameter] public EventCallback<EView360Models.Core.Atm> OnCancelCallback { get; set; }
+    [Parameter] public List<EView360Models.Core.Atm> atms { get; set; }
+    [Parameter] public bool isEdit { get; set; }
+    [Parameter] public long? selectedTreeRegion { get; set; }
+    //[Parameter] public List<EView360Models.Core.Cit> cits { get; set; }
+    [Parameter] public List<EView360Models.Core.NoteSetType> noteSetTypes { get; set; }
+    [Parameter] public List<EView360Models.Core.AppUser> assignedUsers { get; set; }
+    [Parameter] public long userId { get; set; }
+    [Parameter] public List<TerminalType> vendors { get; set; }
+
+
+    protected override void OnInitialized()
+    {
+        if (!isEdit)
+        {
+            AllCheckChanged(true);
+        }
+        else
+        {
+            if (assignedUsers.All(x => x.isSelected) == true)
+            {
+                toggle = true;
+            }
+
+            if (thisAtm.IsRecycler==true && thisAtm.RecyclerType != null && thisAtm.RecyclerTower != null)
+            {
+                this.recyclerType = (RecyclerType)Enum.Parse(typeof(RecyclerType), thisAtm.RecyclerType);
+                this.recylerTower = (NumberOfTower)Enum.Parse(typeof(NumberOfTower), thisAtm.RecyclerTower);
+            }
+        }
+        editContext = new(thisAtm);
+        editContext.OnValidationRequested += CustomValidations;
+        messageStore = new(editContext);
+        objRef = DotNetObjectReference.Create(this);
+        LoadNoteSetType(thisAtm.NoteSetTypeId);
+    }
+
+    private Task OnSelectedTabChanged(string name)
+    {
+        selectedTab = name;
+        return Task.CompletedTask;
+    }
+
+    private async void GetLocalStorageData()
+    {
+        selectedTreeRegion = await atmRepository.GetSelectedRegionId();
+    }
+
+    private void CustomValidations(object? sender, ValidationRequestedEventArgs args)
+    {
+        messageStore?.Clear();
+        List<EView360Models.Core.Atm> ValidationAtms = atms;
+        if (isEdit)
+            ValidationAtms.Remove(ValidationAtms.FirstOrDefault(x => x.AtmId == thisAtm.AtmId));
+
+        if (ValidationAtms.Any(x => x.Title.Trim().ToLower() == thisAtm.Title?.Trim()?.ToLower()))
+            messageStore?.Add(() => thisAtm.Title, "ATM with same name already exists. Please provide unique name");
+
+        if (ValidationAtms.Any(x => x.Ip == thisAtm.Ip))
+            messageStore?.Add(() => thisAtm.Ip, "ATM with same IP already exists. Please provide unique IP");
+
+        if (selectedTreeRegion == null || selectedTreeRegion == 1)
+            messageStore?.Add(() => selectedTreeRegion, "Please select a valid region from tree");
+
+        if (thisAtm.NoteSetTypeId == -1)
+            messageStore?.Add(() => thisAtm.NoteSetTypeId, "Please select a Note Set ID");
+
+        if (string.IsNullOrEmpty(thisAtm.AtmType))
+            messageStore?.Add(() => thisAtm.AtmType, "Please select a vendor type");
+    }
+
+    private async Task SubmitHandler()
+    {
+        try
+        {
+            showSpinner = true;
+            thisAtm.RegionId = selectedTreeRegion;
+
+
+            if (isEdit)
+            {
+                string response = string.Empty;
+                if (thisAtm.RetryCountCounterFile is null)
+                    thisAtm.RetryCountCounterFile = 10;
+
+                response = await service.UpdateAtm(thisAtm);
+                if (response == "success")
+                {
+                    //update tree AtmList & notify
+                    if (!thisAtm.IsActive)
+                    {
+                        await jsRuntime.InvokeVoidAsync("DeleteNode", objRef, "a" + thisAtm.AtmId.ToString());
+                        atmRepository.SelectedAtmIds.Remove(thisAtm.AtmId);
+                        atmRepository.AtmList.Remove(atmRepository.AtmList.FirstOrDefault(x => x.AtmId == thisAtm.AtmId));
+                    }
+                    else
+                    {
+                        await jsRuntime.InvokeVoidAsync("UpdateNode", objRef, 'r' + selectedTreeRegion.ToString(), 'a' + thisAtm.AtmId.ToString(), thisAtm.Title);
+                        string jsonAtm = JsonConvert.SerializeObject(thisAtm);
+                        AtmViewModel atmViewModel = JsonConvert.DeserializeObject<AtmViewModel>(jsonAtm);
+                        atmRepository.AtmList.Remove(atmRepository.AtmList.FirstOrDefault(x => x.AtmId == thisAtm.AtmId));
+                        atmRepository.AtmList.Add(atmViewModel);
+                    }
+                    await notifyService.NotifySearchListChanged();
+
+                    response = await service.UpdateAtmUsers(assignedUsers, thisAtm.AtmId);
+
+                    if (response == "success")
+                    {
+                        await service.RenderSuccessBox("Successfully Updated", "Atm has been successfully updated");
+
+                        await OnSubmitCallback.InvokeAsync(thisAtm);
+                    }
+                }
+                else
+                {
+                    showSpinner = false;
+                    await NotificationService.Error(response, "Error", (options) =>
+                    {
+                        options.IntervalBeforeClose = 4000;
+                    });
+                }
+            }
+            else
+            {
+                string[] response;
+                EView360Models.Core.AppUser user = await localStorage.GetItemAsync<EView360Models.Core.AppUser>("AppUser");
+                thisAtm.CreatedBy = user.UserId;
+                thisAtm.CreationTime = DateTime.Now;
+                thisAtm.IsHealthy = true;
+                thisAtm.RetryCountCounterFile = 10;
+                thisAtm.IsSwapDefaultReplenishment = false;
+                response = await service.InsertAtm(thisAtm);
+                thisAtm.AtmId = Int64.Parse(response[1]);
+
+                if (response[0] == "success")
+                {
+                    await jsRuntime.InvokeVoidAsync("CreateNode", objRef, 'r' + selectedTreeRegion.ToString(), 'a' + thisAtm.AtmId.ToString(), thisAtm.Title);
+
+                    //Add Atm to tree AtmList & notify
+                    atmRepository.AtmList.Add(new EView360Models.ViewModels.AtmViewModel()
+                        {
+                            AtmId = thisAtm.AtmId,
+                            Ip = thisAtm.Ip,
+                            IsCdm = thisAtm.IsCdm,
+                            IsHealthy = thisAtm.IsHealthy,
+                            Location = thisAtm.Location,
+                            MinOperatingBalance = thisAtm.MinOperatingBalance,
+                            NoteSetTypeId = thisAtm.NoteSetTypeId,
+                            RegionId = thisAtm.RegionId,
+                            Title = thisAtm.Title
+                        });
+                    await notifyService.NotifySearchListChanged();
+
+                    await service.UpdateAtmUsers(assignedUsers, thisAtm.AtmId);
+                    await OnSubmitCallback.InvokeAsync(thisAtm);
+                }
+                else
+                {
+                    isEdit = true;
+                    showSpinner = false;
+                    await NotificationService.Error(response[0], "Error", (options) =>
+                    {
+                        options.IntervalBeforeClose = 4000;
+                    });
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            showSpinner = false;
+            logger.LogError($"Exception at AtmSetup, SubmitHandler as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+
+    public void Dispose()
+    {
+        objRef?.Dispose();
+        if (editContext is not null)
+        {
+            editContext.OnValidationRequested -= CustomValidations;
+        }
+    }
+
+    void OnRecyclerCheckChanged(bool? isRecycler)
+    {
+        thisAtm.IsRecycler = isRecycler;
+        if (isRecycler!= null  && isRecycler==true)
+        {
+            OnRecyclerTowerChanged(NumberOfTower.OneTower);
+        }
+        else
+        {
+            thisAtm.RecyclerTower = null;
+            thisAtm.RecyclerType = null;
+        }
+    }
+
+    void OnRecyclerTowerChanged(NumberOfTower recyclerTower)
+    {
+        this.recylerTower = recyclerTower;
+        thisAtm.RecyclerTower = Enum.GetName(this.recylerTower);
+        if (recyclerTower == NumberOfTower.OneTower)
+        {
+            recyclerType = RecyclerType.ScalableRecycler;
+            thisAtm.RecyclerType = Enum.GetName(recyclerType);
+        }
+        else
+        {
+            recyclerType = RecyclerType.RecyclerAndDispenser;
+            thisAtm.RecyclerType = Enum.GetName(recyclerType);
+        }
+    }
+
+    void OnRecyclerTypeChanged(RecyclerType recyclerType)
+    {
+        this.recyclerType = recyclerType;
+        thisAtm.RecyclerType = Enum.GetName(this.recyclerType);
+    }
+
+    Task LoadNoteSetType(long value)
+    {
+        thisAtm.NoteSetTypeId = value;
+
+        if (thisAtm.NoteSetTypeId == -1)
+            return Task.CompletedTask;
+
+        EView360Models.Core.NoteSetType noteSetType = noteSetTypes.Where(x => x.NoteSetTypeId == thisAtm.NoteSetTypeId).FirstOrDefault();
+        if (noteSetType.DenominationType1Title != null)
+        {
+            thisAtm.Cassette1Denomination = (int)noteSetType.DenominationType1;
+            thisAtm.Cassette1Capacity = 2000;
+            thisAtm.Purge1Threshold = 10;
+            thisAtm.IsPurge1ThresholdSelected = true;
+        }
+        if (noteSetType.DenominationType2Title != null)
+        {
+            thisAtm.Cassette2Denomination = (int)noteSetType.DenominationType2;
+            thisAtm.Cassette2Capacity = 2000;
+            thisAtm.Purge2Threshold = 10;
+            thisAtm.IsPurge2ThresholdSelected = true;
+        }
+        if (noteSetType.DenominationType3Title != null)
+        {
+            thisAtm.Cassette3Denomination = (int)noteSetType.DenominationType3;
+            thisAtm.Cassette3Capacity = 2000;
+            thisAtm.Purge3Threshold = 10;
+            thisAtm.IsPurge3ThresholdSelected = true;
+        }
+        if (noteSetType.DenominationType4Title != null)
+        {
+            thisAtm.Cassette4Denomination = (int)noteSetType.DenominationType4;
+            thisAtm.Cassette4Capacity = 2000;
+            thisAtm.Purge4Threshold = 10;
+            thisAtm.IsPurge4ThresholdSelected = true;
+        }
+        if (noteSetType.DenominationType5Title != null)
+        {
+            thisAtm.Cassette5Denomination = (int)noteSetType.DenominationType5;
+            thisAtm.Cassette5Capacity = 2000;
+            thisAtm.Purge5Threshold = 10;
+            thisAtm.IsPurge5ThresholdSelected = true;
+        }
+        if (noteSetType.DenominationType6Title != null)
+        {
+            thisAtm.Cassette6Denomination = (int)noteSetType.DenominationType6;
+            thisAtm.Cassette6Capacity = 2000;
+            thisAtm.Purge6Threshold = 10;
+            thisAtm.IsPurge6ThresholdSelected = true;
+        }
+        if (noteSetType.DenominationType7Title != null)
+        {
+            thisAtm.Cassette7Denomination = (int)noteSetType.DenominationType7;
+            thisAtm.Cassette7Capacity = 2000;
+            thisAtm.Purge7Threshold = 10;
+            thisAtm.IsPurge7ThresholdSelected = true;
+        }
+        return Task.CompletedTask;
+    }
+
+    private void AllCheckChanged(bool value)
+    {
+        toggle = value;
+
+        if (value)
+        {
+            assignedUsers.Where(x => x.UserId != userId).Select(x => { x.isSelected = true; return x; }).ToList();
+        }
+        else
+        {
+            assignedUsers.Where(x => x.UserId != userId).Select(x => { x.isSelected = false; return x; }).ToList();
+        }
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private void ChangeToggle()
+    {
+        if (assignedUsers.All(x => x.isSelected) == true)
+        {
+            toggle = true;
+        }
+        else
+        {
+            toggle = false;
+        }
+    }
+}

@@ -1,0 +1,448 @@
+﻿@page "/DenominationUtilizationAnalysis"
+
+@using Blazorise.LoadingIndicator;
+@using EView360.Common;
+@using EView360.Services.Analytics;
+@using EView360.Services;
+@using EView360.Services.Reports;
+@using EView360Models.Core;
+@using global::Common.RequestModel;
+@using global::Common.ViewModel;
+@using static EView360.Common.Constants;
+@inject DenominationUtilizationAnalysisService service
+@inject ATMTreeViewRepository atmRepository 
+ @inject NotifyService notifyService
+@inject CommonServices common
+@inject IJSRuntime jsRuntime
+@inject ILogger<DenominationUtilizationAnalysis> logger
+@inject CommonServices common
+@inject OutOfCashReportService outOfCashservice;
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@implements IDisposable
+
+
+<div class="row content">
+    <div class="col-sm-2 filter_bar border-right-2">
+        <form style="margin-top: 20px;">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <h5>Filters: </h5>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label>From Date: </label>
+                    <DatePicker TValue="DateTime?" DisplayFormat="dd/MM/yyyy HH:mm" InputMode="DateInputMode.DateTime" Placeholder="Select Date" @bind-Date="@filter.fromDate" TimeAs24hr=true></DatePicker>
+
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label>To Date: </label>
+                    <DatePicker TValue="DateTime?" DisplayFormat="dd/MM/yyyy HH:mm" InputMode="DateInputMode.DateTime" Placeholder="Select Date" @bind-Date="@filter.toDate" TimeAs24hr=true></DatePicker>
+
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label>Note Set Type: </label>
+                    <select @bind="filter.notesetTypeId" class="form-control">
+                        <option value="0" disabled selected>Select note set type</option>
+
+                        @foreach (var notesetType in notesetTypes)
+                        {
+                            <option value="@notesetType.NoteSetTypeId">@notesetType.NoteSetTypeName</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@(async()=> await FilterSubmit())" value="Search">
+            <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@ResetFilter" value="Reset">
+
+        </form>
+    </div>
+    <div class="col-sm-10 text-left content_body" style="margin-top:1%">
+        <div>
+            <b><h2 style="font-family:montserrat; font-weight:bold">Denomination Utilization Analysis</h2></b>
+        </div>
+        <div class="container" style="margin-top:2%;">
+            <h5 class="card-header" style="text-align:center">Denomination Utilization</h5>
+            <div class="row">
+                <div class="col-sm-7">
+                    <LoadingIndicator @ref="lineChartLoader">
+                        <div class="card mb-5" style="max-height: 450px;">
+                            <div class="card-body">
+                                @if (showChart)
+                                {
+                                    <div class="mb-2">
+                                        <LineChart @ref="lineChartDenominationUtilization" TItem="double" Options="@lineChartOptions" />
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </LoadingIndicator>
+                </div>
+                <div class="col-sm-5">
+                    <LoadingIndicator @ref="dataGridLoader">
+                        <div class="card mb-5" style="max-height: 450px;">
+                            <div class="card-body">
+                                @if (showGrid)
+                                {
+                                    <div class="mb-2" style="zoom:88%;max-height: 297px;">
+                                        <DataGrid @ref="@dataGridRef"
+                                              TItem="DenominationUtilizationAnalysisViewModel"
+                                              Data="@DenominationUtilizationForDatagridData"
+                                              Responsive="true"
+                                              FixedHeader
+                                              Narrow="true"
+                                              Sortable  SortMode="DataGridSortMode.Single"
+                                              HeaderThemeContrast="@ThemeContrast.Light">
+
+                                            <DataGridColumn Field="@nameof(DenominationUtilizationAnalysisViewModel.DispensedDate)" Caption="Dispensed Date" DisplayFormat="{0:dd/MM/yyyy}" />
+                                            <DataGridNumericColumn Field="@nameof(DenominationUtilizationAnalysisViewModel.NotesDispensed1)" Caption="Notes Dispensed1" />
+                                            <DataGridNumericColumn Field="@nameof(DenominationUtilizationAnalysisViewModel.NotesDispensed2)" Caption="Notes Dispensed2" />
+                                            <DataGridNumericColumn Field="@nameof(DenominationUtilizationAnalysisViewModel.NotesDispensed3)" Caption="Notes Dispensed3" />
+                                            <DataGridNumericColumn Field="@nameof(DenominationUtilizationAnalysisViewModel.NotesDispensed4)" Caption="Notes Dispensed4" />
+                                        </DataGrid>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </LoadingIndicator>
+                </div>
+            </div>
+            <h5 class="card-header" style="text-align:center">Overall Denomination Utilization Analysis</h5>
+            <div class="row">
+                <div class="col-sm">
+                    <LoadingIndicator @ref="pieChartLoader">
+                        <div class="card mb-5" style="max-height: 490px;">
+                            <div class="card-body" style="scale: 80%">
+                                @if (showChart)
+                                {
+                                    <div class="mb-2" style="margin-top: -10%;">
+                                        <PieChart @ref="pieChartOverallDenomination" Type="ChartType.Pie" TItem="float" />
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </LoadingIndicator>
+                </div>
+                <div class="col-sm">
+                    <LoadingIndicator @ref="barChartLoader">
+                        <div class="card mb-5" style="max-height: 490x;">
+                            <div class="card-body">
+                                @if (showChart)
+                                {
+                                    <div class="mb-2" style="padding-top: 77px;min-height: 394px;">
+                                        <BarChart @ref="barChartOverallDenomination" Type="ChartType.Bar" TItem="float" Options="@chartOptions" />
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </LoadingIndicator>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+
+    .content_body {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+    }
+
+</style>
+
+@code {
+    [Inject] INotificationService NotificationService { get; set; }
+
+    private DotNetObjectReference<DenominationUtilizationAnalysis>? objRef;
+    static DateTime currentTime = DateTime.Now;
+    DenominationUtilizationAnalysisRequestModel filter = new DenominationUtilizationAnalysisRequestModel
+        {
+            fromDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0),
+            toDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 0)
+        };
+    List<NotesetTypeAnalyticsViewModel> notesetTypes = new();
+
+    private List<long>? selectedTreeAtm;
+    bool showChart = false;
+    bool showGrid = false;
+    bool IsDisabled = false;
+
+    long notesetTypeId;
+    List<string> chartLabels;
+
+    LineChart<double>? lineChartDenominationUtilization = new();
+    PieChart<float>? pieChartOverallDenomination = new();
+    BarChart<float>? barChartOverallDenomination = new();
+    DataGrid<DenominationUtilizationAnalysisViewModel>? dataGridRef = new();
+
+    private List<DenominationUtilizationAnalysisViewModel> DenominationUtilizationForDatagridData = new();
+    private List<List<double>> DenominationUtilizationForLineChart = new();
+    private List<float> OverallDenominationForPieChart = new();
+    private List<float> OverallDenominationForBarChart = new();
+
+    //List<string> backgroundColors = new List<string> { ChartColor.FromRgba(0, 255, 0, 0.2f), ChartColor.FromRgba(153, 255, 102, 0.2f), ChartColor.FromRgba(0, 204, 153, 0.2f), ChartColor.FromRgba(0, 255, 153, 0.2f) };
+    //List<string> borderColors = new List<string> { ChartColor.FromRgba(0, 255, 0, 1f), ChartColor.FromRgba(153, 255, 102, 0.1f), ChartColor.FromRgba(0, 204, 153, 1f), ChartColor.FromRgba(0, 255, 153, 1f) };
+    List<string> backgroundColors = new List<string> {  ChartColor.FromRgba(54, 162, 235, 0.2f),  ChartColor.FromRgba(75, 192, 192, 0.2f), ChartColor.FromRgba(153, 102, 255, 0.2f), ChartColor.FromRgba(180, 100, 100, 0.15f) };
+    List<string> borderColors = new List<string> {  ChartColor.FromRgba(54, 162, 235, 1f),  ChartColor.FromRgba(75, 192, 192, 1f), ChartColor.FromRgba(153, 102, 255, 1f), ChartColor.FromRgba(180, 100, 100, 0.7f) };
+
+
+    LoadingIndicator? lineChartLoader, dataGridLoader, pieChartLoader, barChartLoader;
+    BarChartOptions chartOptions = new()
+        {
+            Plugins = new ChartPlugins
+            {
+                Legend = new ChartLegend
+                {
+                    Display = false
+                }
+            },
+            Scales = new ChartScales
+            {
+                Y = new ChartAxis
+                {
+                    Ticks = new ChartAxisTicks
+                    {
+                        Precision = 0
+                    },
+                }
+            }
+        };
+    LineChartOptions lineChartOptions = new()
+        {
+            Scales = new ChartScales
+            {
+                Y = new ChartAxis
+                {
+                    Ticks = new ChartAxisTicks
+                    {
+                        Precision = 0
+                    }
+                }
+            }
+        };
+
+    protected override async Task OnInitializedAsync()
+    {
+        objRef = DotNetObjectReference.Create(this);
+
+        notifyService.OnAtmChange += AtmSelected;
+        notifyService.OnRegionChange += AtmSelected;
+
+        //selectedTreeAtm = await atmRepository.GetSelectedAtmId();
+        //if (selectedTreeAtm != null && selectedTreeAtm.Count > 0)
+        // AppUser appUser = await localStorage.GetItemAsync<AppUser>("AppUser");
+        filter.UserId = (await localStorage.GetItemAsync<EView360Models.Core.AppUser>("AppUser")).UserId;
+        if (filter.UserId !=0)
+        {
+            notesetTypes = await service.GetNoteSetTypesByUser(filter.UserId);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                await jsRuntime.InvokeVoidAsync("handleDatePicker", objRef);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at DenominationUtilizationAnalysis, OnAfterRenderAsync as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    private void ResetFilter()
+    {
+        currentTime = DateTime.Now;
+        filter.fromDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0);
+        filter.toDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 0);
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private async Task FilterSubmit()
+    {
+        if ((filter.notesetTypeId != null) && (notesetTypes != null || notesetTypes.Count() > 0))
+        {   
+            NotesetTypeAnalyticsViewModel selectedNoteSetType = notesetTypes.Where(x => x.NoteSetTypeId == filter.notesetTypeId.Value).FirstOrDefault();
+            if (selectedNoteSetType != null)
+            {
+                IsDisabled = true;
+
+                chartLabels = new() { selectedNoteSetType.DenominationType1Title, selectedNoteSetType.DenominationType2Title,
+                selectedNoteSetType.DenominationType3Title, selectedNoteSetType.DenominationType4Title };
+
+                await lineChartLoader.Show();
+                await dataGridLoader.Show();
+                await pieChartLoader.Show();
+                await barChartLoader.Show();
+
+                await this.InvokeAsync(() => this.StateHasChanged());
+                await common.TaskDelay();
+
+                //For Datagrid
+                logger.LogWarning($"[DenominationUtilizationAnalysisPage:FilterSubmit] going in GetDenominationUtilization ");
+                DenominationUtilizationForDatagridData = await service.GetDenominationUtilization(filter);
+                logger.LogWarning($"[DenominationUtilizationAnalysisPage:FilterSubmit] returning from GetDenominationUtilization ");
+
+                if (DenominationUtilizationForDatagridData?.Count > 0)
+                {
+                    //For Line Chart
+                    logger.LogWarning($"[DenominationUtilizationAnalysisPage:FilterSubmit] going in GetLineChartData ");
+                    DenominationUtilizationForLineChart = await service.GetLineChartData(DenominationUtilizationForDatagridData);
+                    logger.LogWarning($"[DenominationUtilizationAnalysisPage:FilterSubmit] returning from GetLineChartData ");
+
+                    //For Pie & Bar Chart
+                    logger.LogWarning($"[DenominationUtilizationAnalysisPage:FilterSubmit] going in GetPieAndBarChartData ");
+                    OverallDenominationForPieChart = OverallDenominationForBarChart = await service.GetPieAndBarChartData(DenominationUtilizationForLineChart);
+                    logger.LogWarning($"[DenominationUtilizationAnalysisPage:FilterSubmit] returning from GetPieAndBarChartData ");
+
+                    //Show Datagrid
+                    showGrid = showChart = true;
+                }
+                else
+                    showGrid = showChart = false;
+
+                await this.InvokeAsync(() => this.StateHasChanged());
+                await dataGridLoader.Hide();
+
+                //Draw Line Chart
+                if (DenominationUtilizationForDatagridData?.Count > 0)
+                    await LineChartHandleRedraw(lineChartDenominationUtilization, GetLineChartLabel(DenominationUtilizationForDatagridData), DenominationUtilizationForLineChart);
+                await lineChartLoader.Hide();
+
+
+                //Draw Bar Chart
+                if (DenominationUtilizationForDatagridData?.Count > 0)
+                    await BarChartHandleRedraw(barChartOverallDenomination, chartLabels, OverallDenominationForBarChart);
+                await barChartLoader.Hide();
+
+                //Draw Pie Chart
+                if (DenominationUtilizationForDatagridData?.Count > 0)
+                    await PieChartHandleRedraw(pieChartOverallDenomination, chartLabels, OverallDenominationForPieChart);
+                await pieChartLoader.Hide();
+
+                IsDisabled = false;
+                await this.InvokeAsync(() => this.StateHasChanged());
+                await common.TaskDelay();
+            }
+        }
+        else
+        {
+            showChart = showGrid = false;
+            await this.InvokeAsync(() => this.StateHasChanged());
+            await common.RenderCustomBox(RenderMessageType.Info, "Noteset Type Not Selected", "Noteset Type can not empty");
+        }
+
+    }
+
+    private async Task LineChartHandleRedraw(LineChart<double> lineChart, List<string> labels, List<List<double>> chartData)
+    {
+        await lineChart.Clear();
+
+        await lineChart.AddLabelsDatasetsAndUpdate(labels, GetLineChartDataset(chartData[0], 0), GetLineChartDataset(chartData[1], 1), GetLineChartDataset(chartData[2], 2), GetLineChartDataset(chartData[3], 3));
+    }
+
+    private async Task BarChartHandleRedraw(BarChart<float> barChart, List<string> labels, List<float> chartData)
+    {
+        await barChart.Clear();
+
+        await barChart.AddLabelsDatasetsAndUpdate(labels, GetBarChartDataset(chartData));
+    }
+
+    private async Task PieChartHandleRedraw(PieChart<float> pieChart, List<string> labels, List<float> chartData)
+    {
+        await pieChart.Clear();
+
+        await pieChart.AddLabelsDatasetsAndUpdate(labels, GetPieChartDataset(chartData));
+    }
+
+    private LineChartDataset<double> GetLineChartDataset(List<double> chartData, int index)
+    {
+        return new LineChartDataset<double>
+            {
+                Data = chartData,
+                BackgroundColor = backgroundColors[index],
+                BorderColor = borderColors[index],
+                Fill = false,
+                PointRadius = 3,
+                CubicInterpolationMode = "monotone",
+                Label = chartLabels[index]
+            };
+    }
+
+    private BarChartDataset<float> GetBarChartDataset(List<float> chartData)
+    {
+        return new()
+            {
+                Data = chartData,
+                BackgroundColor = backgroundColors,
+                BorderColor = borderColors,
+            };
+    }
+
+    private PieChartDataset<float> GetPieChartDataset(List<float> chartData)
+    {
+        return new()
+            {
+                Data = chartData,
+                BackgroundColor = backgroundColors,
+                BorderColor = borderColors,
+            };
+    }
+
+    private List<string> GetLineChartLabel(List<DenominationUtilizationAnalysisViewModel> denominationUtilizations)
+    {
+        List<string> Labels = new();
+
+        foreach (var denomination in denominationUtilizations)
+        {
+            if (denomination.DispensedDate != null)
+            {
+                Labels.Add(denomination.DispensedDate.Value.Date.ToString("dd/MM/yyyy"));
+            }
+        }
+        return Labels;
+    }
+
+    private async void AtmSelected()
+    {
+        //selectedTreeAtm = await atmRepository.GetSelectedAtmId();
+        //notesetTypes = await service.GetNotesetTypesByAtmIds(selectedTreeAtm);
+        //filter.notesetTypeId = (notesetTypes != null && notesetTypes.Count != 0) ? notesetTypes.Select(x => x.NoteSetTypeId).FirstOrDefault() : null;
+        FilterSubmit();
+    }
+
+
+    public void Dispose()
+    {
+        objRef?.Dispose();
+        notifyService.OnAtmChange -= AtmSelected;
+        notifyService.OnRegionChange -= AtmSelected;
+        //lineChartDenominationUtilization?.Dispose();
+        //dataGridRef?.Dispose();
+        //barChartOverallDenomination?.Dispose();
+        //pieChartOverallDenomination?.Dispose();
+    }
+}

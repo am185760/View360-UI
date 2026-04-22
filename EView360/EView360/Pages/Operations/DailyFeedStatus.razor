@@ -1,0 +1,411 @@
+﻿@page "/DailyFeedStatus"
+
+@using EView360.Common;
+@using EView360.Services.Operations;
+@using EView360Models.RequestModel;
+@using EView360Models.ViewModels;
+@using System.Net;
+@inject ILogger<DailyFeedStatus> logger
+@inject DailyFeedStatusService service;
+@inject CommonServices common;
+@inject CommonServices commonService;
+@inject IJSRuntime jsRuntime
+
+
+<div class="row content">
+    <div class="col-sm-2 filter_bar border-right-2">
+        <form style="margin-top: 20px;">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <h5>Filters: </h5>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label for="inputEmail4">CreationFrom: </label>
+                    <DatePicker TValue="DateTime?" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" @bind-Date="@filter.CreationFrom" class="form-control" TimeAs24hr="true" />
+
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label for="inputEmail4">To(Creation Time) :</label>
+                    <DatePicker TValue="DateTime?" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" @bind-Date="@filter.CreationTo" class="form-control" TimeAs24hr="true" />
+
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label for="inputEmail4">From(End Time) :</label>
+                    <DatePicker TValue="DateTime?" DisplayFormat="dd/MM/yyyy H:m" Placeholder="Select Date" InputMode="DateInputMode.DateTime" @bind-Date="@filter.EndFrom" class="form-control" TimeAs24hr="true" />
+
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label for="inputEmail4">To(End Time) :</label>
+                    <DatePicker TValue="DateTime?" DisplayFormat="dd/MM/yyyy H:m" Placeholder="Select Date" InputMode="DateInputMode.DateTime" @bind-Date="@filter.EndTo" class="form-control" TimeAs24hr="true" />
+
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label for="inputEmail4">Status :</label>
+                    <select @bind="filter.Status" class="form-control">
+                        <option value="*">Any</option>
+                        <option value="Scheduled">Scheduled</option>
+                        <option value="Failed">Failed</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Downloaded">Downloaded</option>
+                        <option value="Unknown">Unknown</option>
+                        <option value="Completed With Exceptions">Completed With Exceptions</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label for="inputEmail4">Task Type :</label>
+                    <select @bind="filter.TaskType" class="form-control">
+                        <option value="*">Any</option>
+                        <option value="Daily Feed Upload">Daily Feed Upload</option>
+                        <option value="Cash Order Download">Cash Order Download</option>
+                    </select>
+                </div>
+            </div>
+
+            <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@FilterSubmit" value="Search">
+            <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@ResetFilter" value="Reset">
+
+        </form>
+    </div>
+
+
+    <div class="col-sm-10 text-left" style="margin-top:1%">
+        <div class="form-group">
+            <b><h2 style="font-family:montserrat; font-weight:bold">Order Download And Daily Feed Status</h2></b>
+        </div>
+
+        @if (showSpinner)
+        {
+            <div class="spinner" style="z-index:4"></div>
+        }
+
+        @if (showGrid)
+        {
+                    <DataGrid @ref="@dataGridRef"
+                          TItem="DailyFeedStatusViewModel"
+                          Data="@feeds"
+                          Editable
+                          Responsive="true"
+                          ShowPager
+                          Bordered
+                          PageSize="50"
+                          FixedHeader
+                          FixedHeaderDataGridHeight="500px"
+                          FixedHeaderDataGridMaxHeight="500px"
+                          Narrow="true"
+                          Sortable  SortMode="DataGridSortMode.Single"
+                          Resizable
+                          HeaderThemeContrast="@ThemeContrast.Light">
+
+                        @*<DataGridColumn Field="@nameof(DailyFeedStatusViewModel.Region)" Caption="Organization" />*@
+                        <DataGridDateColumn Field="@nameof(DailyFeedStatusViewModel.CreationTime)" Caption="Creation Time" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" />
+                        <DataGridColumn Field="@nameof(DailyFeedStatusViewModel.TaskType)" Caption="Type" />
+                        <DataGridColumn Field="@nameof(DailyFeedStatusViewModel.Status)" Caption="Status" />
+                        <DataGridDateColumn Field="@nameof(DailyFeedStatusViewModel.EndTime)" Caption="End Time" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" />
+                        <DataGridColumn Field="@nameof(DailyFeedStatusViewModel.FailureReason)" Caption="Failure Reason" />
+                        <DataGridCheckColumn TextAlignment="TextAlignment.Center" HeaderTextAlignment="TextAlignment.Center" TItem="DailyFeedStatusViewModel" Caption="Details">
+                            <DisplayTemplate>
+                                <Button Clicked="@(()=>ShowDetails(context))">
+                                    <Icon Name="@("fa fa-info-circle")" TextColor="TextColor.Info" />
+                                </Button>
+                            </DisplayTemplate>
+                        </DataGridCheckColumn>
+                        <DataGridCheckColumn TextAlignment="TextAlignment.Center" HeaderTextAlignment="TextAlignment.Center" TItem="DailyFeedStatusViewModel" Caption="View">
+                            <DisplayTemplate>
+                                <Button Clicked="@(()=>ShowFileContents(context.FileName))">
+                                    <Icon Name="@("fa fa-file-text")" TextColor="TextColor.Primary" />
+                                </Button>
+                            </DisplayTemplate>
+                        </DataGridCheckColumn>
+                        <DataGridCheckColumn TextAlignment="TextAlignment.Center" HeaderTextAlignment="TextAlignment.Center" TItem="DailyFeedStatusViewModel" Caption="Save">
+                            <DisplayTemplate>
+                                <Button Clicked="@(()=>DownloadFile(context))">
+                                    <Icon Name="@("fa-download")" TextColor="TextColor.Danger" />
+                                </Button>
+                            </DisplayTemplate>
+                        </DataGridCheckColumn>
+                    </DataGrid>
+        }
+        <Modal @ref="detailsModalRef">
+            <ModalContent Centered Size="ModalSize.Large" TextOverflow="TextOverflow.Wrap">
+                <ModalHeader style="background-color:green;color:white;">
+                    <ModalTitle>
+                        Order Download and Daily Feed Status Details
+                    </ModalTitle>
+                    <CloseButton />
+                </ModalHeader>
+                <ModalBody>
+                    <Table>
+                        <TableBody>
+                            @*<TableRow>
+                            <TableRowHeader>Organization:</TableRowHeader>
+                            <TableRowCell>@thisFeed?.Region</TableRowCell>
+                            </TableRow>*@
+                            <TableRow>
+                                <TableRowHeader>File Name:</TableRowHeader>
+                                <TableRowCell>@thisFeed?.FileName</TableRowCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableRowHeader>Creation Time:</TableRowHeader>
+                                <TableRowCell>@thisFeed?.CreationTime</TableRowCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableRowHeader>Last Invoked At:</TableRowHeader>
+                                <TableRowCell>@thisFeed?.LastInvokedAt</TableRowCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableRowHeader>Failure Reason:</TableRowHeader>
+                                <TableRowCell>@thisFeed?.FailureReason</TableRowCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableRowHeader>Task Type:</TableRowHeader>
+                                <TableRowCell>@thisFeed?.TaskType</TableRowCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableRowHeader>Status:</TableRowHeader>
+                                <TableRowCell>@thisFeed?.Status</TableRowCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableRowHeader>End Time:</TableRowHeader>
+                                <TableRowCell>@thisFeed?.EndTime</TableRowCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableRowHeader>Retry Count::</TableRowHeader>
+                                <TableRowCell>@thisFeed?.RetryCount</TableRowCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </ModalBody>
+            </ModalContent>
+        </Modal>
+
+        <Modal @ref="viewModalDataGridRef">
+            <ModalContent Centered Size="ModalSize.Fullscreen">
+                <ModalHeader style="background-color:green;color:white;">
+                    <ModalTitle>
+                        Daily Feed File
+                    </ModalTitle>
+                    <CloseButton />
+                </ModalHeader>
+                <ModalBody>
+                    <pre>
+                        @fileContent
+                    </pre>
+                </ModalBody>
+                @*<ModalFooter>
+                <Button Color="Color.Secondary" Clicked="@HideModal">Close</Button>
+                </ModalFooter>*@
+            </ModalContent>
+        </Modal>
+    </div>
+</div>
+
+<style>
+    pre {
+        overflow: revert;
+    }
+
+    form {
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .table-primary .showAnimation {
+        animation: spin 1200ms linear infinite;
+    }
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        margin-top: 20px;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        width: 170px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    .modal-body {
+        height: 70vh;
+        overflow-y: auto;
+    }
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+
+</style>
+
+
+
+@code {
+    [Inject] INotificationService? NotificationService { get; set; }
+    [Inject] IMessageService? MessageService { get; set; }
+
+    private bool showGrid = true, showSpinner = false;
+    private bool IsDisabled = false;
+    private List<DailyFeedStatusViewModel> feeds = null;
+    private DataGrid<DailyFeedStatusViewModel>? dataGridRef;
+    static DateTime currentTime = DateTime.Now;
+    private DailyFeedStatusFilter filter = new DailyFeedStatusFilter()
+        {
+            CreationFrom = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0),
+            CreationTo = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 0)
+        };
+
+    private Modal? detailsModalRef;
+    private Modal? viewModalDataGridRef;
+
+    private DailyFeedStatusViewModel? thisFeed;
+    private string? fileContent;
+    private DotNetObjectReference<DailyFeedStatus>? objRef;
+
+    protected override void OnParametersSet()
+    {
+        filter.CreationFrom = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+        filter.CreationTo = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 23, 59, 0);
+        filter.EndFrom = filter.EndTo = null;
+        filter.Status = "*";
+        filter.TaskType = "*";
+        feeds = new();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        objRef = DotNetObjectReference.Create(this);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                await jsRuntime.InvokeVoidAsync("handleDatePicker", objRef);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at DailyFeedStatus, OnAfterRenderAsync as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    private async Task LoadData()
+    {
+        showSpinner = IsDisabled = true;
+        showGrid = false;
+        await this.InvokeAsync(() => this.StateHasChanged());
+        await common.TaskDelay();
+        logger.LogWarning($"[DailyFeedStatusPage:LoadData] going in GetDailyFeed ");
+        feeds = await service.GetDailyFeed(filter);
+        logger.LogWarning($"[DailyFeedStatusPage:LoadData] returning from GetDailyFeed ");
+        showSpinner = IsDisabled = false;
+        showGrid = true;
+        await this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private async void FilterSubmit()
+    {
+        await LoadData();
+    }
+
+    private void ResetFilter()
+    {
+
+        filter.CreationFrom = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+        filter.CreationTo = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 23, 59, 0);
+        filter.EndFrom = null;
+        filter.EndTo = null;
+        filter.Status = "*";
+        filter.TaskType = "*";
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private void ShowDetails(DailyFeedStatusViewModel dailyFeed)
+    {
+        thisFeed = dailyFeed;
+        detailsModalRef?.Show();
+    }
+
+    private async void ShowFileContents(string filePath)
+    {
+        if (File.Exists(filePath))
+        {
+            fileContent = string.Empty;
+            fileContent = File.ReadAllText(filePath);
+            viewModalDataGridRef?.Show();
+        }
+        else
+        {
+            await NotificationService.Error("Unable to find the specified file", "File Not Found", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    private async void DownloadFile(DailyFeedStatusViewModel dailyFeed)
+    {
+        string tempFilename = string.Empty;
+
+        if (dailyFeed.TaskType.Equals("Daily Feed Upload"))
+        {
+            if (File.Exists(dailyFeed.FileName))
+                tempFilename = dailyFeed.FileName;
+            else
+                tempFilename = dailyFeed.FileName.Replace("PendingUpload", "OutputArchive");
+        }
+        if (File.Exists(tempFilename))
+        {
+            fileContent = string.Empty;
+            fileContent = File.ReadAllText(tempFilename);
+            await jsRuntime.InvokeVoidAsync("saveFile", objRef, Path.GetFileName(tempFilename), fileContent);
+        }
+        else
+        {
+            await NotificationService.Error("Unable to find the specified file", "File Not Found", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    private Task HideModal()
+    {
+        return detailsModalRef.Hide();
+    }
+}

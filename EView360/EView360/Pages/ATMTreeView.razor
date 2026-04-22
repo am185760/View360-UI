@@ -1,0 +1,578 @@
+﻿@page "/ATMTreeView"
+@inject IJSRuntime jsRuntime
+@using DataRequestorMiddleware.Services.Admin;
+@using EView360.Common;
+@using EView360.Services
+@using EView360.Data
+@using EView360Models.Core;
+@using EView360Models.ViewModels;
+@using Newtonsoft.Json;
+@using static EView360.Common.Constants;
+
+@inject ATMTreeViewRepository atmRepository 
+ @inject NotifyService notifyService
+@inject NotifyService notifyService
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@*@inject Blazored.localStorage.ISessionStorageService sessionStorage
+*@
+@inject ILogger<ATMTreeView> logger
+@implements IDisposable
+
+
+
+<div class="container-fluid-tree">
+    <div id="the-basics">
+        <input class="typeahead form-control" type="text" placeholder="Search..">
+    </div>
+    <div id="@treeID" class="float-left">
+    </div>
+    <div class="spinner spinner_tree" style="z-index:4"></div>
+</div>
+
+<style>
+
+    #the-basics .tt-menu {
+        max-height: 150px;
+        overflow-y: auto;
+    }
+
+    .fa-university {
+        color: #FF8C00;
+    }
+
+    span.twitter-typeahead .tt-menu,
+    span.twitter-typeahead .tt-dropdown-menu {
+        cursor: pointer;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 1000;
+        display: none;
+        float: left;
+        min-width: 160px;
+        padding: 5px 0;
+        margin: 2px 0 0;
+        list-style: none;
+        font-size: 14px;
+        text-align: left;
+        background-color: #ffffff;
+        border: 1px solid #cccccc;
+        border: 1px solid rgba(0, 0, 0, 0.15);
+        border-radius: 4px;
+        -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+        background-clip: padding-box;
+    }
+
+    span.twitter-typeahead .tt-suggestion {
+        display: block;
+        padding: 3px 20px;
+        clear: both;
+        font-weight: normal;
+        line-height: 1.42857143;
+        color: #333333;
+        white-space: nowrap;
+    }
+
+        span.twitter-typeahead .tt-suggestion.tt-cursor,
+        span.twitter-typeahead .tt-suggestion:hover,
+        span.twitter-typeahead .tt-suggestion:focus {
+            color: #ffffff;
+            text-decoration: none;
+            outline: 0;
+            background-color: #337ab7;
+        }
+
+    .input-group.input-group-lg span.twitter-typeahead .form-control {
+        height: 46px;
+        padding: 10px 16px;
+        font-size: 18px;
+        line-height: 1.3333333;
+        border-radius: 6px;
+    }
+
+    .input-group.input-group-sm span.twitter-typeahead .form-control {
+        height: 30px;
+        padding: 5px 10px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 3px;
+    }
+
+    span.twitter-typeahead {
+        width: 100%;
+    }
+
+    .input-group span.twitter-typeahead {
+        display: block !important;
+        height: 34px;
+    }
+
+        .input-group span.twitter-typeahead .tt-menu,
+        .input-group span.twitter-typeahead .tt-dropdown-menu {
+            top: 32px !important;
+        }
+
+        .input-group span.twitter-typeahead:not(:first-child):not(:last-child) .form-control {
+            border-radius: 0;
+        }
+
+        .input-group span.twitter-typeahead:first-child .form-control {
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .input-group span.twitter-typeahead:last-child .form-control {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+
+    .input-group.input-group-sm span.twitter-typeahead {
+        height: 30px;
+    }
+
+        .input-group.input-group-sm span.twitter-typeahead .tt-menu,
+        .input-group.input-group-sm span.twitter-typeahead .tt-dropdown-menu {
+            top: 30px !important;
+        }
+
+    .input-group.input-group-lg span.twitter-typeahead {
+        height: 46px;
+    }
+
+        .input-group.input-group-lg span.twitter-typeahead .tt-menu,
+        .input-group.input-group-lg span.twitter-typeahead .tt-dropdown-menu {
+            top: 46px !important;
+        }
+</style>
+
+@code {
+    [Inject] INotificationService NotificationService { get; set; }
+    [Inject] IMessageService MessageService { get; set; }
+    private EView360.Data.TreeView bankTreeView = new();
+    private DotNetObjectReference<ATMTreeView>? objRef;
+    //[Parameter] public bool isCheckbox { get; set; }
+    [Parameter] public string treeID { get; set; }
+
+    public bool isTreeLoaded = false;
+    PeriodicTimer timer = new PeriodicTimer(TimeSpan.FromSeconds(15));
+    private Random random = new();
+    public List<string> AtmTitles { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            objRef = DotNetObjectReference.Create(this);
+            notifyService.OnSearchListChange += SearchListChanged;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at ATMTree, OnInitializedAsync as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender && (bankTreeView is null || bankTreeView.treeNodes is null || bankTreeView.treeNodes.Count == 0))
+            {
+                AppUser appUser = await localStorage.GetItemAsync<AppUser>("AppUser");
+                if (appUser is not null)
+                {
+                    ATMTreeViewRepository.UserId = appUser.UserId;
+                }
+                await LoadData();
+                await TryLoadingTreeScript();
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at ATMTree, OnAfterRenderAsync as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+
+            await NotificationService.Info("Reload the site to render atm tree view", "Info", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    [JSInvokable]
+    public async Task AutocompleteHandler(string selectedSearchValue)
+    {
+        if (!string.IsNullOrEmpty(selectedSearchValue))
+        {
+            if (atmRepository.AtmList.Any(x => x.Title.ToLower() == selectedSearchValue.ToLower()))
+            {
+                AtmViewModel atm = atmRepository.AtmList.FirstOrDefault(x => x.Title.ToLower() == selectedSearchValue.ToLower())!;
+                List<long?> parentRegionIds = new();
+                GetOrganization(atm.RegionId, parentRegionIds);
+                parentRegionIds.Reverse();
+                await jsRuntime.InvokeVoidAsync("AtmTreeSearchHandler", objRef, selectedSearchValue, atm.AtmId, atm.RegionId, parentRegionIds);
+            }
+            else if (atmRepository.AtmList.Any(x => x.Location.ToLower() == selectedSearchValue.ToLower()))
+            {
+                List<AtmViewModel> matchedAtms = atmRepository.AtmList.Where(x => x.Location.ToLower() == selectedSearchValue.ToLower()).ToList();
+                List<long?> regions = matchedAtms.Select(x => x.RegionId).Distinct().ToList();
+                List<List<long?>> parentRegionsLst = new();
+
+                foreach(long? regionID in regions)
+                {
+                    List<long?> parentRegionIds = new();
+                    GetOrganization(regionID, parentRegionIds);
+                    parentRegionIds.Reverse();
+                    parentRegionsLst.Add(parentRegionIds);
+                }
+                List<string> atmIDs = matchedAtms.Select(x => "a" + x.AtmId.ToString()).ToList();
+                await jsRuntime.InvokeVoidAsync("AtmTreeLocationSearchHandler", atmIDs, parentRegionsLst);
+            }
+            else if (atmRepository.RegionList.Any(x => x.RegionName.ToLower().Contains(selectedSearchValue.ToLower())))
+            {
+                long regionId = atmRepository.RegionList.FirstOrDefault(x => x.RegionName.ToLower().Contains(selectedSearchValue.ToLower()))!.RegionId;
+                List<long?> parentRegionIds = new();
+                GetOrganization(regionId, parentRegionIds);
+                parentRegionIds.RemoveAt(0);
+                parentRegionIds.Reverse();
+                await jsRuntime.InvokeVoidAsync("AtmTreeRegionSearchHandler", selectedSearchValue, regionId, parentRegionIds);
+            }
+        }        
+        else
+        {
+            await jsRuntime.InvokeVoidAsync("ClearSearch");
+        }
+    }
+
+    public long GetOrganization(long? region_id, List<long?> parentRegionIds)
+    {
+        parentRegionIds.Add(region_id);
+        Region region = atmRepository.RegionList.FirstOrDefault(x => x.RegionId == region_id)!;
+
+        if (region.ParentRegionId is null)
+        {
+            return region.RegionId;
+        }
+        else
+        {
+            return GetOrganization(region.ParentRegionId.Value, parentRegionIds);
+        }
+    }
+
+    [JSInvokable]
+    public async Task HandleTreeLoadingBit()
+    {
+        isTreeLoaded = true;
+        this.InvokeAsync(() => this.StateHasChanged());
+        await Task.CompletedTask;
+    }
+
+    [JSInvokable]
+    public List<string> GetAtmTitles()
+    {
+        return AtmTitles;
+    }
+
+    private async Task TryLoadingTreeScript()
+    {
+        if (!isTreeLoaded)
+        {
+            while (await timer.WaitForNextTickAsync())
+            {
+                if (isTreeLoaded)
+                    break;
+
+                await jsRuntime.InvokeVoidAsync("renderjQueryComponents", objRef);
+                this.InvokeAsync(() => this.StateHasChanged());
+            }
+        }
+    }
+
+    private TreeResponseViewModel GetTreeResponseView()
+    {
+        string atmRespone = string.Empty;
+        string regionRespone = string.Empty;
+
+        TreeResponseViewModel treeResponseView = atmRepository.GetAtmAndRegionList(ref atmRespone, ref regionRespone);
+
+        if (!string.IsNullOrEmpty(atmRespone))
+        {
+            RenderErrorBox("error", atmRespone);
+        }
+        if (!string.IsNullOrEmpty(regionRespone))
+        {
+            RenderErrorBox("error", regionRespone);
+        }
+
+        return treeResponseView;
+    }
+
+    private async Task LoadData()
+    {
+        TreeResponseViewModel treeResponseView = GetTreeResponseView();
+
+        if (treeResponseView.AtmList?.Count > 0)
+        {
+            AtmTitles = treeResponseView.AtmList.Select(x => x.Title).ToList();
+            AtmTitles.AddRange(treeResponseView.AtmList.Select(x => x.Location).Distinct().ToList());
+            AtmTitles.AddRange(treeResponseView.RegionList.Select(x => x.RegionName).Distinct().ToList());
+
+            atmRepository.SelectedAtmIds = treeResponseView.AtmList.Select(x => x.AtmId).ToList();
+            HandleRegionSelectionOnAtmCreation();
+
+        }                
+        await jsRuntime.InvokeVoidAsync("renderjQueryComponents", objRef);
+        await jsRuntime.InvokeVoidAsync("initializeTypeahead", objRef, AtmTitles);
+    }
+
+    private void HandleRegionSelectionOnAtmCreation()
+    {
+        if (atmRepository?.RegionList?.Count > 0)
+        {
+            long regionId = 1; // Parent Node Region Id..
+            Region region = atmRepository.RegionList.FirstOrDefault(x => x.RegionId == regionId);
+            if (region is not null)
+            {
+                Queue<long> regionQue = new Queue<long>(10);
+
+                regionQue.Enqueue(regionId);
+                List<long> selectedATMs = new();
+                string selectedRegions = regionQue.Peek().ToString();
+
+                while (regionQue.Count > 0)
+                {
+                    List<Region> childRegions = atmRepository.RegionList.Where(x => x.ParentRegionId == regionQue.Peek()).ToList();
+                    if (childRegions?.Count > 0)
+                    {
+                        childRegions.ForEach(r => regionQue.Enqueue(r.RegionId));
+                        selectedRegions += "," + string.Join(",", childRegions.Select(x => x.RegionId));
+                    }
+                    regionQue.Dequeue();
+                }
+                StoreSelectedType(SessionStorageKeys.TypeRegion);
+                StoreSelectedRegionIdWithAllChildRegions(selectedRegions.Split(',').Select(long.Parse).ToList());
+            }
+        }        
+    }
+
+    private async void SearchListChanged()
+    {
+
+        AtmTitles = atmRepository.AtmList.Select(x => x.Title).ToList();
+        AtmTitles.AddRange(atmRepository.AtmList.Select(x => x.Location).Distinct().ToList());
+        await jsRuntime.InvokeVoidAsync("UpdateTypeAhead", objRef, AtmTitles);
+    }
+
+    [JSInvokable]
+    public TreeViewNode GetFirstLevelChildren(string id)
+    {
+        TreeViewNode viewNode = new();
+
+        if (atmRepository?.RegionList?.Count > 0)
+        {
+            if (id == "#")
+            {
+                Region region = atmRepository.RegionList.FirstOrDefault(x => x.RegionId == 1)!;
+                TreeViewNode node = atmRepository.CreateRegionNode(region.RegionName, true, region.RegionId, "fa fa-university fa-lg");
+                node.Type = "TreeRoot";
+                node.HasChildren = true;
+                node.ToolTip = "Total Atms: " + atmRepository.AtmList.Count();
+                viewNode.Nodes = new();
+                viewNode.Nodes.Add(node);
+            }
+            else
+            {
+                Region currentRegion = atmRepository.RegionList.FirstOrDefault(x => x.RegionId == long.Parse(id.Substring(1)))!;
+                if (currentRegion != null)
+                    atmRepository.PopulateSubTree(currentRegion, viewNode, true, true);
+            }
+        }        
+
+        return viewNode;
+    }
+
+
+    [JSInvokable]
+    public async Task RenderErrorBox(string title, string message)
+    {
+        await NotificationService.Error(message, title, (options) =>
+        {
+            options.IntervalBeforeClose = 4000;
+        });
+    }
+
+    [JSInvokable]
+    public async Task RenderSuccessBox(string title, string message)
+    {
+        await notifyService.NotifyNodeChanged();
+        await NotificationService.Success(message, title, (options) =>
+        {
+            options.IntervalBeforeClose = 4000;
+        });
+    }
+
+    [JSInvokable]
+    public async Task<string> DeleteNode(string currentNodeId)
+    {
+        if (await MessageService.Confirm("Are you sure you want to delete region?", "Confirmation", (options) => { options.ConfirmButtonColor = Color.Success; }))
+        {
+            atmRepository.ClearAtmRegionSessionValues();
+            return await atmRepository.DeleteNode(currentNodeId);
+        }
+        else
+        {
+            return "cancel";
+        }
+    }
+
+    [JSInvokable]
+    public async Task NodeSelected(string currentNodeId, string currentNodeParentId)
+    {
+        try
+        {
+            if (currentNodeId.StartsWith('a'))
+            {
+                StoreSelectedAtmId(new List<long> { long.Parse(currentNodeId.Substring(1)) });
+                StoreSelectedAtmParentId(new List<long> { long.Parse(currentNodeParentId.Substring(1)) });
+                StoreSelectedType(SessionStorageKeys.TypeAtm);
+                await notifyService.NotifyAtmChanged();
+            }
+            else if (currentNodeId.StartsWith('r'))
+            {
+                TreeResponseViewModel treeResponseView = GetTreeResponseView();
+                List<Region>? RegionList = treeResponseView.RegionList;
+                List<AtmViewModel>? AtmList = treeResponseView.AtmList;
+
+                long regionId = long.Parse(currentNodeId.Substring(1));
+                StoreSelectedRegionId(regionId);
+
+                Region region = RegionList.FirstOrDefault(x => x.RegionId == regionId);
+                if (region is not null)
+                {
+                    Queue<long> regionQue = new Queue<long>(10);
+
+                    regionQue.Enqueue(regionId);
+                    List<long> selectedATMs = new();
+                    string selectedRegions = regionQue.Peek().ToString();
+
+                    while (regionQue.Count > 0)
+                    {
+                        List<AtmViewModel> atms = AtmList.Where(x => x.RegionId == regionQue.Peek()).ToList();
+                        if (atms?.Count > 0)
+                        {
+                            selectedATMs.AddRange(atms.Select(x => x.AtmId));
+                        }
+                        List<Region> childRegions = RegionList.Where(x => x.ParentRegionId == regionQue.Peek()).ToList();
+                        if (childRegions?.Count > 0)
+                        {
+                            childRegions.ForEach(r => regionQue.Enqueue(r.RegionId));
+                            selectedRegions += "," + string.Join(",", childRegions.Select(x => x.RegionId));
+                        }
+                        regionQue.Dequeue();
+                    }
+
+                    StoreSelectedAtmId(selectedATMs);
+                    StoreSelectedType(SessionStorageKeys.TypeRegion);
+                    StoreSelectedRegionIdWithAllChildRegions(selectedRegions.Split(',').Select(long.Parse).ToList());
+
+                    //   atmRepository._sessionStorage = localStorage;
+                    await notifyService.NotifyRegionChanged();
+                }
+            }
+            else
+            {
+                await NotificationService.Error("unable to identify node as atm / region", "Error during node selection", (options) =>
+                {
+                    options.IntervalBeforeClose = 4000;
+                });
+                throw new ArgumentOutOfRangeException();
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error during node selection", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    [JSInvokable]
+    public async Task<string> MoveNode(string currentNodeId, string parentNodeId)
+    {
+        atmRepository.ClearAtmRegionSessionValues();
+        return await atmRepository.MoveNode(currentNodeId, parentNodeId);
+    }
+
+    [JSInvokable]
+    public async Task<string> CreateRegion(string nodeName, string parentRegion)
+    {
+        atmRepository.ClearAtmRegionSessionValues();
+        return await atmRepository.CreateRegion(nodeName, parentRegion);
+    }
+
+    [JSInvokable]
+    public async Task<string> RenameNode(string currentNodeId, string newName, string oldName)
+    {
+        atmRepository.ClearAtmRegionSessionValues();
+        return await atmRepository.RenameNode(currentNodeId, newName, oldName);
+    }
+
+
+
+    public void StoreAtmList(List<AtmViewModel> atmList)
+    {
+        atmRepository.AtmList = atmList;
+    }
+
+    public void StoreRegionList(List<Region> regionList)
+    {
+        atmRepository.RegionList = regionList;
+    }
+
+    public void StoreSelectedAtmId(List<long> atmIds)
+    {
+        atmRepository.SelectedAtmIds = atmIds;
+    }
+
+    public void StoreSelectedRegionId(long? regionId)
+    {
+        atmRepository.SelectedRegionId = regionId;
+    }
+
+    public void StoreSelectedAtmParentId(List<long> atmIds)
+    {
+        atmRepository.SelectedtAtmParentId = atmIds;
+    }
+
+    public void StoreSelectedType(string selectedType)
+    {
+        atmRepository.SelectedType = selectedType;
+    }
+
+    public void StoreSelectedRegionIdWithAllChildRegions(List<long> regionId)
+    {
+        atmRepository.SelectedRegionIdWithAllChildRegions = regionId;
+    }
+    public void Dispose()
+    {
+        objRef?.Dispose();
+        notifyService.OnSearchListChange -= SearchListChanged;
+
+    }
+}

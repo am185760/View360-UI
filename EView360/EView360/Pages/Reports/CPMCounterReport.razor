@@ -1,0 +1,154 @@
+﻿@page "/CPMCounterReport"
+@using EView360.Services;
+@using EView360Models.Core;
+@using System.Text;
+@using System.Net;
+@using Newtonsoft.Json;
+@inject ILogger<ReportTask> logger
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject NoteSetTypeService noteSetTypeService
+
+
+<div class="row content">
+    @if (showSpinner)
+    {
+        <div class="spinner" style="z-index:4"></div>
+    }
+    <div class="col-sm-2 filter_bar border-right-2">
+        <form style="margin-top: 20px;">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <h5>Filters: </h5>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label>From Date: </label>
+                    <DatePicker TValue="DateTime" @ref="@dateRef" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" TimeAs24hr="true" Placeholder="Selete Date" @bind-Date="@fromDate"></DatePicker>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label>To Date: </label>
+                    <DatePicker TValue="DateTime" @ref="@dateRef" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" TimeAs24hr="true" Placeholder="Selete Date" @bind-Date="@toDate"></DatePicker>
+
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label>Report Type : </label>
+                    <RadioGroup TValue="int" Name="order" @bind-CheckedValue="@reportTypeId">
+                        <Radio Value="0">Detail</Radio>
+                        <Radio Value="1">
+                            Summary
+                        </Radio>
+                    </RadioGroup>
+                </div>
+            </div>
+            <div class="form-row">
+                <label for="Comm" class="col-5 col-form-label col-form-label">Current:</label>
+                <div class="col-4">
+                    <Check TValue="bool" @bind-Checked="isCurrent" class="form-check-input" />
+                </div>
+            </div>
+
+            <input class="btn btn-success" type="button" onclick="@FilterSubmit" value="Generate Report">
+            <input class="btn btn-success" type="button" onclick="@ResetFilter" value="Reset">
+        </form>
+    </div>
+
+
+    <div class="col-sm-10 text-left" style="margin-top:1%">
+        <div class="form-group">
+            <b><h2 style="font-family:montserrat; font-weight:bold">CPM Counter Report</h2></b>
+        </div>
+    </div>
+</div>
+
+
+<style>
+
+    form {
+        max-width: 100%;
+    }
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+
+</style>
+
+@code {
+    private bool showSpinner = false;
+    private bool showGrid = false;
+    DateTime fromDate = DateTime.Now.Date.AddDays(-1);
+    DateTime toDate = DateTime.Now.Date;
+    DatePicker<DateTime>? dateRef;
+    private string? filterNoteSetTypeBy = "*";
+    int reportTypeId = 0;
+    private List<NoteSetType>? noteSetType;
+    private bool isCurrent = false;
+    [Inject] INotificationService NotificationService { get; set; }
+    [Inject] IMessageService MessageService { get; set; }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                AppUser appUser = await localStorage.GetItemAsync<AppUser>("AppUser");
+                if (appUser is not null)
+                {
+                    noteSetTypeService.UserId = appUser.UserId;
+                }
+
+                fromDate = DateTime.Now.Date.AddDays(-1);
+                toDate = DateTime.Now;
+                noteSetType = await noteSetTypeService.GetNoteSetTypeListAsync();
+                this.InvokeAsync(() => this.StateHasChanged());
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at Dead Atm Report, OnAfterRenderAsync as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    private async Task LoadData()
+    {
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private async void FilterSubmit()
+    {
+        
+    }
+
+    private async void ResetFilter()
+    {
+        filterNoteSetTypeBy = "*";
+        fromDate = DateTime.Now.Date;
+        toDate = DateTime.Now;
+        await LoadData();
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+}
+

@@ -1,0 +1,38 @@
+[
+  {
+    "ContainingType": "EView360.Controllers.ServiceCommunicationController",
+    "Method": "Get",
+    "RelativePath": "api/ServiceCommunication",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.String",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "EView360.Controllers.FileController",
+    "Method": "DownloadPdf",
+    "RelativePath": "File/DownloadPdf",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "filepath",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  }
+]

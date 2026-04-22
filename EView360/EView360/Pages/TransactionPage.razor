@@ -1,0 +1,142 @@
+﻿@page "/transactions"
+@using EView360.Services;
+@using EView360.Data
+@inject IJSRuntime jsRuntime
+@inject TransactionRepository transactionService
+
+<PageTitle>Transactions</PageTitle>
+
+<h3>View Transactions</h3>
+
+<form style="margin-top:30px;">
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1">
+        <label class="form-check-label" for="inlineRadio1">All Transactions</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
+        <label class="form-check-label" for="inlineRadio2">Last Replishment Till Now</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3">
+        <label class="form-check-label" for="inlineRadio3">Transactions b/w  Replishments</label>
+    </div>
+    <div class="form-group row">
+        <div class="form-group col-md-3">
+            <label for="inputEmail4">From: </label>
+            <input type="date" class="form-control" id="inputEmail4" placeholder="From Date">
+        </div>
+        <div class="form-group col-md-3">
+            <label for="inputPassword4">To: </label>
+            <input type="date" class="form-control" id="inputPassword4" placeholder="To Date">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="form-group col-md-3">
+            <label for="inputEmail4">Purged Note From: </label>
+            <input type="text" class="form-control" id="inputEmail4" placeholder="Purged Note From">
+        </div>
+        <div class="form-group col-md-3">
+            <label for="inputPassword4">Purged Note To: </label>
+            <input type="text" class="form-control" id="inputPassword4" placeholder="Purged Note To">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="form-group col-md-3">
+            <label for="inputEmail4">Amount From: </label>
+            <input type="text" class="form-control" id="inputEmail4" placeholder="Amount From">
+        </div>
+        <div class="form-group col-md-3">
+            <label for="inputPassword4">Amount To: </label>
+            <input type="text" class="form-control" id="inputPassword4" placeholder="Amount To">
+        </div>
+    </div>
+    Group:
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
+        <label class="form-check-label" for="inlineCheckbox1">FOREX2</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2">
+        <label class="form-check-label" for="inlineCheckbox2">AN2C</label>
+    </div>
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="option3">
+        <label class="form-check-label" for="inlineCheckbox3">NCRF,NCRC</label>
+    </div>
+</form>
+<button type="submit" class="btn btn-primary search-btn">Search</button>
+<button type="submit" class="btn btn-primary search-btn">Reset</button>
+
+@if (transactionList == null)
+{
+    <div class="spinner" style="z-index:4"></div>
+}
+else
+{
+    <table class="table" id="transactionPage" style="margin-top:30px; border-style: groove;">
+        <thead>
+            <tr>
+                <th>ATM</th>
+                <th>Location</th>
+                <th>Group</th>
+                <th>DateTime</th>
+                <th>Amount</th>
+                <th>Dispensed 1</th>
+                <th>Dispensed 2</th>
+                <th>Dispensed 3</th>
+                <th>Purged 1</th>
+                <th>Purged 2</th>
+                <th>Purged 3</th>
+                <th>Purged Notes</th>
+                <th>Remaining 1</th>
+                <th>Remaining 2</th>
+                <th>Remaining 3</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Transactions singleTransaction in transactionList)
+            {
+                <tr>
+                    <td>@singleTransaction.atm</td>
+                    <td>@singleTransaction.Location</td>
+                    <td>@singleTransaction.Group</td>
+                    <td>@singleTransaction.Date.ToShortDateString()</td>
+                    <td>@singleTransaction.Amount</td>
+                    <td>@singleTransaction.Dispensed1</td>
+                    <td>@singleTransaction.Dispensed2</td>
+                    <td>@singleTransaction.Dispensed3</td>
+                    <td>@singleTransaction.Purged1</td>
+                    <td>@singleTransaction.Purged2</td>
+                    <td>@singleTransaction.Purged3</td>
+                    <td>@singleTransaction.PurgedNotes</td>
+                    <td>@singleTransaction.Remaining1</td>
+                    <td>@singleTransaction.Remaining2</td>
+                    <td>@singleTransaction.Remaining2</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Transactions> transactionList = new List<Transactions>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();        
+    }
+
+    //protected override async Task OnAfterRenderAsync(bool firstRender)
+    //{
+    //    await jsRuntime.InvokeVoidAsync("renderDtableComponents");
+    //    await base.OnAfterRenderAsync(firstRender);
+
+    //}
+
+    private async Task LoadData()
+    {
+        transactionList = await transactionService.GetTransactionAsync();
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+}

@@ -1,0 +1,48 @@
+﻿@using EView360.Data;
+@using EView360.Services;
+@using EView360.Pages;
+@inherits LayoutComponentBase
+
+<PageTitle>EView360</PageTitle>
+
+
+
+<AuthorizeView>
+    <Authorized>
+
+        <NavMenu/>
+
+        <div class="container-fluid container_body">
+            <div class="row content">
+                    
+                <div class="col-sm-2 atm-Tree-container sidenav nav-scrollable border-right-2">
+                    <ATMTreeView treeID="jstree" />
+                     
+                 </div>
+
+                <div class="col-sm-10 other-content text-left">
+                    <MessageProvider />
+                    <span style="margin-bottom:35%">
+                        <NotificationProvider Location="NotificationLocation.Center" />
+                    </span>
+                    @Body
+                </div>
+            </div>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+         <NotificationProvider Location="NotificationLocation.Center" />
+         <Login />
+    </NotAuthorized>
+</AuthorizeView>
+
+<style>
+    .snackbar-stack-center {
+        top: 15% !important;
+    }
+</style>
+
+
+@code {
+    [Parameter] public bool isCheckbox { get; set; }
+                    }

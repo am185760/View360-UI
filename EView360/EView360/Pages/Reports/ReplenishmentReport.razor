@@ -1,0 +1,400 @@
+﻿@page "/ReplenishmentReport"
+@page "/ReplenishmentReport/{mode}"
+
+@using EView360.Common;
+@using EView360.Data;
+@using EView360.Services;
+@using EView360.Services.Reports;
+@using Microsoft.Extensions.Caching.Distributed;
+@using Microsoft.Extensions.Options;
+@using Newtonsoft.Json;
+@using System.Text;
+@using global::Common.RequestModel;
+@using global::Common.ViewModel;
+@inject AtmService atmService
+@inject IJSRuntime jsRuntime
+@inject IOptions<ApiUrl> apiUrl
+@inject HttpClient client
+@inject OutOfCashReportService outOfCashService
+@inject ILogger<ReplenishmentReport> logger
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject CommonServices common;
+@inject ReplenishmentReportService service;
+@inject IDistributedCache _distributedCache
+@inject IConfiguration _configuration
+
+
+<div class="row content">
+    @if (showSpinner)
+    {
+        <div class="spinner" style="z-index:4"></div>
+    }
+
+    <div class="col-sm-12">
+        <div class="form-group">
+            <b><h2 style="font-family:montserrat; font-weight:bold; margin-top: 1%;">Replenishment Report @(isArchive ? "- Archive" : "")</h2></b>
+        </div>
+        <div class="card" style="border-width: medium;border-color: orange; margin-top:2%;">
+            <div class="card-body">
+                <form style="margin-top: 20px;">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <h5>Filters: </h5>
+                        </div>
+                    </div>
+                    @if (@mode is not null && mode.Equals("Archive"))
+                    {
+                        <div class="form-row">
+                            <div class="form-group col-md-1">
+                                <label>Archive Year: </label>
+                            </div>
+                            <div class="form-group col-md-2">
+                                <Select TValue="int" SelectedValue="filter.ArchiveYear" class="form-control" SelectedValueChanged="@OnArchiveYearChange">
+                                    @foreach (int year in archiveYears)
+                                    {
+                                        <SelectItem Value=year>@year</SelectItem>
+                                    }
+                                </Select>
+                            </div>
+                        </div>
+                    }
+                    <div class="form-row">
+                        <div class="form-group col-md-1">
+                            <label>From Date: </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            @if (isArchive)
+                            {
+                                <DatePicker TValue="DateTime?" @bind-Date="@filter.FromDate" DisplayFormat="dd/MM H:m" InputMode="DateInputMode.DateTime" class="form-control" @oninput="ChangeToArchiveYear" TimeAs24hr="true" />
+                            }
+                            else
+                            {
+                                <DatePicker TValue="DateTime?" @bind-Date="@filter.FromDate" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" class="form-control" TimeAs24hr="true" />
+                            }
+                        </div>
+                        <div class="form-group col-md-4 text-right">
+                            <label>To Date: </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            @if (isArchive)
+                            {
+                                <DatePicker TValue="DateTime?" @bind-Date="@filter.ToDate" DisplayFormat="dd/MM H:m" InputMode="DateInputMode.DateTime" class="form-control" @oninput="ChangeToArchiveYear" TimeAs24hr="true" />
+                            }
+                            else
+                            {
+                                <DatePicker TValue="DateTime?" @bind-Date="@filter.ToDate" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" class="form-control" TimeAs24hr="true" />
+                            }
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-1">
+                            <label>Status: </label>
+                        </div>
+
+                        <div class="form-group col-md-2">
+                            <select @bind="filter.Status" class="form-control">
+                                <option selected value="*">All</option>
+                                <option value="Normal">Normal</option>
+                                <option value="Suspicious">Suspicious</option>
+                            </select>
+                        </div>
+
+
+                        <div class="form-group col-md-4 text-right">
+                            <label>Report Type: </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <RadioGroup TValue="int" Name="Status" @bind-CheckedValue="@filter.ReportType">
+                                <Radio Value="0" Checked>Detail Report</Radio>
+                                <Radio Value="1">Summary Report</Radio>
+                            </RadioGroup>
+                        </div>
+
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-1">
+                            <label>Group: </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <ListView TItem="NoteSetTypeViewModel"
+                                      Data="noteSetTypes"
+                                      TextField="(item) => item.NoteSetTypeName"
+                                      ValueField="(item) => item.NoteSetTypeId.ToString()"
+                                      Mode="ListGroupMode.Static"
+                                      MaxHeight="125px"
+                                      Style="margin-top: 2%">
+                                <ItemTemplate>
+                                    <Check TValue="bool" @bind-Checked="context.Item.isSelected">@context.Text</Check>
+                                </ItemTemplate>
+                            </ListView>
+                        </div>
+                    </div>
+
+
+
+
+                    <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@FilterSubmit" value="Generate Report">
+                    <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@ResetFilter" value="Reset">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+
+    form {
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .table-primary .showAnimation {
+        animation: spin 1200ms linear infinite;
+    }
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        margin-top: 20px;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        width: 170px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    .modal-body {
+        height: 70vh;
+        overflow-y: auto;
+    }
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+
+</style>
+
+@if (@mode is not null)
+{
+    <style>
+        .flatpickr-prev-month, .flatpickr-month .numInputWrapper, .flatpickr-next-month {
+            visibility: hidden;
+        }
+
+        .flatpickr-month {
+            font-size: large;
+        }
+    </style>
+}
+
+@code {
+    private string userLogin = string.Empty;
+    static DateTime currentTime = DateTime.Now;
+    private ReplenishmentReportRequestModel filter = new ReplenishmentReportRequestModel()
+        {
+            FromDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0),
+            ToDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 0)
+        };
+    private List<NoteSetTypeViewModel>? noteSetTypes = new();
+
+    [Parameter]
+    public string? mode { get; set; }
+    private List<int> archiveYears = new();
+    bool isArchive = false;
+    bool showSpinner = false;
+    bool IsDisabled = false;
+    private DotNetObjectReference<ReplenishmentReport>? objRef;
+
+
+    [Inject] INotificationService? NotificationService { get; set; }
+
+    protected async override void OnParametersSet()
+    {
+        if (mode is not null && mode.Equals("Archive"))
+        {
+            archiveYears = common.GetLastNYears();
+            filter.ArchiveYear = archiveYears.FirstOrDefault();
+            filter.ToDate = new DateTime(filter.ArchiveYear, currentTime.Month, currentTime.Day, 23, 59, 0);
+            filter.FromDate = new DateTime(filter.ArchiveYear, currentTime.Month, currentTime.Day, 0, 0, 0);
+            isArchive = true;
+        }
+        else
+        {
+            filter.FromDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0);
+            filter.ToDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 0);
+            filter.ArchiveYear = 0;
+        }
+        filter.SelectedAtmIds = new();
+        filter.ReportType = 0;
+        filter.Status = "*";
+        filter.UserId = (await localStorage.GetItemAsync<EView360Models.Core.AppUser>("AppUser")).UserId;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        objRef = DotNetObjectReference.Create(this);
+
+        userLogin = (await localStorage.GetItemAsync<EView360Models.Core.AppUser>("AppUser")).UserLogin;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                await jsRuntime.InvokeVoidAsync("handleDatePicker", objRef);
+
+                noteSetTypes = await outOfCashService.GetNoteSetTypesByUser(filter.UserId);
+                this.InvokeAsync(() => this.StateHasChanged());
+            }
+        }
+        catch (Exception ex)
+        {
+            await outOfCashService.RenderErrorBox("Error", ex.Message);
+            logger.LogError($"Exception at Replenishment Report, OnAfterRenderAsync as: {ex.Message}");
+        }
+    }
+    private void ResetFilter()
+    {
+        currentTime = DateTime.Now;
+
+        if (isArchive)
+        {
+            filter.ArchiveYear = archiveYears.FirstOrDefault();
+            filter.FromDate = new DateTime(filter.ArchiveYear, currentTime.Month, currentTime.Day, 0, 0, 0);
+            filter.ToDate = new DateTime(filter.ArchiveYear, currentTime.Month, currentTime.Day, 23, 59, 0);
+        }
+        else
+        {
+            filter.FromDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0);
+            filter.ToDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 0);
+            filter.ArchiveYear = 0;
+        }
+        filter.ReportType = 0;
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private Task OnArchiveYearChange(int selectedYear)
+    {
+        filter.ArchiveYear = selectedYear;
+        filter.FromDate = new DateTime(filter.ArchiveYear, currentTime.Month, currentTime.Day, 0, 0, 0);
+        filter.ToDate = new DateTime(filter.ArchiveYear, currentTime.Month, currentTime.Day, 23, 59, 0);
+        this.InvokeAsync(() => this.StateHasChanged());
+        return Task.CompletedTask;
+    }
+
+    private Task ChangeToArchiveYear()
+    {
+        if (isArchive)
+        {
+            if (filter.FromDate != null && filter.FromDate.Value.Year != filter.ArchiveYear)
+                filter.FromDate = new DateTime(filter.ArchiveYear, filter.FromDate.Value.Month, filter.FromDate.Value.Day, filter.FromDate.Value.Hour, filter.FromDate.Value.Month, filter.FromDate.Value.Second);
+
+            if (filter.ToDate != null && filter.ToDate.Value.Year != filter.ArchiveYear)
+                filter.ToDate = new DateTime(filter.ArchiveYear, filter.ToDate.Value.Month, filter.ToDate.Value.Day, filter.ToDate.Value.Hour, filter.ToDate.Value.Month, filter.ToDate.Value.Second);
+        }
+        return Task.CompletedTask;
+    }
+
+    private async void FilterSubmit()
+    {
+        try
+        {
+            showSpinner = IsDisabled = true;
+            await this.InvokeAsync(() => this.StateHasChanged());
+            await common.TaskDelay();
+
+            //var selectAtmResponse = await atmService.GetMultipleSelectedAtms();
+            //if (!selectAtmResponse.IsSuccess)
+            //{
+            //    await NotificationService.Error($"{selectAtmResponse.Message}", "Error", (options) =>
+            //    {
+            //        options.IntervalBeforeClose = 4000;
+            //    });
+            //}
+            //else
+            //{
+            //var atms = ((List<string>)selectAtmResponse.Data);
+            //filter.SelectedAtmIds = atms;
+            filter.NoteSetTypeIds = noteSetTypes?.Where(x => x.isSelected).Select(x => x.NoteSetTypeId).ToList();
+
+            logger.LogWarning($"[ReplenishmentReportPage:FilterSubmit] going in GetReplenishmentReport ");
+            var data = await service.GetReplenishmentReport(filter);
+            logger.LogWarning($"[ReplenishmentReportPage:FilterSubmit] returning from GetReplenishmentReport ");
+
+            //if (!data.Columns.Contains("organization"))
+            //    data.Columns.Add("organization");
+            if (!data.Columns.Contains("cash_order_datetime"))
+                data.Columns.Add("cash_order_datetime");
+            if (!data.Columns.Contains("bank_logo"))
+                data.Columns.Add("bank_logo");
+            if (!data.Columns.Contains("cassette1_suggested_notes"))
+                data.Columns.Add("cassette1_suggested_notes");
+            if (!data.Columns.Contains("cassette2_suggested_notes"))
+                data.Columns.Add("cassette2_suggested_notes");
+            if (!data.Columns.Contains("cassette3_suggested_notes"))
+                data.Columns.Add("cassette3_suggested_notes");
+            if (!data.Columns.Contains("cassette4_suggested_notes"))
+                data.Columns.Add("cassette4_suggested_notes");
+            if (!data.Columns.Contains("suggested_amount"))
+                data.Columns.Add("suggested_amount");
+
+
+            logger.LogWarning($"ReplenishmentRpt: DataTable's row Count =  : {data.Rows.Count}");
+
+            logger.LogWarning($"ReplenishmentRpt: going to SerializeObject");
+            string serializedDatatable = JsonConvert.SerializeObject(data);
+            logger.LogWarning($"ReplenishmentRpt: return from SerializeObject");
+
+            logger.LogWarning($"ReplenishmentRpt: going to Encoding the string");
+            byte[] bytes = Encoding.ASCII.GetBytes(serializedDatatable);
+            logger.LogWarning($"ReplenishmentRpt: return from Encoding the string");
+
+            string redisKey = $"ReplenishmentReport_{filter.UserId}";
+
+            logger.LogWarning($"ReplenishmentRpt: going to cache the data");
+            _distributedCache.Set(redisKey, bytes, new DistributedCacheEntryOptions()
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_configuration.GetValue<int>("RedisKeyExpirationTimeInMinutes"))
+                });
+            logger.LogWarning($"ReplenishmentRpt: return from cache the data");
+
+            var reports = new ReportsRequestModel()
+                {
+                    redisKey = $"{redisKey}",
+                };
+
+            if (data.Rows.Count > 0)
+            {
+                string url = $"{apiUrl.Value.ReportingProjectUrl}ReportPopup.aspx?Report=SuspiciousReplenishment.rpt&ReportTitle=Replenishment%20Report&FromDate={filter.FromDate.Value.ToString("MM/dd/yyyy hh:mm:ss")}&ToDate={filter.ToDate.Value.ToString("MM/dd/yyyy hh:mm:ss")}&GeneratedBy={userLogin}&suppressDetail={filter.ReportType} ";
+                await jsRuntime.InvokeVoidAsync("openWindowWithPost", url, reports);
+            }
+            //}
+            showSpinner = IsDisabled = false;
+            await this.InvokeAsync(() => this.StateHasChanged());
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+}

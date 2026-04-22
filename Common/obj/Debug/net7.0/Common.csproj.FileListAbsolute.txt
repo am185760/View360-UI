@@ -1,0 +1,61 @@
+C:\Jabbar\GitProject\Common\obj\Debug\net7.0\Common.csproj.AssemblyReference.cache
+C:\Jabbar\GitProject\Common\obj\Debug\net7.0\Common.GeneratedMSBuildEditorConfig.editorconfig
+C:\Jabbar\GitProject\Common\obj\Debug\net7.0\Common.AssemblyInfoInputs.cache
+C:\Jabbar\GitProject\Common\obj\Debug\net7.0\Common.AssemblyInfo.cs
+C:\Jabbar\GitProject\Common\obj\Debug\net7.0\Common.csproj.CoreCompileInputs.cache
+C:\Jabbar\GitProject\Common\bin\Debug\net7.0\Common.deps.json
+C:\Jabbar\GitProject\Common\bin\Debug\net7.0\Common.dll
+C:\Jabbar\GitProject\Common\bin\Debug\net7.0\Common.pdb
+C:\Jabbar\GitProject\Common\bin\Debug\net7.0\EView360Models.dll
+C:\Jabbar\GitProject\Common\bin\Debug\net7.0\Encryption.dll
+C:\Jabbar\GitProject\Common\bin\Debug\net7.0\ICSharpCode.SharpZipLib.dll
+C:\Jabbar\GitProject\Common\bin\Debug\net7.0\EView360Models.pdb
+C:\Jabbar\GitProject\Common\bin\Debug\net7.0\Encryption.pdb
+C:\Jabbar\GitProject\Common\bin\Debug\net7.0\ICSharpCode.SharpZipLib.pdb
+C:\Jabbar\GitProject\Common\bin\Debug\net7.0\ICSharpCode.SharpZipLib.xml
+C:\Jabbar\GitProject\Common\obj\Debug\net7.0\Common.csproj.CopyComplete
+C:\Jabbar\GitProject\Common\obj\Debug\net7.0\Common.dll
+C:\Jabbar\GitProject\Common\obj\Debug\net7.0\refint\Common.dll
+C:\Jabbar\GitProject\Common\obj\Debug\net7.0\Common.pdb
+C:\Jabbar\GitProject\Common\obj\Debug\net7.0\ref\Common.dll
+C:\Jabbar\Git Repository\Common\bin\Debug\net7.0\Common.deps.json
+C:\Jabbar\Git Repository\Common\bin\Debug\net7.0\Common.dll
+C:\Jabbar\Git Repository\Common\bin\Debug\net7.0\Common.pdb
+C:\Jabbar\Git Repository\Common\bin\Debug\net7.0\EView360Models.dll
+C:\Jabbar\Git Repository\Common\bin\Debug\net7.0\Encryption.dll
+C:\Jabbar\Git Repository\Common\bin\Debug\net7.0\ICSharpCode.SharpZipLib.dll
+C:\Jabbar\Git Repository\Common\bin\Debug\net7.0\EView360Models.pdb
+C:\Jabbar\Git Repository\Common\bin\Debug\net7.0\Encryption.pdb
+C:\Jabbar\Git Repository\Common\bin\Debug\net7.0\ICSharpCode.SharpZipLib.pdb
+C:\Jabbar\Git Repository\Common\bin\Debug\net7.0\ICSharpCode.SharpZipLib.xml
+C:\Jabbar\Git Repository\Common\obj\Debug\net7.0\Common.csproj.AssemblyReference.cache
+C:\Jabbar\Git Repository\Common\obj\Debug\net7.0\Common.GeneratedMSBuildEditorConfig.editorconfig
+C:\Jabbar\Git Repository\Common\obj\Debug\net7.0\Common.AssemblyInfoInputs.cache
+C:\Jabbar\Git Repository\Common\obj\Debug\net7.0\Common.AssemblyInfo.cs
+C:\Jabbar\Git Repository\Common\obj\Debug\net7.0\Common.csproj.CoreCompileInputs.cache
+C:\Jabbar\Git Repository\Common\obj\Debug\net7.0\Common.csproj.CopyComplete
+C:\Jabbar\Git Repository\Common\obj\Debug\net7.0\Common.dll
+C:\Jabbar\Git Repository\Common\obj\Debug\net7.0\refint\Common.dll
+C:\Jabbar\Git Repository\Common\obj\Debug\net7.0\Common.pdb
+C:\Jabbar\Git Repository\Common\obj\Debug\net7.0\ref\Common.dll
+D:\View360\Repository - View360 Depart\Common\bin\Debug\net7.0\Common.deps.json
+D:\View360\Repository - View360 Depart\Common\bin\Debug\net7.0\Common.dll
+D:\View360\Repository - View360 Depart\Common\bin\Debug\net7.0\Common.pdb
+D:\View360\Repository - View360 Depart\Common\bin\Debug\net7.0\EView360Models.dll
+D:\View360\Repository - View360 Depart\Common\bin\Debug\net7.0\Encryption.dll
+D:\View360\Repository - View360 Depart\Common\bin\Debug\net7.0\ICSharpCode.SharpZipLib.dll
+D:\View360\Repository - View360 Depart\Common\bin\Debug\net7.0\EView360Models.pdb
+D:\View360\Repository - View360 Depart\Common\bin\Debug\net7.0\Encryption.pdb
+D:\View360\Repository - View360 Depart\Common\bin\Debug\net7.0\ICSharpCode.SharpZipLib.pdb
+D:\View360\Repository - View360 Depart\Common\bin\Debug\net7.0\ICSharpCode.SharpZipLib.xml
+D:\View360\Repository - View360 Depart\Common\obj\Debug\net7.0\Common.csproj.AssemblyReference.cache
+D:\View360\Repository - View360 Depart\Common\obj\Debug\net7.0\Common.GeneratedMSBuildEditorConfig.editorconfig
+D:\View360\Repository - View360 Depart\Common\obj\Debug\net7.0\Common.AssemblyInfoInputs.cache
+D:\View360\Repository - View360 Depart\Common\obj\Debug\net7.0\Common.AssemblyInfo.cs
+D:\View360\Repository - View360 Depart\Common\obj\Debug\net7.0\Common.csproj.CoreCompileInputs.cache
+D:\View360\Repository - View360 Depart\Common\obj\Debug\net7.0\Common.sourcelink.json
+D:\View360\Repository - View360 Depart\Common\obj\Debug\net7.0\Common.csproj.Up2Date
+D:\View360\Repository - View360 Depart\Common\obj\Debug\net7.0\Common.dll
+D:\View360\Repository - View360 Depart\Common\obj\Debug\net7.0\refint\Common.dll
+D:\View360\Repository - View360 Depart\Common\obj\Debug\net7.0\Common.pdb
+D:\View360\Repository - View360 Depart\Common\obj\Debug\net7.0\ref\Common.dll

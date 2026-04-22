@@ -1,0 +1,174 @@
+﻿@page "/GroupReport"
+
+@using EView360.Common;
+@using EView360.Data;
+@using EView360.Services;
+@using EView360.Services.Reports;
+@using EView360Models.Core;
+@using Microsoft.Extensions.Caching.Distributed;
+@using Microsoft.Extensions.Options;
+@using Newtonsoft.Json;
+@using System.Text;
+@using global::Common.RequestModel;
+@using global::Common.ViewModel;
+
+@inject ILogger<GroupReport> logger
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject IJSRuntime jsRuntime
+@inject HttpClient client;
+@inject AtmService atmService;
+@inject GroupReportService service;
+@inject CommonServices common;
+@inject IOptions<ApiUrl> apiUrl
+@inject IDistributedCache _distributedCache
+
+
+<div class="row content">
+    @if (showSpinner)
+    {
+        <div class="spinner" style="z-index:4"></div>
+    }
+    <div class="col-sm-12">
+        <div class="form-group">
+            <b><h2 style="font-family:montserrat; font-weight:bold; margin-top: 1%;">Group List Report</h2></b>
+        </div>
+
+        <div class="card" style="border-width: medium;border-color: orange; margin-top:2%;">
+            <div class="card-body">
+                <form style="margin-top: 20px;">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <h5>Filters: </h5>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-1">
+                            <label>Group Name:: </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <input type="email" class="form-control" @bind="filter.GroupName" placeholder="Search group name..">
+                        </div>
+                    </div>
+                    <input class="btn btn-success mt-1" disabled="@IsDisabled" type="button" onclick="@GenerateReport" value="Generate Report">
+                    <input class="btn btn-success mt-1" disabled="@IsDisabled" type="button" onclick="@ResetFilter" value="Reset">
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<style>
+
+    form {
+        max-width: 100%;
+    }
+
+    .table-primary .showAnimation {
+        animation: spin 1200ms linear infinite;
+    }
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        margin-top: 20px;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        width: 170px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    .modal-body {
+        height: 70vh;
+        overflow-y: auto;
+    }
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+
+</style>
+
+@code {
+
+    GroupReportViewModel filter = new();
+    AppUser appUser;
+    bool showSpinner = false;
+    bool IsDisabled = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        appUser = await localStorage.GetItemAsync<AppUser>("AppUser");
+    }
+
+    private async void GenerateReport()
+    {
+        showSpinner = IsDisabled = true;
+        await this.InvokeAsync(() => this.StateHasChanged());
+        await common.TaskDelay();
+
+        var selectAtmResponse = await atmService.GetMultipleSelectedAtms();
+        if (!selectAtmResponse.IsSuccess)
+        {
+            await common.RenderErrorBox(selectAtmResponse.Message);
+        }
+        else
+        {
+            filter.SelectedAtmIds = ((List<string>)selectAtmResponse.Data);
+
+            logger.LogWarning($"[GroupReportPage:GenerateReport] going in GetGroupListReport ");
+            var data = await service.GetGroupListReport(filter);
+            logger.LogWarning($"[GroupReportPage:GenerateReport] returning from GetGroupListReport ");
+
+            logger.LogWarning("[GroupReportPage:GenerateReport] Start Serializing Datatable ");
+            string serializedDatatable = JsonConvert.SerializeObject(data);
+            logger.LogWarning("[GroupReportPage:GenerateReport] End Serializing Datatable ");
+
+            logger.LogWarning("[GroupReportPage:GenerateReport] Start convering serialized Datatable into bytes ");
+            byte[] bytes = Encoding.ASCII.GetBytes(serializedDatatable);
+            logger.LogWarning("[GroupReportPage:GenerateReport] End convering serialized Datatable into bytes ");
+
+            string redisKey = $"GroupReport_{appUser.UserId}";
+            _distributedCache.Set(redisKey, bytes);
+
+            var reports = new ReportsRequestModel()
+                {
+                    redisKey = $"{redisKey}",
+                };
+
+            if (data.Rows.Count > 0)
+            {
+                string url = $"{apiUrl.Value.ReportingProjectUrl}ReportPopup.aspx?Report=GroupList.rpt&FromDate=" + DateTime.Now.ToString("MM/dd/yyyy") + "&ToDate=" + DateTime.Now.ToString("MM/dd/yyyy") + "&ReportTitle=Group List&GeneratedBy=" + appUser.UserLogin + "&UserId=" + appUser.UserId;
+                await jsRuntime.InvokeVoidAsync("openWindowWithPost", url, reports);
+            }
+        }
+        showSpinner = IsDisabled = false;
+        await this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private void ResetFilter()
+    {
+        filter.GroupName = string.Empty;
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+}
+

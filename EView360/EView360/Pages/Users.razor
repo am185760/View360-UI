@@ -1,0 +1,360 @@
+﻿@page "/UserManagement"
+@using EView360.Data;
+@using EView360.Services;
+@using EView360Models.Core;
+@using EView360Models.ViewModels;
+@using static EView360.Data.Enumerations;
+@inject UserManagementService service;
+@inject NavigationManager _navigationManager
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject ILogger<Users> logger
+
+<div class="row content">
+    @if (showFilter)
+    {
+        <div class="col-sm-2 filter_bar border-right-2">
+            <form style="margin-top: 20px;">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <h5>Filters: </h5>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="float-left" for="inputEmail4">User ID: </label>
+                        <input type="email" class="form-control" @bind="filteredUserLogin" id="searchNoteSetType" placeholder="Search ID..">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="inputEmail4">Full Name: </label>
+                        <input type="email" class="form-control" @bind="filteredUserName" id="searchNoteSetType" placeholder="Search name..">
+                    </div>
+                </div>
+                <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@FilterSubmit" value="Search">
+                <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@ResetFilter" value="Reset">
+                @if (CheckPermission((int)Permissions.CreateUser))
+                {
+                    <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@Add" value="Add" style="margin-left: 3px;">
+                }
+            </form>
+
+        </div>
+    }
+    <div class="col-sm-10 text-left" style="margin-top:1%">
+        
+        @if (showSpinner)
+        {
+            <div class="spinner" style="z-index:4"></div>
+        }
+
+        @if (showGrid)
+        {
+            <div>
+                <b><h2 style="font-family:montserrat; font-weight:bold">User Management</h2></b>
+            </div>
+            <DataGrid @ref="@dataGridRef"
+                  TItem="UserViewModel"
+                  Data="@filteredappUsers"
+                  @bind-SelectedRow="@selectedappUser"
+                  Editable
+                  Responsive="true"
+                  ShowPager
+                  UseValidation
+                  ShowValidationsSummary="false"
+                  ShowValidationFeedback
+                  PopupSize="ModalSize.Large"
+                  Bordered
+                  PageSize="50"
+                  FixedHeader
+                  FixedHeaderDataGridHeight="570px"
+                  FixedHeaderDataGridMaxHeight="570px"
+                  Narrow="true"
+                  Sortable  SortMode="DataGridSortMode.Single"
+                  RowRemoving="@OnRowRemoving"
+                  RowRemoved="@OnRowRemoved"
+                  HeaderThemeContrast="@ThemeContrast.Light">
+
+
+                <DataGridColumn TItem="UserViewModel" Field="User.UserLogin" Caption="User ID" />
+                <DataGridColumn TItem="UserViewModel" Field="User.UserFullName" Caption="Full Name" />
+                <DataGridColumn TItem="UserViewModel" Field="User.UserEmail" Caption="Email" />
+                <DataGridCheckColumn TextAlignment="TextAlignment.Center" HeaderTextAlignment="TextAlignment.Center" TItem="UserViewModel" Field="User.UserIsActive" Caption="Status">
+                    <DisplayTemplate>
+                        @if (context.User.UserId != service.userId)
+                        {
+                            <Button Clicked="@(()=>ChangeUserStatus(context.User.UserId,context.User.UserIsActive, context.User.UserFullName))">
+                                <Icon Name="@(context.User.UserIsActive?"fa-solid fa-check":"fa-solid fa-ban")" TextColor="TextColor.Info" />
+                            </Button>
+                        }
+                    </DisplayTemplate>
+                </DataGridCheckColumn>
+
+
+                <DataGridCommandColumn CellClass="@((item)=> "all_headers")" ClearFilterCommandAllowed="false" TItem="UserViewModel">
+                    <NewCommandTemplate/>
+                    <EditCommandTemplate>
+                        @if (context.Item.User.UserId != service.userId && CheckPermission((int)Permissions.ModifyUser))
+                        {
+                            <Button Clicked="@(()=>OnCustomEditCommand(context))" title="Edit">
+                                <Icon Name="IconName.Edit" TextColor="TextColor.Success" IconSize=IconSize.Small />
+                            </Button>
+                        }
+                    </EditCommandTemplate>
+                    <DeleteCommandTemplate>
+                        @if (context.Item.User.UserId != service.userId && CheckPermission((int)Permissions.DeleteUser))
+                        {
+                            <Button Clicked="@context.Clicked" title="Delete"><Icon Name="IconName.Delete" TextColor="TextColor.Danger" IconSize=IconSize.Small /></Button>
+                        }
+                    </DeleteCommandTemplate>
+                    <CancelCommandTemplate>
+                        <Button Color="Color.Secondary" Clicked="@context.Clicked">Cancel</Button>
+                    </CancelCommandTemplate>
+                    <SaveCommandTemplate>
+                        <Button Color="Color.Success" Clicked="@context.Clicked">Save</Button>
+                    </SaveCommandTemplate>
+                </DataGridCommandColumn>
+            </DataGrid>
+        }
+        @if (showModal)
+        {
+            <div>
+                <b><h2 style="font-family:montserrat; font-weight:bold">@title</h2></b>
+            </div>
+            <UserForm OnSubmitCallback="SubmitHandler" OnCancelCallback="HideModal" thisUser="thisUser" isEdit="isEdit" appUsers="appUsers" />
+        }
+    </div>
+</div>
+
+<style>
+
+    form {
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .table-primary .showAnimation {
+        animation: spin 1200ms linear infinite;
+    }
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        margin-top: 20px;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        width: 170px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    .modal-body {
+        height: 70vh;
+        overflow-y: auto;
+    }
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+
+</style>
+
+@code {
+    private bool showSpinner = true;
+    private bool showGrid = false;
+    private bool isEdit = false;
+    private bool showModal = false;
+    private bool showFilter = false;
+    private bool IsDisabled = true;
+    private string title = string.Empty;
+
+    private string filteredUserName = string.Empty;
+    private string filteredUserLogin = string.Empty;
+
+    public List<UserViewModel> appUsers = new();
+    private List<UserViewModel> filteredappUsers = new();
+    private UserViewModel selectedappUser;
+    private DataGrid<UserViewModel>? dataGridRef;
+    private UserViewModel thisUser { get; set; }
+    Dictionary<int, string> userRights;
+
+    [Inject] INotificationService NotificationService { get; set; }
+    [Inject] IMessageService MessageService { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        service.userId = (await localStorage.GetItemAsync<EView360Models.Core.AppUser>("AppUser")).UserId;
+        userRights = await localStorage.GetItemAsync<Dictionary<int, string>>("userRights");
+
+        if ((appUsers is null || appUsers.Count == 0))
+        {
+            await LoadData();
+            ResetFilter();
+        }
+    }
+
+    private async Task LoadData()
+    {
+        logger.LogWarning($"[UsersPage:LoadData] going in GetUsers ");
+        appUsers = filteredappUsers = await service.GetUsers();
+        logger.LogWarning($"[UsersPage:LoadData] returning from GetUsers ");
+
+        showSpinner = IsDisabled = false;
+        showGrid = true;
+        showFilter = true;
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private bool CheckPermission(int right)
+    {
+        try
+        {
+            if (userRights is not null)
+                return userRights.ContainsKey(right);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at UserManagement, CheckPermission as: {ex.Message}");
+
+            NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+        return false;
+    }
+
+    private async void ChangeUserStatus(long userId, bool status, string userName)
+    {
+        if (CheckPermission((int)Permissions.ActivateUser))
+        {
+            await service.ChangeUserStatus(userId, status, userName);
+            filteredappUsers.Where(x => x.User.UserId == userId).FirstOrDefault().User.UserIsActive = !filteredappUsers.Where(x => x.User.UserId == userId).FirstOrDefault().User.UserIsActive;
+            await this.InvokeAsync(() => this.StateHasChanged());
+        }
+    }
+
+    private void FilterSubmit()
+    {
+        filteredappUsers = appUsers;
+
+        if (!string.IsNullOrEmpty(filteredUserLogin))
+        {
+            filteredappUsers = filteredappUsers.Where(x => x.User.UserLogin.Trim().ToLower() == filteredUserLogin.Trim().ToLower()).ToList();
+        }
+        if (!string.IsNullOrEmpty(filteredUserName))
+        {
+            filteredappUsers = filteredappUsers.Where(x => x.User.UserFullName.Trim().ToLower() == filteredUserName.Trim().ToLower()).ToList();
+        }
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private void ResetFilter()
+    {
+        filteredappUsers = appUsers;
+        filteredUserLogin = string.Empty;
+        filteredUserName = string.Empty;
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    async Task OnCustomEditCommand(EditCommandContext<UserViewModel> context)
+    {
+        isEdit = true;
+        thisUser = context.Item;
+        showModal = true;
+        showFilter = false;
+        showGrid = false;
+        title = "Edit User";
+        //userAtms = await service.GetUserAtms(thisUser.User.UserId);
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    async Task Add()
+    {
+        thisUser = await service.GetNewUser();
+        isEdit = false;
+        showModal = true;
+        showFilter = false;
+        showGrid = false;
+        title = "Add New User";
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private void HideModal()
+    {
+        showModal = false;
+        showGrid = true;
+        showFilter = true;
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private async Task SubmitHandler(UserViewModel responseUser)
+    {
+        showSpinner = IsDisabled = true;
+        showGrid = false;
+        HideModal();
+        string response = string.Empty;
+
+        if (isEdit)
+        {
+            thisUser = responseUser;
+            response = await service.UpdateUser(thisUser);
+        }
+        else
+        {
+            filteredappUsers.Add(responseUser);
+            thisUser.User.UserCreatedBy = service.userId;
+            response = await service.InsertUser(thisUser);
+        }
+        if (response != "success")
+        {
+            await NotificationService.Error(response, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+
+        await Task.Delay(300);
+        await LoadData();
+    }
+
+    async Task OnRowRemoving(CancellableRowChange<UserViewModel> cancellableRow)
+    {
+        if (!await MessageService.Confirm("Are you sure you want to delete User?", "Confirmation", (options) => { options.ConfirmButtonColor = Color.Success; }))
+        {
+            cancellableRow.Cancel = true;
+        }
+    }
+
+    async Task OnRowRemoved(UserViewModel user)
+    {
+        string response = await service.DeleteUser(user.User.UserId,user.User.UserFullName);
+
+        if (response != "success")
+        {
+            await NotificationService.Error(response, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+        await LoadData();
+    }
+}

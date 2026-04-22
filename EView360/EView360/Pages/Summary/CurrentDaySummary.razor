@@ -1,0 +1,187 @@
+﻿@using EView360.Common;
+@using EView360.Services.Summary;
+@using EView360.Services;
+@using global::Common.ViewModel;
+@inject CurrentDaySummaryService currentDaySummaryService
+@inject ATMTreeViewRepository atmRepository
+@inject CommonServices common
+@inject ILogger<CurrentDaySummary> logger
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+@if (showGrid)
+{
+    <div>
+        <DataGrid @ref="@dataGridRef"
+                  TItem="CurrentDaySummaryViewModel"
+                  Data="@currentDaySummary"
+                    Editable
+                   Responsive="true"
+                    Bordered
+                   PageSize="50"
+                    FixedHeader
+                   FixedHeaderDataGridHeight="100%"
+                   FixedHeaderDataGridMaxHeight="100%"
+                   Narrow="true"
+                    Sortable  SortMode="DataGridSortMode.Single"
+                   HeaderThemeContrast="@ThemeContrast.Light">
+
+
+             <DataGridColumn Field="@nameof(CurrentDaySummaryViewModel.Task)" Caption="Alert" />
+             <DataGridColumn Field="@nameof(CurrentDaySummaryViewModel.Unresolved)" Caption="Unresolved" />
+             <DataGridColumn Field="@nameof(CurrentDaySummaryViewModel.Resolved)" Caption="Resolved" />
+             <DataGridColumn Field="@nameof(CurrentDaySummaryViewModel.Total)" Caption="Total" />
+
+             <DataGridCommandColumn>
+                 <NewCommandTemplate />
+                 <DeleteCommandTemplate />
+                 <EditCommandTemplate>
+                     <Button Clicked="@(()=>ShowDetails(context.Item.Task))" title="Edit"><Icon Name="IconName.Edit" TextColor="TextColor.Success" IconSize=IconSize.Small /></Button>
+                 </EditCommandTemplate>
+             </DataGridCommandColumn>
+
+         </DataGrid>
+
+         <Modal @ref="DetailsModalDataGridRef">
+             <ModalContent Centered Size="ModalSize.Large">
+                 <ModalHeader>
+                     <ModalTitle>
+                         Detailed Current Day Summary
+                     </ModalTitle>
+                     <CloseButton />
+                 </ModalHeader>
+
+                 <ModalBody>
+                     <DataGrid @ref="@DetailedDataGridRef"
+                               TItem="DetailedCurrentDaySummaryViewModel"
+                               Data="@DetailedCurrentDaySummary"
+                                Editable
+                               Responsive="true"
+                                Bordered
+                               PageSize="1000000"
+                                FixedHeader
+                               FixedHeaderDataGridHeight="100%"
+                               FixedHeaderDataGridMaxHeight="100%"
+                               Narrow="true"
+                                Sortable  SortMode="DataGridSortMode.Single"
+                               HeaderThemeContrast="@ThemeContrast.Light">
+
+
+                         <DataGridColumn Field="@nameof(DetailedCurrentDaySummaryViewModel.AtmTitle)" Caption="ATM" />
+                         <DataGridColumn Field="@nameof(DetailedCurrentDaySummaryViewModel.AlertType)" Caption="Alert Type" />
+                         <DataGridColumn Field="@nameof(DetailedCurrentDaySummaryViewModel.GeneratedAt)" Caption="Generated At" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" />
+                         <DataGridColumn Field="@nameof(DetailedCurrentDaySummaryViewModel.ResolvedAt)" Caption="Resolved At" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" />
+
+                     </DataGrid>
+                 </ModalBody>
+                 @*<ModalFooter>
+            <Button Color="Color.Secondary" Clicked="@HideModal">Close</Button>
+            </ModalFooter>*@
+             </ModalContent>
+         </Modal>
+     </div>
+}
+else
+{
+    <div class="card-text">Alerts summary loading...</div>
+    <div class="spinner" style="z-index:4"></div>
+}
+
+
+<style>
+
+    form {
+        max-width: 100%;
+    }
+
+    .table-primary .showAnimation {
+        animation: spin 1200ms linear infinite;
+    }
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        width: 100%;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    .modal-body {
+        height: 70vh;
+        overflow-y: auto;
+    }
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+
+</style>
+
+@code {
+    [Inject] INotificationService NotificationService { get; set; }
+    public List<CurrentDaySummaryViewModel> currentDaySummary = new();
+    public List<DetailedCurrentDaySummaryViewModel> DetailedCurrentDaySummary = new();
+    private DataGrid<CurrentDaySummaryViewModel>? dataGridRef;
+    private DataGrid<DetailedCurrentDaySummaryViewModel>? DetailedDataGridRef;
+    private Modal? DetailsModalDataGridRef;
+    private bool showGrid = true;
+    private long userId;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                userId = (await localStorage.GetItemAsync<EView360Models.Core.AppUser>("AppUser")).UserId;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at CurrentDaySummary, OnAfterRenderAsync as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+    public async Task LoadData()
+    {
+        showGrid = false;
+        await this.InvokeAsync(() => this.StateHasChanged());
+        await common.TaskDelay();
+        logger.LogWarning($"[CurrentDaySummaryPage:LoadData] going in GetCurrentDaySummary ");
+        currentDaySummary = await currentDaySummaryService.GetCurrentDaySummary(userId);
+        logger.LogWarning($"[CurrentDaySummaryPage:LoadData] returning from GetCurrentDaySummary ");
+        showGrid = true;
+        await this.InvokeAsync(() => this.StateHasChanged());
+
+    }
+
+    private async void ShowDetails(string taskTitle)
+    {
+        logger.LogWarning($"[CurrentDaySummaryPage:LoadData] going in GetDetailedCurrentDaySummary ");
+        DetailedCurrentDaySummary = await currentDaySummaryService.GetDetailedCurrentDaySummary(taskTitle, userId);
+        logger.LogWarning($"[CurrentDaySummaryPage:LoadData] returning from GetDetailedCurrentDaySummary ");
+        DetailsModalDataGridRef?.Show();
+    }
+}

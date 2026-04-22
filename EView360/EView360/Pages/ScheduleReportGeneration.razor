@@ -1,0 +1,660 @@
+﻿@page "/ScheduleReportGeneration"
+@using EView360.Services;
+@using Newtonsoft.Json;
+@using global::Common.ViewModel;
+@using static EView360.Data.Enumerations;
+@inject ScheduleReportGenerationService service
+@inject ScheduleReportService ScheduleReportservice
+@inject ILogger<ScheduleReportGeneration> logger
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+
+<div class="row content">
+    @* <div class="col-sm-2 filter_bar border-right-2">
+        <form style="margin-top: 20px;">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <h5>Filters: </h5>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-8">
+                    <label for="inputEmail4">Report name: </label>
+                    <input type="email" class="form-control" @bind="filterReportName" placeholder="Search name..">
+                </div>
+            </div>
+            <input class="btn btn-success" type="button" onclick="@FilterSubmit" value="Filter">
+            <input class="btn btn-success" type="button" onclick="@ResetFilter" value="Clr">
+        </form>
+    </div> *@
+
+    <div class="col-sm-2 filter_bar border-right-2">
+        <form style="margin-top: 20px;">
+
+
+
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <h5>Filters: </h5>
+                </div>
+            </div>
+@*             <div class="form-row">
+                <div class="form-group">
+                    <label class="float-left" for="CreatedByName">Created By:</label>
+                    <select @bind="filterCreatedBy" class="form-control">
+                        <option value="*">Any</option>
+                        @foreach (string userName in noteSetTypes.Select(x => x.CreatedByName).ToList().Distinct())
+                        {
+                            <option value="@userName">@userName</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="inputEmail4">Name: </label>
+                    <input type="email" class="form-control" @bind="filteredNoteSetTypeName" id="searchNoteSetType" placeholder="Search name..">
+                </div>
+            </div> *@
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="inputEmail4">Report name: </label>
+                    <input type="email" class="form-control" @bind="filterReportName" placeholder="Search name..">
+                </div>
+            </div>
+            <input class="btn btn-success" type="button" onclick="@FilterSubmit" value="Search">
+            <input class="btn btn-success" type="button" onclick="@ResetFilter" value="Reset">           
+
+        </form>
+    </div>
+    <div class="col-sm-10 text-left" style="margin-top:1%">
+        <div class="form-group">
+            @if (isEdit)
+            {
+                <h2>Edit Schedule Report Generation</h2>
+
+            }
+            else
+            {
+                <h2>Schedule Report Generation</h2>
+            }
+        </div>
+        @if (showSpinner)
+        {
+            <div class="spinner" style="z-index:4"></div>
+        }
+
+        @if (showGrid)
+        {
+            <DataGrid @ref="@dataGridRef"
+                      TItem="ScheduleReportsViewModel"
+                      RowRemoving="@OnRowRemoving"
+                      RowRemoved="@OnRowRemoved"
+                      Data="@filterscheduleReports"
+                            Editable
+                       Responsive="true"
+                            ShowPager
+                            Bordered
+                       PageSize="50"
+                            FixedHeader
+                       FixedHeaderDataGridHeight="570px"
+                       FixedHeaderDataGridMaxHeight="570px"
+                       Narrow="true"
+                            Sortable SortMode="DataGridSortMode.Single"
+                       HeaderThemeContrast="@ThemeContrast.Light">
+
+
+                 @*<DataGridColumn Field="@nameof(ScheduleReportsViewModel.Organizations)" Caption="Organizations" />*@
+                 <DataGridColumn Field="@nameof(ScheduleReportsViewModel.ReportName)" Caption="ReportName" />
+                 <DataGridColumn Field="@nameof(ScheduleReportsViewModel.ReportFriendlyName)" Caption="Report Friendly Name" />
+
+                 <DataGridCommandColumn ClearFilterCommandAllowed="false" DeleteCommandAllowed="true" NewCommandAllowed="false">
+
+                     <EditCommandTemplate>
+                         @if (CheckPermission((int)Permissions.EditScheduleReports))
+                        {
+                            <Button Clicked="@(()=>OnCustomEditCommand(context))" title="Edit"><Icon Name="IconName.Edit" TextColor="TextColor.Success" /></Button>
+                        }
+                    </EditCommandTemplate>
+                    <DeleteCommandTemplate>
+                        @if (CheckPermission((int)Permissions.DeleteReportSchedule))
+                        {
+                            <Button Class="DeleteBtn" Clicked="@context.Clicked" title="Delete"><Icon Name="IconName.Delete" TextColor="TextColor.Danger" /></Button>
+                        }
+                    </DeleteCommandTemplate>
+
+                </DataGridCommandColumn>
+                @*            <DataGridCommandColumn ClearFilterCommandAllowed="false" DeleteCommandAllowed="false" NewCommandAllowed="false">
+            </DataGridCommandColumn>
+            *@
+            </DataGrid>
+        }
+
+
+        @if (showModal)
+        {
+
+            <div class="modal-body">
+                <EditForm id="EditGroups" EditContext="editContext" OnValidSubmit=@SubmitHandler Context="parentContext">
+                    <DataAnnotationsValidator />
+                    <Microsoft.AspNetCore.Components.Forms.ValidationSummary />
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label for="exampleFormControlTextarea1">Report Name :</label>
+                            <FieldLabel @bind-Value="scheduleReport.ReportName" class="form-control" Disabled>@scheduleReport.ReportName</FieldLabel>
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="exampleFormControlTextarea1"> Report Friendly Name :</label>
+                            <InputText @bind-Value="scheduleReport.ReportFriendlyName" class="form-control"></InputText>
+                        </div>
+
+                    </div>
+                    @*                                <div class="form-group">
+                <label for="exampleFormControlTextarea1">Report Name :</label>
+                <FieldLabel @bind-Value="scheduleReport.ReportName" class="form-control" Disabled>@scheduleReport.ReportName</FieldLabel>
+                </div>*@
+
+                    @*<div class="form-group">
+                <label for="exampleFormControlTextarea1"> Report Friendly Name :</label>
+                <InputText @bind-Value="scheduleReport.ReportFriendlyName" class="form-control"></InputText>
+                </div>*@
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label for="exampleFormControlTextarea1"> Physical Path :</label>
+                            <InputText @bind-Value="scheduleReport.ReportsPhysicalPath" class="form-control"></InputText>
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="exampleFormControlTextarea1">Temp Path :</label>
+                            <InputText @bind-Value="scheduleReport.ReportstTempPath" class="form-control"></InputText>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label for="exampleFormControlTextarea1">Export Data Older Than:</label>
+                            <InputNumber @bind-Value="scheduleReport.ExportDataOlderThan" class="form-control"></InputNumber>
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="exampleFormControlTextarea1">Retry Count:</label>
+                            <InputNumber @bind-Value="scheduleReport.RetryCount" class="form-control"></InputNumber>
+                        </div>
+                    </div>
+                    @*<div class="form-group">
+                <label for="exampleFormControlTextarea1"> Physical Path :</label>
+                <InputText @bind-Value="scheduleReport.ReportsPhysicalPath" class="form-control"></InputText>
+                </div>*@
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <label for="exampleFormControlTextarea1">Export Type:</label>
+                            <Check TValue="bool"  class="form-check-input" @bind-Checked="@scheduleReport.ExportPDFChecked">Portable Document Format(PDF)</Check>
+                            <Check TValue="bool"  class="form-check-input" @bind-Checked="scheduleReport.ExportExcelChecked">Excel</Check>
+                            @*<Check TValue="bool?" @bind-Checked="alertType.OpenTicketInGasper" class="form-check-input" />*@
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="exampleFormControlTextarea1">Recipients :</label>
+                            <InputTextArea @bind-Value="scheduleReport.Recipitents" class="form-control" rows="3"></InputTextArea>
+                        </div>
+                    </div>
+
+                    @*       <div class="form-group">
+                <label for="exampleFormControlTextarea1">Temp Path :</label>
+                <InputText @bind-Value="scheduleReport.ReportstTempPath" class="form-control"></InputText>
+                </div>*@
+
+                    <div class="row m-1 mt-1 p-3 border-3">
+                        <div class="col-sm-2">
+                            <label for="exampleFormControlTextarea1">Schedule Type:</label>
+
+                            <RadioGroup TValue="bool" Name="Schedule" @bind-CheckedValue="@scheduleTypeId">
+                                <Radio Value=false>Relative</Radio>
+                                <Radio Value=true>Absolute</Radio>
+                            </RadioGroup>
+                        </div>
+                        @if (showScheduleTime)
+                        {
+                            <div class="col-sm-3">
+                                <div class="">
+                                    <div class="col-sm-12">
+                                        <label for="exampleFormControlTextarea1">Schedule Time :</label>
+                                        <div class="row">
+                                            <div class="col-sm-6 float-left">
+                                                <label class="float-left">Hour :</label>
+                                                <select @bind="hour" class="form-control">
+                                                    <option value="">Any</option>
+                                                    @foreach (var hour in hourList)
+                                                    {
+                                                        <option value="@hour">@hour</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="col-sm-6 float-left">
+                                                <label class="float-left"> Minute :</label>
+                                                <select @bind="miniute" class="form-control">
+                                                    <option value="">Any</option>
+                                                    @foreach (var minute in minuteList)
+                                                    {
+                                                        <option value="@minute">@minute</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="row m-2">
+                                            <button type="button" class="btn btn-success" onclick="@AddScheduleToList">Add List</button>
+                                            <button type="button" class="btn btn-danger" onclick="@RemoveScheduleToList">Remove List</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                @*  <div class="row">
+                        </div>*@
+                            </div>
+                            <div class="col-sm-4 p-1">
+                                <ListView TItem="string"
+                                          Data="scheduleList"
+                                          TextField="(item) => item"
+                                          ValueField="(item) => item"
+                                          Mode="ListGroupMode.Selectable"
+                                          MaxHeight="120px"
+                                @bind-SelectedItem="@schedule">
+                                </ListView>
+                            </div>
+
+                            @* <div >
+                    <button type="button" class="btn btn-secondary" onclick="@AddScheduleToList">Add List</button>
+                    <button type="button" class="btn btn-secondary" onclick="@RemoveScheduleToList">Remove List</button>
+                    </div>*@
+                        }
+                        else
+                        {
+                            <div class="form-group">
+                                <label for="exampleFormControlTextarea1">Minutes To Schedule Again:</label>
+                                <InputNumber @bind-Value="scheduleReport.MinutesToScheduleAgain" class="form-control"></InputNumber>
+                            </div>
+                        }
+
+                    </div>
+
+                    @*<div class="form-group">
+                <label for="exampleFormControlTextarea1">Export Data Older Than:</label>
+                <InputNumber @bind-Value="scheduleReport.ExportDataOlderThan" class="form-control"></InputNumber>
+                </div>
+                <div class="form-group">
+                <label for="exampleFormControlTextarea1">Retry Count:</label>
+                <InputNumber @bind-Value="scheduleReport.RetryCount" class="form-control"></InputNumber>
+                </div>*@
+
+
+
+                </EditForm>
+            </div>
+            <div class="form-group">
+                @if (CheckPermission((int)Permissions.EditScheduleReports))
+                {
+                    <input type="submit" form="EditGroups" class="btn btn-success" value="Save" onclick="@UpdateReportGeneration" />
+                }
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="@CloseEditForm">Close</button>
+            </div>
+        }
+
+
+    </div>
+</div>
+
+
+
+<style>
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        margin-top: 20px;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        width: 170px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+
+</style>
+
+
+
+@code {
+    private bool isEdit;
+    public List<ScheduleReportsViewModel> scheduleReports = new();
+    public List<ScheduleReportsViewModel> filterscheduleReports = new();
+    public List<string> scheduleList = new();
+    public List<int> hourList = new();
+    public List<int> minuteList = new();
+    public int? hour;
+    public int? miniute;
+    public bool scheduleTypeId = false;
+    public string filterReportName = "";
+    public string schedule { get; set; }
+    private bool showSpinner = true;
+    private bool showGrid = false;
+    private bool showModal = false;
+    private bool showScheduleTime = false;
+    private DataGrid<ScheduleReportsViewModel>? dataGridRef;
+    private EditContext? editContext;
+    private ScheduleReportsViewModel scheduleReport = new();
+    Dictionary<int, string> userRights;
+    [Inject] INotificationService NotificationService { get; set; }
+    [Inject] IMessageService MessageService { get; set; }
+
+    protected override async void OnInitialized()
+    {
+        EView360Models.Core.AppUser appUser = await localStorage.GetItemAsync<EView360Models.Core.AppUser>("AppUser");
+        ScheduleReportservice.userId = appUser.UserId;
+        editContext = new(scheduleReport);
+        userRights = await localStorage.GetItemAsync<Dictionary<int, string>>("userRights");
+        for (int i = 0; i < 24; i++)
+        {
+            hourList.Add(i);
+        }
+
+        for (int i = 0; i < 60; i++)
+        {
+            minuteList.Add(i);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (scheduleTypeId == false)
+            {
+                showScheduleTime = false;
+            }
+            if (scheduleTypeId == true)
+            {
+                showScheduleTime = true;
+            }
+            await this.InvokeAsync(() => this.StateHasChanged());
+            if (firstRender)
+            {
+                await LoadData();
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at ScheduleReportGeneration Page, OnAfterRenderAsync as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    private async Task LoadData()
+    {
+        showSpinner = true;
+        showGrid = false;
+        filterscheduleReports = scheduleReports = await ScheduleReportservice.GetScheduleReport();
+        showSpinner = false;
+        showGrid = true;
+        await this.InvokeAsync(() => this.StateHasChanged());
+
+        //if (scheduleReports is null || scheduleReports.Count == 0)
+        //{
+        //    await NotificationService.Success("No record found", "Succes", (options) =>
+        //    {
+        //        options.IntervalBeforeClose = 4000;
+        //    });
+        //}
+    }
+
+    async Task OnCustomEditCommand(EditCommandContext<ScheduleReportsViewModel> context)
+    {
+        isEdit = true;
+        string jsonContent = JsonConvert.SerializeObject(context.Item);
+        scheduleReport = JsonConvert.DeserializeObject<ScheduleReportsViewModel>(jsonContent)!;
+        editContext = new(scheduleReport);
+        List<string> scheduleTimeList = new();
+
+        if (scheduleReport.ReportScheduleId > 0)
+        {
+            var reportGenerations = await ScheduleReportservice.GetScheduleReportGeneration(scheduleReport.ReportScheduleId);
+
+            foreach (var item in reportGenerations)
+            {
+                scheduleTimeList.Add($"{item.NextGenerationAt.Value.Hour}:{item.NextGenerationAt.Value.Minute}");
+            }
+            scheduleList = scheduleTimeList;
+        }
+
+
+
+        if (scheduleReport.ExportType == 1 || scheduleReport.ExportType == 3)
+        {
+            scheduleReport.ExportPDFChecked = true;
+        }
+        if (scheduleReport.ExportType == 2 || scheduleReport.ExportType == 3)
+        {
+            scheduleReport.ExportExcelChecked = true;
+        }
+        if (scheduleReport.ScheduleType == false)
+        {
+            scheduleTypeId = false;
+            showScheduleTime = false;
+        }
+        else
+        {
+            scheduleTypeId = true;
+            showScheduleTime = true;
+        }
+
+        showModal = true;
+        showGrid = false;
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    public async Task RenderErrorBox(string title, string message)
+    {
+        await NotificationService.Error(message, title, (options) =>
+        {
+            options.IntervalBeforeClose = 4000;
+        });
+    }
+
+    private void HideModal()
+    {
+        showModal = false;
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private async Task SubmitHandler()
+    {
+        try
+        {
+            isEdit = false;
+            showSpinner = true;
+            showGrid = false;
+            string response = string.Empty;
+            HideModal();
+
+            //response = await service.UpdateAlertType(scheduleReport);
+            if (response == "error")
+            {
+                await NotificationService.Error("An error occured while updating schedule reports, check logs..", "Error", (options) =>
+                {
+                    options.IntervalBeforeClose = 4000;
+                });
+            }
+
+            //if (response != "error")
+            //{
+            //    await NotificationService.Success("Changes completed successfully.", "Success", (options) =>
+            //    {
+            //        options.IntervalBeforeClose = 4000;
+            //    });
+            //}
+            await Task.Delay(300);
+            await LoadData();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at SubmitHandler, SubmitHandler as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+    private void CloseEditForm()
+    {
+        showModal = false;
+        showGrid = true;
+        isEdit = false;
+        LoadData();
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private void AddScheduleToList()
+    {
+        if (miniute != null && hour != null && hour > 0 && miniute > 0)
+        {
+            string item = hour + ":" + miniute;
+            if (!scheduleList.Contains(item))
+                scheduleList.Add(item);
+
+            this.InvokeAsync(() => this.StateHasChanged());
+        }
+    }
+
+    private void RemoveScheduleToList()
+    {
+        scheduleList.Remove(schedule);
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+
+    private async void UpdateReportGeneration()
+    {
+        scheduleReport.ScheduleType = scheduleTypeId;
+        await ScheduleReportservice.UpdateReportGeneration(scheduleReport, scheduleList);
+        showModal = false;
+        await LoadData();
+        await this.InvokeAsync(() => this.StateHasChanged());
+    }
+    public Task OnCheckedValueChanged(int value)
+    {
+        if (value == 0)
+        {
+            showScheduleTime = false;
+
+        }
+        else if (value == 1)
+        {
+            showScheduleTime = true;
+        }
+        this.InvokeAsync(() => this.StateHasChanged());
+        return Task.CompletedTask;
+    }
+
+    async Task OnRowRemoved(ScheduleReportsViewModel scheduleReportsView)
+    {
+        var response = await ScheduleReportservice.DeleteScheduleReport(scheduleReportsView.ReportScheduleId, scheduleReportsView.ReportName);
+        if (response == false)
+        {
+            await NotificationService.Error("an error occured while deleting group, check logs..", "error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+
+        await Task.Delay(300);
+        await LoadData();
+        await this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    async Task OnRowRemoving(CancellableRowChange<ScheduleReportsViewModel> cancellableRow)
+    {
+        if (await MessageService.Confirm("Are you sure you want to delete ?", "Confirmation", (options) => { options.ConfirmButtonColor = Color.Success; }))
+        {
+            if (cancellableRow.Item == null)
+            {
+                cancellableRow.Cancel = true;
+                await RenderErrorBox("Error", "Schedule Report not found !");
+            }
+        }
+        else
+        {
+            cancellableRow.Cancel = true;
+        }
+    }
+
+    private bool CheckPermission(int right)
+    {
+        try
+        {
+            if (userRights is not null)
+                return userRights.ContainsKey(right);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at ScheduleReportGeneration, CheckPermission as: {ex.Message}");
+
+            NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+        return false;
+    }
+    private void FilterSubmit()
+    {
+        showSpinner = true;
+        showGrid = false;
+        filterscheduleReports = scheduleReports;
+                //group name
+        if (!string.IsNullOrEmpty(filterReportName))
+        {
+            filterscheduleReports = scheduleReports.Where(x => x.ReportName.Trim().ToLower().Contains(filterReportName.Trim().ToLower())).ToList();
+        }
+
+        showSpinner = false;
+        showGrid = true;
+
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private void ResetFilter()
+    {
+        showSpinner = true;
+        showGrid = false;
+
+        filterscheduleReports = scheduleReports;
+        filterReportName = string.Empty;
+        showSpinner = false;
+        showGrid = true;
+
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+}

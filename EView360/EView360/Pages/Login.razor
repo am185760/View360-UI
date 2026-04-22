@@ -1,0 +1,293 @@
+﻿@page "/Login"
+@using System.Security.Claims
+@using ClientsideEncryption;
+@using EView360.Data;
+@using EView360.Services;
+@using Encryption;
+@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Components.Forms
+@using EView360Models.Core;
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject UserService userService
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject AuditLogService auditService
+@inject LdapService ldapService
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject IJSRuntime jsRuntime
+
+@if (showLogin)
+
+{
+
+    @* <header class="container col-12 border-bottom" style="background-color: white;">
+        <div class="row">
+            <img src="css/ncr_atleos_logo.png" alt="Header Image" style="height: 40px;width: 220px;margin-left: 10px;">
+        </div>
+    </header> *@
+
+    <div class="container">
+
+
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+
+                <div class="text-center" style="padding-top:50px">
+                    <img src="images/nbelogo1.png" style="width:200px;height:100px;">
+
+                </div>
+
+                <h2 class="text-center text-dark mt-5">Enterprise View360</h2>
+
+                <div class="text-center mb-5 text-dark">Please login with your credentials</div>
+
+                <div class="card my-5" style="background: rgba(255, 255, 255, 0.85);">
+                    <span class="col-12" style="text-align:center; font-weight:bold; color:red">@LoginMesssage</span>
+
+                    <form class="card-body cardbody-color p-lg-5">
+
+
+                        <div class="mb-3">
+
+                            <EditForm Model="@user" OnValidSubmit="@ValidateUser">
+                                @if (showProgress)
+                                {
+                                    <div class="spinner" style="z-index:4; margin-left: -8%"></div>
+                                }
+                                <div class="form-group">
+                                    <input class="form-control" placeholder="User ID" name="username" id="username-textbox" type="text" @bind-value="user.UserLogin">
+                                </div>
+                                <div class="form-group">
+                                    <input class="form-control" placeholder="Password" name="password" id="password-textbox" type="password" @bind="user.Password">
+                                </div>
+
+                                <input class="btn btn-lg btn-success btn-block" type="submit" value="Login">
+                                <input class="btn btn-lg btn-outline-primary btn-block" type="button" value="Reset" onclick="@ResetFilter">
+
+                            </EditForm>
+                        </div>
+
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+<style>
+    body {
+        background-image: url('css/bg-login4.jpg');
+
+    }
+</style>
+
+@code {
+    private bool showProgress = false;
+    private bool showLogin = true;
+    private User user = new User();
+    bool isValidUser = false;
+    public string? LoginMesssage { get; set; }
+    private DotNetObjectReference<Login>? objRef;
+
+    ClaimsPrincipal? claimsPrincipal;
+    [Inject] INotificationService NotificationService { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? authenticationStateTask { get; set; }
+
+    protected async override System.Threading.Tasks.Task OnInitializedAsync()
+    {
+        if (userService._isSecurityWebServiceEnabled == "1")
+            NavigationManager.NavigateTo(userService._SecurityWebUrl);
+
+        user = new User();
+        objRef = DotNetObjectReference.Create(this);
+
+        claimsPrincipal = (await authenticationStateTask).User;
+
+        if (claimsPrincipal.Identity.IsAuthenticated)
+        {
+            await ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(user);
+        }
+    }
+
+
+    private async Task<bool> ValidateUserLdap()
+    {
+        showProgress = true;
+        await this.InvokeAsync(() => this.StateHasChanged());
+
+        bool isValid = ldapService.ValidateCredentials(user.UserLogin, user.Password);
+
+        if (!isValid)
+        {
+            LoginMesssage = "Invalid User Id or Password";
+            return false;
+        }
+
+        AppUser returnedUser = await userService.GetUserFromDbAsync(user);
+        if (returnedUser == null)
+        {
+            await NotificationService.Info("Credentials verified, Please wait, so get user information", "Login Success", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+
+            bool status = ldapService.HandleNewUser(user.UserLogin);
+            if (!status)
+            {
+                LoginMesssage = "Credentials are verified, but unable to login right now due to some Internal Error / API Connectivity";
+                return false;
+            }
+            else
+            {
+                Dictionary<long, string> userRights = await userService.GetUserRightsAsync(returnedUser.UserId);
+                showLogin = false;
+                await this.InvokeAsync(() => this.StateHasChanged());
+                await auditService.InsertAuditLogEntry("User successfully logged in", returnedUser.UserId, userRights.FirstOrDefault(x => x.Value == "Login").Key);
+
+
+                await localStorage.SetItemAsync("AppUser", returnedUser);
+                await localStorage.SetItemAsync("userRights", userRights);
+                await ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(user);
+            }
+        }
+
+        return true;
+    }
+
+
+    //validate user credentials
+    private async Task<bool> ValidateUser()
+    {
+        showProgress = true;
+        await this.InvokeAsync(() => this.StateHasChanged());
+
+
+        if (string.IsNullOrEmpty(user.UserLogin) || string.IsNullOrEmpty(user.Password))
+        {
+            if (string.IsNullOrEmpty(user.UserLogin) && string.IsNullOrEmpty(user.Password))
+            {
+                LoginMesssage = "Username and Password are required";
+                await jsRuntime.InvokeVoidAsync("setFocusToUsername", objRef);
+            }
+
+            else if (string.IsNullOrEmpty(user.UserLogin))
+            {
+                LoginMesssage = "Username is required";
+                await jsRuntime.InvokeVoidAsync("setFocusToUsername", objRef);
+            }
+
+            else if (string.IsNullOrEmpty(user.Password))
+            {
+                LoginMesssage = "Password is required";
+                await jsRuntime.InvokeVoidAsync("setFocusToPassword", objRef);
+            }
+
+            showProgress = false;
+            await this.InvokeAsync(() => this.StateHasChanged());
+            return false;
+        }
+
+        AppUser returnedUser = await userService.GetUserFromDbAsync(user);
+        showProgress = false;
+        await this.InvokeAsync(() => this.StateHasChanged());
+
+
+        if (returnedUser is null || returnedUser.UserId == -1)
+        {
+            if (returnedUser is null)
+                LoginMesssage = "API Connectivity Error";
+
+            else if (returnedUser.UserId == -1)
+                LoginMesssage = "Invalid username";
+
+            await jsRuntime.InvokeVoidAsync("setFocusToUsername", objRef);
+            return false;
+        }
+
+        bool isUsernameContainSpecialChars = userService.CheckSpecialChars(user.UserLogin);
+        Dictionary<long, string> userRights = await userService.GetUserRightsAsync(returnedUser.UserId);
+        var password = !string.IsNullOrEmpty(userService._IsEncodeSignIn) && bool.Parse(userService._IsEncodeSignIn) ? AESEncrytDecry.DecryptStringAES(user.Password) : user.Password;
+        int RetryAttempt = 0;
+
+        if ((isUsernameContainSpecialChars == false))
+        {
+            if (userService._isSecurityWebServiceEnabled == "1")
+            {
+                await ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(user);
+                isValidUser = userService.ValidateWithNBESecurityModule();
+                if (isValidUser)
+                    NavigationManager.NavigateTo("/index");
+            }
+            else
+            {
+                string response = string.Empty;
+
+                if (!returnedUser.IsActiveDirectoryUser && !(returnedUser.UserPassword == Encryption.Cryptic.EncryptString(password, Helper.ConstractKey(false))))
+                {
+                    RetryAttempt = await userService.GetUserRetryAttempts(returnedUser.UserId);
+
+                    if (RetryAttempt <= 0)
+                    {
+                        if (returnedUser.UserIsActive)
+                            response = await userService.SetUserAsInactive(returnedUser.UserId);
+
+                        LoginMesssage = "Account set to Inactive. Please contact administrator";
+                        await jsRuntime.InvokeVoidAsync("setFocusToUsername", objRef);
+                        return false;
+                    }
+                    else
+                    {
+                        response = await userService.DeductUserRetryAttempt(returnedUser.UserId);
+                        LoginMesssage = "Incorrect password. Please try again";
+                        await jsRuntime.InvokeVoidAsync("setFocusToPassword", objRef);
+                        return false;
+                    }
+                    if (response != "success")
+                    {
+                        await userService.RenderErrorBox("Error", response);
+                    }
+                    else
+                    {
+                        await userService.RenderSuccessBox("Success", "Row changes completed successfully.");
+                    }
+                }
+                else
+                {
+                    if (!returnedUser.UserIsActive)
+                    {
+                        LoginMesssage = "Your account is inactive. Please contact administrator";
+                        await jsRuntime.InvokeVoidAsync("setFocusToUsername", objRef);
+                        return false;
+                    }
+                    else
+                    {
+                        //returnedUser.UserLastLoginTime = DateTime.Now;
+                        showLogin = false;
+                        await this.InvokeAsync(() => this.StateHasChanged());
+                        await auditService.InsertAuditLogEntry("User successfully logged in", returnedUser.UserId, userRights.FirstOrDefault(x => x.Value == "Login").Key);
+                        string resetRetryResponse = await userService.ResetRetryAttempt(returnedUser.UserId);
+
+                        await localStorage.SetItemAsync("AppUser", returnedUser);
+                        await localStorage.SetItemAsync("userRights", userRights);
+                        await ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(user);
+                    }
+                }
+            }
+        }
+        else
+        {
+            LoginMesssage = "Invalid User Id or Password";
+            await jsRuntime.InvokeVoidAsync("setFocusToUsername", objRef);
+        }
+
+        return false;
+    }
+
+    private void ResetFilter()
+    {
+        user.UserLogin = user.Password = string.Empty;
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+}

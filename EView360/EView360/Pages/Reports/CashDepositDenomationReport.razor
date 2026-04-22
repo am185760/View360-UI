@@ -1,0 +1,453 @@
+﻿@page "/CashDepositDenomationReport"
+@page "/CashDepositDenomationReport/{mode}"
+
+@using EView360.Common;
+@using EView360.Data;
+@using EView360.Services.Reports;
+@using EView360Models.Core;
+@using EView360.Services.Operations;
+@using EView360.Services;
+@using EView360Models.RequestModel;
+@using System.IO.Compression;
+@using System.Web;
+@using Microsoft.Extensions.Caching.Distributed;
+@using System.Data;
+@using global::Common.RequestModel;
+@using global::Common.ViewModel;
+@using Microsoft.Extensions.Options;
+@using Newtonsoft.Json;
+@using System.Text;
+@using System.Dynamic;
+@using System.Net;
+@using static System.Net.WebRequestMethods;
+@using static EView360.Common.Constants;
+@using static EView360.Data.Enumerations;
+@inject NoteSetTypeService noteSetTypeService
+@inject ILogger<CashDepositDenomationReport> logger
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject NavigationManager NavigationManager
+@inject IJSRuntime jsRuntime
+@inject UserManagementService userManagementService
+@inject AtmService atmService;
+@inject AtmSetupService atmSetupService;
+@inject HttpClient client;
+@inject TaskStatusReportsService taskStatusReportService;
+@inject OutOfCashReportService outOfCashservice;
+@inject CashDepositDenominationReportService service;
+@inject IOptions<ApiUrl> apiUrl
+@inject YearService yearService
+@inject CommonServices common
+@inject IDistributedCache _distributedCache
+@inject IConfiguration _configuration
+
+<div class="row content">
+    @if (showSpinner)
+    {
+        <div class="spinner" style="z-index:4"></div>
+    }
+    <div class="col-sm-12">
+        <div class="form-group">
+            <b><h2 style="font-family:montserrat; font-weight:bold; margin-top: 1%;">Cash Deposit Denomation Report @(@mode is not null && mode.Equals("Archive") ? "- Archive" : "")</h2></b>
+        </div>
+
+        <div class="card" style="border-width: medium;border-color: orange; margin-top:2%;">
+            <div class="card-body">
+                <form style="margin-top: 20px;">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <h5>Filters: </h5>
+                        </div>
+                    </div>
+                    @if (@mode is not null && mode.Equals("Archive"))
+                    {
+                        <div class="form-row">
+                            <div class="form-group col-md-1">
+                                <label>Archive Year: </label>
+                            </div>
+                            <div class="form-group col-md-2">
+                                <Select TValue="int" SelectedValue="@ArchiveYear" class="form-control" SelectedValueChanged="@DateChanged">
+                                    @foreach (int year in archiveYears)
+                                    {
+                                        <SelectItem Value=year>@year</SelectItem>
+                                    }
+                                </Select>
+                            </div>
+                        </div>
+                    }
+                    <div class="form-row">
+                        <div class="form-group col-md-1">
+                            <label>From Date: </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            @if (@mode is not null && mode.Equals("Archive"))
+                            {
+                                <DatePicker TValue="DateTime" @ref="@dateRef" DisplayFormat="dd/MM H:m" InputMode="DateInputMode.DateTime" Placeholder="Selete Date" @bind-Date="@fromDate" TimeAs24hr="true"></DatePicker>
+                            }
+                            else
+                            {
+                                <DatePicker TValue="DateTime" @ref="@dateRef" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" Placeholder="Selete Date" @bind-Date="@fromDate" TimeAs24hr="true"></DatePicker>
+                            }
+                        </div>
+                        <div class="form-group col-md-4 text-right">
+                            <label>To Date: </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            @if (@mode is not null && mode.Equals("Archive"))
+                            {
+                                <DatePicker TValue="DateTime" @ref="@dateRef" DisplayFormat="dd/MM H:m" InputMode="DateInputMode.DateTime" Placeholder="Selete Date" @bind-Date="@toDate" TimeAs24hr="true"></DatePicker>
+                            }
+                            else
+                            {
+                                <DatePicker TValue="DateTime" @ref="@dateRef" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" Placeholder="Selete Date" @bind-Date="@toDate" TimeAs24hr="true"></DatePicker>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-1">
+                            <label>TSN: </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <InputText @bind-Value="tsn" class="form-control"></InputText>
+
+                        </div>
+                        <div class="form-group col-md-4 text-right">
+                            <label>Status: </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            @*                             <Select TValue="string" SelectedValue="@status" class="form-control">
+                            <SelectItem Value="string.Empty" >Any</SelectItem>
+                            <SelectItem Value="0">Successful</SelectItem>
+                            <SelectItem Value="1">Failed</SelectItem>
+                            <SelectItem Value="2">Suspicious</SelectItem>
+                            </Select> *@
+                            <select @bind="status" class="form-control">
+                                <option value="">Any</option>
+                                <option value="Successful">Successful</option>
+                                <option value="Failed">Failed</option>
+                                <option value="Suspicious">Suspicious</option>
+
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+
+                        <div class="form-group col-md-1 input-sm">
+                            <label>Report Type: </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <RadioGroup TValue="int" Name="Transactions" @bind-CheckedValue="@reportTypeId">
+                                <Radio Value="0">Detail</Radio>
+                                <Radio Value="1">Summary</Radio>
+                            </RadioGroup>
+                        </div>
+                    </div>
+                    <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@GenerateReport" value="Generate Report">
+                    <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@ResetFilter" value="Reset">
+                </form>
+            </div>
+        </div>
+
+
+
+    </div>
+
+</div>
+
+
+<style>
+
+    form {
+        max-width: 100%;
+    }
+
+    .table-primary .showAnimation {
+        animation: spin 1200ms linear infinite;
+    }
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        margin-top: 20px;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        width: 170px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    .modal-body {
+        height: 70vh;
+        overflow-y: auto;
+    }
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+
+</style>
+@if (@mode is not null)
+{
+    <style>
+        .flatpickr-prev-month, .flatpickr-month .numInputWrapper, .flatpickr-next-month {
+            visibility: hidden;
+        }
+
+        .flatpickr-month {
+            font-size: large;
+        }
+    </style>
+}
+
+@code {
+
+    [Parameter]
+    public string? mode { get; set; }
+
+    int ArchiveYear;
+    private List<int> archiveYears = new();
+    private bool isCurrent = false;
+    private bool showSpinner = false;
+    private bool showGrid = false;
+    private bool showTransactionsBetweenReplenishmentsRow = false;
+    private bool showFromDateAndToDateRow = false;
+    private Modal? modalRef;
+    private int reportTypeId = 0;
+
+    static DateTime currentTime = DateTime.Now;
+    string duration = string.Empty;
+    DateTime fromDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0);
+    DateTime toDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 59);
+
+    DatePicker<DateTime> dateRef;
+    private List<NoteSetTypeViewModel>? NoteSetTypes = new();
+    [Inject] INotificationService NotificationService { get; set; }
+    [Inject] IMessageService MessageService { get; set; }
+    private DotNetObjectReference<CashDepositDenomationReport>? objRef;
+    private bool IsDisabled = false;
+    private string tsn;
+    private string status;
+
+    protected override async Task OnInitializedAsync()
+    {
+        objRef = DotNetObjectReference.Create(this);
+
+        AppUser appUser = await localStorage.GetItemAsync<AppUser>("AppUser");
+        if (appUser is not null)
+        {
+            //service.UserId = appUser.UserId;
+            noteSetTypeService.UserId = appUser.UserId;
+            NoteSetTypes = await outOfCashservice.GetNoteSetTypesByUser(appUser.UserId);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                await jsRuntime.InvokeVoidAsync("handleDatePicker", objRef);
+
+                fromDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0);
+                toDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 59);
+
+                if (mode is not null && mode.Equals("Archive"))
+                {
+                    archiveYears = yearService.GetLastNYears(5);
+                    ArchiveYear = archiveYears.FirstOrDefault();
+                    fromDate = new DateTime(ArchiveYear, fromDate.Month, fromDate.Day, fromDate.Hour, fromDate.Minute, fromDate.Second);
+                    toDate = new DateTime(ArchiveYear, toDate.Month, toDate.Day, toDate.Hour, toDate.Minute, toDate.Second);
+
+                }
+
+                await this.InvokeAsync(() => this.StateHasChanged());
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at CashDepositDenomationReport, OnAfterRenderAsync as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    private async void GenerateReport()
+    {
+        DataTable SubReportdata = null;
+        AppUser appUser = await localStorage.GetItemAsync<AppUser>("AppUser");
+
+        //var selectAtmResponse = await atmService.GetMultipleSelectedAtms();
+        //if (!selectAtmResponse.IsSuccess)
+        //{
+        //    await NotificationService.Error($"{selectAtmResponse.Message}", "Error", (options) =>
+        //    {
+        //        options.IntervalBeforeClose = 4000;
+        //    });
+        //}
+        //else
+        //{
+        //var atms = ((List<string>)selectAtmResponse.Data);
+        //string selectedAtms = string.Join(",", atms);
+        showSpinner = true;
+        IsDisabled = true;
+        await this.InvokeAsync(() => this.StateHasChanged());
+        await common.TaskDelay();
+        CashDepositDenominationRequestModel requestModel = new()
+            {
+
+                FromDate = (mode is not null && mode.Contains("Archive")) ? new DateTime(ArchiveYear, fromDate.Month, fromDate.Day, fromDate.Hour, fromDate.Minute, fromDate.Second) : fromDate,
+                ToDate = (mode is not null && mode.Contains("Archive")) ? new DateTime(ArchiveYear, toDate.Month, toDate.Day, toDate.Hour, toDate.Minute, toDate.Second) : toDate,
+                tsn = tsn,
+                status = status,
+                ArchiveYear = ArchiveYear == 0 ? string.Empty : ArchiveYear.ToString()
+            };
+
+
+        logger.LogWarning($"CashDepositDenomationReportPage:GenerateReport] going in GetCashDepositDenomationReport UI Service");
+        var data = await service.GetCashDepositDenominationReport(requestModel);
+        logger.LogWarning($"CashDepositDenomationReportPage:GenerateReport] return from GetCashDepositDenomationReport UI Service");
+
+        logger.LogWarning("[CashDepositDenomationReportPage:GenerateReport] Start Serializing Datatable ");
+        string serializedDatatable = JsonConvert.SerializeObject(data);
+        logger.LogWarning("[CashDepositDenomationReportPage:GenerateReport] End Serializing Datatable ");
+
+        logger.LogWarning("[CashDepositDenomationReportPage:GenerateReport] Start convering serialized Datatable into bytes ");
+        byte[] bytes = Encoding.ASCII.GetBytes(serializedDatatable);
+        logger.LogWarning("[CashDepositDenomationReportPage:GenerateReport] End convering serialized Datatable into bytes ");
+
+        string redisKey = $"CashDepositDenomationReport_{appUser.UserId}";
+        string redisKeySubReport = $"CashDepositDenomationSubReportReport_{appUser.UserId}";
+
+
+        logger.LogWarning($"CashDepositDenomationReportPage: going to cache the data");
+        _distributedCache.Set(redisKey, bytes, new DistributedCacheEntryOptions()
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_configuration.GetValue<int>("RedisKeyExpirationTimeInMinutes"))
+            });
+        logger.LogWarning($"CashDepositDenomationReportPage: return from cache the data");
+
+        var reports = new ReportsRequestModel()
+            {
+                redisKey = $"{redisKey}",
+                redisKeySubReport = redisKeySubReport
+            };
+
+        showSpinner = false;
+        IsDisabled = false;
+        await this.InvokeAsync(() => this.StateHasChanged());
+        if (data.Rows.Count > 0)
+        {
+            string url = string.Empty;
+            if (reportTypeId == 0)
+            {
+                url = $"{apiUrl.Value.ReportingProjectUrl}ReportPopup.aspx?Report=EjBnaTransactions.rpt&ReportTitle=Cash Deposit Denomination Report&FromDate=" + fromDate.ToString("MM/dd/yyyy") + "&ToDate=" + toDate.ToString("MM/dd/yyyy") + "&GeneratedBy=" + appUser.UserLogin + "&UserId=" + appUser.UserId;
+
+            }
+            else
+            {
+                url = $"{apiUrl.Value.ReportingProjectUrl}ReportPopup.aspx?Report=EjBnaTransactionsSummary.rpt&ReportTitle=Cash Deposit Summary Report&FromDate=" + fromDate.ToString("MM/dd/yyyy") + "&ToDate=" + toDate.ToString("MM/dd/yyyy") + "&GeneratedBy=" + appUser.UserLogin + "&UserId=" + appUser.UserId;
+               
+                logger.LogWarning("[CashDepositDenomationReportPage:GenerateReport] going in GetBnaCounterSubReportReport UI sevice");
+                // SubReportdata = await service.GetCashDepositNotesUtilizationDetail(requestModel);
+                logger.LogWarning("[CashDepositDenomationReportPage:GenerateReport] return from GetBnaCounterSubReportReport UI service");
+
+                logger.LogWarning("[CashDepositDenomationReportPage:GenerateReport] Start Serializing Datatable Sub Report ");
+                string serializedDatatableSubReport = JsonConvert.SerializeObject(SubReportdata);
+                logger.LogWarning("[CashDepositDenomationReportPage:GenerateReport] End Serializing Datatable Sub Report");
+
+                logger.LogWarning("[CashDepositDenomationReportPage:GenerateReport] Start convering serialized Datatable Sub Report into bytes ");
+                byte[] SubReportbytes = Encoding.ASCII.GetBytes(serializedDatatableSubReport);
+                logger.LogWarning("[CashDepositDenomationReportPage:GenerateReport] End convering serialized Datatable Sub Report into bytes ");
+
+                logger.LogWarning($"CashDepositDenomationReportPage: going to cache the  subreport data");
+                _distributedCache.Set(redisKeySubReport, SubReportbytes, new DistributedCacheEntryOptions()
+                    {
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_configuration.GetValue<int>("RedisKeyExpirationTimeInMinutes"))
+                    });
+                logger.LogWarning($"CashDepositDenomationReportPage: return from cache the subreport data");
+
+            }
+            await jsRuntime.InvokeVoidAsync("openWindowWithPost", url, reports);
+
+        }
+
+        //}
+    }
+    public static byte[] CompressString(string input)
+    {
+        using (MemoryStream memoryStream = new MemoryStream())
+        {
+            using (GZipStream gzipStream = new GZipStream(memoryStream, CompressionMode.Compress))
+            {
+                using (StreamWriter writer = new StreamWriter(gzipStream, Encoding.UTF8))
+                {
+                    writer.Write(input);
+                }
+            }
+
+            return memoryStream.ToArray();
+        }
+    }
+    private async void ResetFilter()
+    {
+        fromDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0);
+        toDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 59);
+
+        ArchiveYear = (mode is not null && mode.Contains("Archive")) ? archiveYears.FirstOrDefault() : 0;
+        fromDate = (mode is not null && mode.Contains("Archive")) ? new DateTime(ArchiveYear, fromDate.Month, fromDate.Day, fromDate.Hour, fromDate.Minute, fromDate.Second) : fromDate;
+        toDate = (mode is not null && mode.Contains("Archive")) ? new DateTime(ArchiveYear, toDate.Month, toDate.Day, toDate.Hour, toDate.Minute, toDate.Second) : toDate;
+        reportTypeId = 0;
+        await this.InvokeAsync(() => this.StateHasChanged());
+    }
+    private Task DateChanged(int selectedYear)
+    {
+        ArchiveYear = selectedYear;
+        fromDate = new DateTime(ArchiveYear, fromDate.Month, fromDate.Day, fromDate.Hour, fromDate.Minute, fromDate.Second);
+        toDate = new DateTime(ArchiveYear, toDate.Month, toDate.Day, toDate.Hour, toDate.Minute, toDate.Second);
+        this.InvokeAsync(() => this.StateHasChanged());
+        return Task.CompletedTask;
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (mode is not null && mode.Equals("Archive"))
+        {
+            archiveYears = common.GetLastNYears();
+            ArchiveYear = archiveYears.FirstOrDefault();
+            fromDate = new DateTime(ArchiveYear, fromDate.Month, fromDate.Day, fromDate.Hour, fromDate.Minute, fromDate.Second);
+            toDate = new DateTime(ArchiveYear, toDate.Month, toDate.Day, toDate.Hour, toDate.Minute, toDate.Second);
+        }
+        else
+        {
+            fromDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0);
+            toDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 59);
+
+            ArchiveYear = 0;
+        }
+        reportTypeId = 0;
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+}
+

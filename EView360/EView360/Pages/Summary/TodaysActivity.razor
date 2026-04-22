@@ -1,0 +1,121 @@
+﻿@using EView360.Common;
+@using EView360.Services;
+@using EView360.Services.Summary;
+@using EView360Models.Core;
+@using global::Common.RequestModel;
+@using global::Common.ViewModel;
+@inject TodaysActivityService todaysActivityService
+@inject ATMTreeViewRepository atmRepository
+@inject CommonServices common
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+
+<div class="">
+    @if (showSpinner)
+    {
+        <div class="spinner" style="z-index:4"></div>
+    }
+
+        <DataGrid @ref="@dataGridRef"
+              TItem="TodaysActivityViewModel"
+              Data="@todaysActivity"
+                    Editable
+              Responsive="true"
+                    Bordered
+              PageSize="1000000"
+                    FixedHeader
+              FixedHeaderDataGridHeight="280px"
+              FixedHeaderDataGridMaxHeight="280px"
+              Narrow="true"
+                    Sortable  SortMode="DataGridSortMode.Single"
+              HeaderThemeContrast="@ThemeContrast.Light">
+
+
+        <DataGridColumn Field="@nameof(TodaysActivityViewModel.Status)" Caption="Status" />
+        <DataGridColumn Field="@nameof(TodaysActivityViewModel.Count)" Caption="Count" />
+        <DataGridColumn Field="@nameof(TodaysActivityViewModel.Task)" Caption="Task" />
+        </DataGrid>
+    
+</div>
+
+
+<style>
+    /*.spinner {
+        top: 50%;
+        left: 50%;
+        margin-left: -4em;
+    }
+    form {
+        max-width: 100%;
+    }
+
+    .table-primary .showAnimation {
+        animation: spin 1200ms linear infinite;
+    }
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        width: 100%;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    .modal-body {
+        height: 70vh;
+        overflow-y: auto;
+    }
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }*/
+
+</style>
+@code {
+    public List<TodaysActivityViewModel> todaysActivity = new();
+    private DataGrid<TodaysActivityViewModel>? dataGridRef;
+    private bool showSpinner = false;
+    private bool showGrid = false;
+    [Inject]
+    INotificationService NotificationService { get; set; }
+
+
+    public async Task LoadData()
+    {
+        showSpinner = true;
+        showGrid = false;
+        await this.InvokeAsync(() => this.StateHasChanged());
+        AppUser appUser = await localStorage.GetItemAsync<AppUser>("AppUser");
+        var requesModel = new TodaysActivityRequestModel()
+            {
+
+                UserId = appUser.UserId
+            };
+        todaysActivity = await todaysActivityService.GetTodaysActivity(requesModel);
+        
+        showSpinner = false;
+        showGrid = true;
+        await this.InvokeAsync(() => this.StateHasChanged());
+        await common.TaskDelay();
+
+    }
+}

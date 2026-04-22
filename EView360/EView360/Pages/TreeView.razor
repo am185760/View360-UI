@@ -1,0 +1,27 @@
+﻿@using EView360.Data;
+
+
+<li data-jstree='{"icon":"@item.Icon", "type":"@item.Type"}' type="@item.Type" id="@item.Id" location="@item.ToolTip">
+    @item.Text
+    @if (item.Nodes is not null)
+    {
+        <ul>
+            @foreach (TreeViewNode child in item.Nodes)
+            {
+                <TreeView Item=@child @key=child />
+            }
+        </ul>
+    }
+    else if (item.HasChildren)
+    {
+        <ul>
+            <li id="dummy_@item.Id"></li>
+        </ul>
+    }
+</li>
+
+
+
+@code {
+    [Parameter] public TreeViewNode item { get; set; }
+}

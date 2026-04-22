@@ -1,0 +1,305 @@
+﻿@page "/UserForm"
+@using EView360.Data;
+@using EView360.Services;
+@using EView360Models.ViewModels;
+@using Encryption;
+@inject IJSRuntime jsRuntime
+@inject ATMTreeViewRepository atmRepository 
+ @inject NotifyService notifyService
+@inject ILogger<ATMTreeView> logger
+@implements IDisposable
+
+
+<div tabindex="-1" role="dialog" style="display:block; width: 120%;">
+    <div>
+        <div>
+            @*<div class="modal-header">
+            <h5 class="modal-title">Edit User</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="@OnCancelCallback">
+            <span aria-hidden="true">&times;</span>
+            </button>
+            </div>*@
+            <div>
+                <EditForm id="EditUserForm" EditContext="editContext" Context="editFormContext" OnValidSubmit=@SubmitHandler>
+                    <DataAnnotationsValidator />
+                    <Microsoft.AspNetCore.Components.Forms.ValidationSummary />
+                    <div class="row content">
+                        <div class="col-sm-4 sidenav nav-scrollable border-right-2">
+
+                            <table class="table">
+                                <tbody>
+                                    @*<tr>
+                                    <td>User Type</td>
+                                    <td <InputText class="form-control" @bind-Value="thisUser.User.UserType" /></td>
+                                    </tr>*@
+                                    <tr>
+                                        <td><i class="fa fa-asterisk" aria-hidden="true" style="font-size:xx-small;vertical-align:top; color:red"></i> Login ID</td>
+                                        <td <InputText class="form-control" @bind-Value="thisUser.User.UserLogin"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><i class="fa fa-asterisk" aria-hidden="true" style="font-size:xx-small;vertical-align:top; color:red"></i> Password</td>
+                                        <td <InputText type="password" class="form-control" @bind-Value="userPassword"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Confirm Password</td>
+                                        <td <InputText type="password" class="form-control" @bind-Value="confirmPassword"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><i class="fa fa-asterisk" aria-hidden="true" style="font-size:xx-small;vertical-align:top; color:red"></i> Full Name</td>
+                                        <td <InputText class="form-control" @bind-Value="thisUser.User.UserFullName"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Email</td>
+                                        <td <InputText class="form-control" @bind-Value="thisUser.User.UserEmail"/></td>
+                                    </tr>
+                                    @*<tr>
+                                    <td>Mobile</td>
+                                    <td <InputText class="form-control" @bind-Value="thisUser.User.MobileNumber"/></td>
+                                    </tr>
+                                    <tr>
+                                    <td>Manager</td>
+                                    <td <InputNumber class="form-control" @bind-Value="thisUser.User.ManagerId"/></td>
+                                    </tr>*@
+                                    <tr>
+                                        <td>User Group(s)</td>
+                                        <td>
+                                            <ListView TItem="EView360Models.Core.Group"
+                                                      Data="thisUser.Groups"
+                                                      TextField="(item) => item.GroupName"
+                                                      ValueField="(item) => item.GroupId.ToString()"
+                                                      Mode="ListGroupMode.Static"
+                                                      MaxHeight="400px"
+                                                      Style="margin-top: 2%">
+                                                <ItemTemplate>
+                                                    <Check TValue="bool" @bind-Checked="context.Item.isSelected">@context.Text</Check>
+                                                </ItemTemplate>
+                                            </ListView>
+                                        </td>
+                                    </tr>
+                                    @*<tr>
+                                    <td>Organization</td>
+                                    <td>
+                                    <ListView TItem="EView360Models.Core.CcmsOrganization"
+                                    Data="thisUser.Organizations"
+                                    TextField="(item) => item.Mcn"
+                                    ValueField="(item) => item.Id.ToString()"
+                                    Mode="ListGroupMode.Static"
+                                    MaxHeight="400px"
+                                    Style="margin-top: 2%">
+                                    <ItemTemplate>
+                                    <Check TValue="bool" @bind-Checked="context.Item.isSelected">@context.Text</Check>
+                                    </ItemTemplate>
+                                    </ListView>
+                                    </td>
+
+                                    </tr>*@
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-sm-4 sidenav nav-scrollable border-right-2">
+
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        @if (showUserTree)
+                                        {
+                                        <td>User ATM(s)</td>
+                                        <div class="container-fluid-tree .nav-scrollable">
+                                            <div class="spinner" style="z-index:4"></div>
+                                            <input id="atmTreeSearch" type="text" class="form-control search-input-atm" placeholder="Search">
+                                            <div id="CheckboxJstree" class="float-left" style="display:none">
+                                                <ul level="0">
+                                                    @foreach (TreeViewNode item in bankTreeView?.treeNodes)
+                                                    {
+                                                        <TreeView Item=@item @key=item />
+                                                    }
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        }
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-sm-4 sidenav nav-scrollable">
+                            <h3>Configure Alert Notifications</h3>
+                            <Switch TValue="bool" Style="margin-top: 2%" Checked="@toggle" CheckedChanged="@AllCheckChanged">Select All</Switch>
+                            <ListView TItem="EView360Models.Core.AlertType"
+                                      Data="thisUser.Alerts"
+                                      TextField="(item) => item.AlertTypeName"
+                                      ValueField="(item) => item.AlertTypeId.ToString()"
+                                      Mode="ListGroupMode.Static"
+                                      MaxHeight="400px"
+                                      Style="margin-top: 2%">
+                                <ItemTemplate>
+                                    <Check TValue="bool" @bind-Checked="context.Item.isSelected">@context.Text</Check>
+                                </ItemTemplate>
+                            </ListView>
+                        </div>
+                    </div>
+                </EditForm>
+            </div>
+
+            <div class="modal-footer">
+                <input type="submit" form="EditUserForm" class="btn btn-success" value="Save" />
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="@OnCancelCallback">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    .nav-scrollable {
+        /* Allow sidebar to scroll for tall menus */
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+    }
+</style>
+
+@code {
+    private EditContext? editContext;
+    private ValidationMessageStore? messageStore;
+    private DotNetObjectReference<UserForm>? objRef;
+    private string userPassword = string.Empty;
+    private string confirmPassword = string.Empty;
+    private string oldPassword = string.Empty;
+    private bool showUserTree = false;
+    private EView360.Data.TreeView bankTreeView = new();
+    private bool toggle = false;
+
+    [Inject] INotificationService NotificationService { get; set; }
+
+    [Parameter] public UserViewModel thisUser { get; set; }
+    [Parameter] public EventCallback<UserViewModel> OnSubmitCallback { get; set; }
+    [Parameter] public EventCallback<UserViewModel> OnCancelCallback { get; set; }
+    [Parameter] public List<UserViewModel> appUsers { get; set; }
+    [Parameter] public bool isEdit { get; set; }
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        try
+        {
+            editContext = new(thisUser);
+            editContext.OnValidationRequested += CustomValidations;
+            messageStore = new(editContext);
+            objRef = DotNetObjectReference.Create(this);
+            showUserTree = true;
+            bankTreeView = await atmRepository.BuidATMTreeView(atmRepository.RegionList, atmRepository.AtmList);
+            notifyService.OnNodeChange += ReloadOnNodeChange;
+            if (isEdit)
+            {
+                userPassword = confirmPassword = oldPassword = thisUser.User.UserPassword;
+                if (thisUser.Alerts.All(x => x.isSelected) == true)
+                {
+                    toggle = true;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at User Form, OnInitializedAsync as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (bankTreeView != null)
+            {
+                if (thisUser.AtmIds == null)
+                    thisUser.AtmIds = new string[0];
+                await jsRuntime.InvokeVoidAsync("renderComponents", objRef, thisUser.AtmIds.Select(Id => 'a' + Id).ToArray());
+            }
+        }
+    }
+
+    private void CustomValidations(object? sender, ValidationRequestedEventArgs args)
+    {
+        messageStore?.Clear();
+        List<UserViewModel> users = new();
+
+        if (userPassword.Equals(confirmPassword))
+        {
+            if (!oldPassword.Equals(confirmPassword))
+                thisUser.User.UserPassword = Encryption.Cryptic.EncryptString(confirmPassword, Helper.ConstractKey(false));
+        }
+        else
+            messageStore?.Add(() => thisUser.User.UserPassword, "Password do not match, please enter a valid password");
+
+        if (isEdit)
+            users = appUsers.Where(x => x.User.UserLogin != thisUser.User.UserLogin).ToList();
+
+        if (thisUser.User.UserLogin == null)
+            messageStore?.Add(() => thisUser.User.UserLogin, "Please enter a Login ID");
+
+        if (thisUser.User.UserPassword == null)
+            messageStore?.Add(() => thisUser.User.UserPassword, "Please enter a valid password");
+
+        if (thisUser.User.UserFullName == null)
+            messageStore?.Add(() => thisUser.User.UserFullName, "Please enter the user full name");
+
+        foreach (var user in users)
+        {
+            if (user.User.UserLogin.Equals(thisUser.User.UserLogin))
+            {
+                messageStore?.Add(() => thisUser.User.UserLogin, "User Name already exists, please provide a unique name");
+                break;
+            }
+        }
+    }
+
+    private async void SubmitHandler()
+    {
+        thisUser.AtmIds = await jsRuntime.InvokeAsync<string[]>("getCheckboxSelection", objRef);
+        await OnSubmitCallback.InvokeAsync(thisUser);
+    }
+
+    private void AllCheckChanged(bool value)
+    {
+        toggle = value;
+
+        if (value)
+        {
+            thisUser.Alerts.Select(x => { x.isSelected = true; return x; }).ToList();
+        }
+        else
+        {
+            thisUser.Alerts.Select(x => { x.isSelected = false; return x; }).ToList();
+        }
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private void ChangeToggle()
+    {
+        if (thisUser.Alerts.All(x => x.isSelected) == true)
+        {
+            toggle = true;
+        }
+        else
+        {
+            toggle = false;
+        }
+    }
+    //event to occour when tree node renamed, deleted, moved or region added
+    private async void ReloadOnNodeChange()
+    {
+        showUserTree = false;
+        StateHasChanged();
+        bankTreeView = await atmRepository.BuidATMTreeView(atmRepository.RegionList, atmRepository.AtmList);
+        showUserTree = true;
+        StateHasChanged();
+        await jsRuntime.InvokeVoidAsync("renderComponents", objRef, thisUser.AtmIds.Select(Id => 'a' + Id).ToArray());
+    }
+    public void Dispose()
+    {
+        objRef?.Dispose();
+        notifyService.OnNodeChange -= ReloadOnNodeChange;
+    }
+}

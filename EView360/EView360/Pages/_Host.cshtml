@@ -1,0 +1,72 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.Components.Web
+@namespace EView360.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <base href="~/" />
+    <link rel="stylesheet" href="css/AWSNavbar.css">
+    <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link href="css/site.css" rel="stylesheet" />
+    <link href="EView360.styles.css" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+
+    <link href="css/jstree/style.min.css" rel="stylesheet" />
+    <link href="css/font-awesome.min.css" rel="stylesheet" />
+    <link href="fontawesome/css/all.min.css" rel="stylesheet" />
+    <link href="_content/Blazorise/blazorise.css" rel="stylesheet" />
+    <link href="_content/Blazorise.LoadingIndicator/blazorise.loadingindicator.css" rel="stylesheet" />
+    <link href="_content/Blazorise.Bootstrap/blazorise.bootstrap.css" rel="stylesheet" />
+    <link href="_content/Blazorise.Snackbar/blazorise.snackbar.css" rel="stylesheet" />
+    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
+</head>
+<body>
+    <script src="_framework/blazor.server.js" autostart="false"></script>
+    <script>
+        Blazor.start({
+            configureSignalR: function (builder) {
+                let c = builder.build();
+                c.serverTimeoutInMilliseconds = 30000;
+                c.keepAliveIntervalInMilliseconds = 15000;
+                builder.build = () => {
+                    return c;
+                };
+            }
+        });
+    </script>
+    <component type="typeof(App)" render-mode="Server" />
+
+    <div id="blazor-error-ui">
+        <environment include="Staging,Production">
+            An error has occurred. This application may no longer respond until reloaded.
+        </environment>
+        <environment include="Development">
+            An unhandled exception has occurred. See browser dev tools for details.
+        </environment>
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+    
+    <script src="js/bootstrap.bundle.min.js?v=1.0"></script>
+    <script src="js/jquery.min.js?v=2.0"></script>
+    <script src="js/jstree.min.js?v=3.0"></script>
+    @* <script src="js/fontawesome.js?v=4.0"></script> *@
+    <script src="js/bloodhound.js"></script>
+    <script src="scripts/common.js?v=5.0"></script>    
+    <script src="js/typeahead.bundle.js?v=9.0"></script>
+    <script src="scripts/jquery.inactivity.js?v=11.0"></script>
+    <script src="scripts/jquery.inactivity.min.js?v=12.0"></script>
+    <script src="js/auth-helper.js?v=6.0"></script>
+    <script src="js/chart.min.js?v=7.0"></script>
+    <script src="js/SaveAsFile.js?v=8.0"></script>
+    <script src="_framework/blazor.webassembly.js"></script> 
+    @*<script src="js/socketInterop.js"></script>*@
+    @* <script src="_framework/blazor.server.js"></script> *@
+
+</body>
+</html>

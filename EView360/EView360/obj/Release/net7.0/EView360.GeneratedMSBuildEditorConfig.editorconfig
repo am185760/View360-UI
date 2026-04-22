@@ -1,0 +1,369 @@
+is_global = true
+build_property.TargetFramework = net7.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = EView360
+build_property.RootNamespace = EView360
+build_property.ProjectDir = D:\View360\Repository - View360 Depart\EView360\EView360\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 7.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = D:\View360\Repository - View360 Depart\EView360\EView360
+build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 7.0
+build_property.EnableCodeStyleSeverity = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/App.razor]
+build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/AlertBox.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWxlcnRCb3gucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/AlertTemplatePage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWxlcnRUZW1wbGF0ZVBhZ2UucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Analytics/CashUtilizationPage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQW5hbHl0aWNzXENhc2hVdGlsaXphdGlvblBhZ2UucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Analytics/DenominationUtilizationAnalysis.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQW5hbHl0aWNzXERlbm9taW5hdGlvblV0aWxpemF0aW9uQW5hbHlzaXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Analytics/ReplenishmentAnalysis.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQW5hbHl0aWNzXFJlcGxlbmlzaG1lbnRBbmFseXNpcy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Analytics/TransactionAnalytics.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQW5hbHl0aWNzXFRyYW5zYWN0aW9uQW5hbHl0aWNzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/ApplicationConfiguration/ApplicationConfiguration.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXBwbGljYXRpb25Db25maWd1cmF0aW9uXEFwcGxpY2F0aW9uQ29uZmlndXJhdGlvbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/ATMNetworkInformation/ATMNetworkInfo.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQVRNTmV0d29ya0luZm9ybWF0aW9uXEFUTU5ldHdvcmtJbmZvLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/AtmSetup.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXRtU2V0dXAucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/AtmSetupForm.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXRtU2V0dXBGb3JtLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/ATMTreeView.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQVRNVHJlZVZpZXcucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Audit Log/AuditLog.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXVkaXQgTG9nXEF1ZGl0TG9nLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/AWSNavbar.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQVdTTmF2YmFyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/BulkUpdateAtms.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQnVsa1VwZGF0ZUF0bXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/ChangePassword.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2hhbmdlUGFzc3dvcmQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Counter.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ291bnRlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Default.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGVmYXVsdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/DraggableTreeView.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRHJhZ2dhYmxlVHJlZVZpZXcucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/GroupManagement.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcR3JvdXBNYW5hZ2VtZW50LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Index.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXgucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Login.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9naW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/NoteSetType.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTm90ZVNldFR5cGUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/NoteSetTypeForm.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTm90ZVNldFR5cGVGb3JtLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Operations/AlertMonitoring.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT3BlcmF0aW9uc1xBbGVydE1vbml0b3JpbmcucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Operations/AtmPendingFiles.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT3BlcmF0aW9uc1xBdG1QZW5kaW5nRmlsZXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Operations/AtmTask.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT3BlcmF0aW9uc1xBdG1UYXNrLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Operations/BalanceInvestigation.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT3BlcmF0aW9uc1xCYWxhbmNlSW52ZXN0aWdhdGlvbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Operations/BnaTransaction.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT3BlcmF0aW9uc1xCbmFUcmFuc2FjdGlvbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Operations/CashPositions.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT3BlcmF0aW9uc1xDYXNoUG9zaXRpb25zLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Operations/DailyFeedStatus.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT3BlcmF0aW9uc1xEYWlseUZlZWRTdGF0dXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Operations/Dashboards/AtmTaskDashboard.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT3BlcmF0aW9uc1xEYXNoYm9hcmRzXEF0bVRhc2tEYXNoYm9hcmQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Operations/Dashboards/AtmTaskDataGrid.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT3BlcmF0aW9uc1xEYXNoYm9hcmRzXEF0bVRhc2tEYXRhR3JpZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Operations/Dashboards/BNATransactionDashboard.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT3BlcmF0aW9uc1xEYXNoYm9hcmRzXEJOQVRyYW5zYWN0aW9uRGFzaGJvYXJkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Operations/Dashboards/BNATransactionDataGrid.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT3BlcmF0aW9uc1xEYXNoYm9hcmRzXEJOQVRyYW5zYWN0aW9uRGF0YUdyaWQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Operations/Dashboards/CashPositionDashboard.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT3BlcmF0aW9uc1xEYXNoYm9hcmRzXENhc2hQb3NpdGlvbkRhc2hib2FyZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Operations/Dashboards/CashPositionDataGrid.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT3BlcmF0aW9uc1xEYXNoYm9hcmRzXENhc2hQb3NpdGlvbkRhdGFHcmlkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Operations/Dashboards/MinimumThresholdDashboardDataGrid.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT3BlcmF0aW9uc1xEYXNoYm9hcmRzXE1pbmltdW1UaHJlc2hvbGREYXNoYm9hcmREYXRhR3JpZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Operations/Dashboards/OrderDownloadDashboardDataGrid.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT3BlcmF0aW9uc1xEYXNoYm9hcmRzXE9yZGVyRG93bmxvYWREYXNoYm9hcmREYXRhR3JpZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Operations/Dashboards/TransactionsHourlyAnalysis.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT3BlcmF0aW9uc1xEYXNoYm9hcmRzXFRyYW5zYWN0aW9uc0hvdXJseUFuYWx5c2lzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Operations/EJReplenishment.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT3BlcmF0aW9uc1xFSlJlcGxlbmlzaG1lbnQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Operations/Replenishment.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT3BlcmF0aW9uc1xSZXBsZW5pc2htZW50LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Operations/ReportTask.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT3BlcmF0aW9uc1xSZXBvcnRUYXNrLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Operations/WithdrawalTransaction.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT3BlcmF0aW9uc1xXaXRoZHJhd2FsVHJhbnNhY3Rpb24ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Pagination.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUGFnaW5hdGlvbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/RecreateDailyFeed.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVjcmVhdGVEYWlseUZlZWQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Reports/AlertMonitoringReport.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0c1xBbGVydE1vbml0b3JpbmdSZXBvcnQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Reports/AtmSummaryReport.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0c1xBdG1TdW1tYXJ5UmVwb3J0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Reports/ATMWithoutTransaction24Hour.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0c1xBVE1XaXRob3V0VHJhbnNhY3Rpb24yNEhvdXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Reports/AuditLogReport.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0c1xBdWRpdExvZ1JlcG9ydC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Reports/BnaCounterReport.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0c1xCbmFDb3VudGVyUmVwb3J0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Reports/CashDepositDenomationReport.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0c1xDYXNoRGVwb3NpdERlbm9tYXRpb25SZXBvcnQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Reports/CashPositionsReport.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0c1xDYXNoUG9zaXRpb25zUmVwb3J0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Reports/CashUtilizationReport.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0c1xDYXNoVXRpbGl6YXRpb25SZXBvcnQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Reports/CashWithdrawalReport.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0c1xDYXNoV2l0aGRyYXdhbFJlcG9ydC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Reports/CPMCounterReport.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0c1xDUE1Db3VudGVyUmVwb3J0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Reports/DeadAtmReport.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0c1xEZWFkQXRtUmVwb3J0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Reports/GroupReport.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0c1xHcm91cFJlcG9ydC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Reports/LowBalanceReport.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0c1xMb3dCYWxhbmNlUmVwb3J0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Reports/NoCashWithdrawalReport.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0c1xOb0Nhc2hXaXRoZHJhd2FsUmVwb3J0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Reports/OutOfCashReport.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0c1xPdXRPZkNhc2hSZXBvcnQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Reports/PurgeBinThresholdReport.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0c1xQdXJnZUJpblRocmVzaG9sZFJlcG9ydC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Reports/ReplenishmentReport.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0c1xSZXBsZW5pc2htZW50UmVwb3J0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Reports/ReplenishmentReturnReport.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0c1xSZXBsZW5pc2htZW50UmV0dXJuUmVwb3J0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Reports/TaskStatusReport.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0c1xUYXNrU3RhdHVzUmVwb3J0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Reports/UserReport.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVwb3J0c1xVc2VyUmVwb3J0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/ScheduleReportGeneration.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2NoZWR1bGVSZXBvcnRHZW5lcmF0aW9uLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Summary/AtmStatus.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3VtbWFyeVxBdG1TdGF0dXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Summary/BnaStatus.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3VtbWFyeVxCbmFTdGF0dXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Summary/CurrentDaySummary.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3VtbWFyeVxDdXJyZW50RGF5U3VtbWFyeS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Summary/CurrentLoggedInUsers.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3VtbWFyeVxDdXJyZW50TG9nZ2VkSW5Vc2Vycy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Summary/RemDenQty.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3VtbWFyeVxSZW1EZW5RdHkucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Summary/Summary.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3VtbWFyeVxTdW1tYXJ5LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Summary/TodaysActivity.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3VtbWFyeVxUb2RheXNBY3Rpdml0eS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Summary/Top10Atms.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3VtbWFyeVxUb3AxMEF0bXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/TransactionPage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVHJhbnNhY3Rpb25QYWdlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/TreeView.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVHJlZVZpZXcucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/UserForm.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlckZvcm0ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Users.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlcnMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Shared/EmptyLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXEVtcHR5TGF5b3V0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Shared/EmptyPage.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXEVtcHR5UGFnZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Shared/SurveyPrompt.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFN1cnZleVByb21wdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Shared/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5MYXlvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-cv0hxt75ca
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Shared/NavMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE5hdk1lbnUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-gd417gv6ip
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/View360/Repository - View360 Depart/EView360/EView360/Pages/_Host.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX0hvc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 

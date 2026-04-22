@@ -1,0 +1,125 @@
+﻿@page "/TransactionsHourlyAnalysis"
+@using EView360.Common;
+@using EView360.Services.Operations.DashBoard;
+@using EView360.Services;
+@using EView360Models.Core;
+@using EView360Models.RequestModel;
+@using EView360Models.ViewModels;
+@inject TransactionsHourlyAnalysisService service
+@inject ILogger<TransactionsHourlyAnalysis> logger
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject ATMTreeViewRepository atmRepository 
+@inject NotifyService notifyService
+@inject IConfiguration _configuration
+@inject CommonServices common
+@implements IDisposable
+
+
+<div class="row content">
+    <div class="col-sm-2 filter_bar border-right-2">
+        <form style="margin-top: 20px;">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <h5>Filters: </h5>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <i class="fa fa-asterisk" aria-hidden="true" style="font-size:xx-small;vertical-align:top; color:red"></i>
+                    <label for="inputEmail4">Inactivity Threshold(Hour):</label>
+                    <InputNumber @bind-Value="threshold" class="form-control" />
+                </div>
+            </div>
+            <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@LoadData" value="Search">
+            <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@ResetFilter" value="Reset">
+        </form>
+    </div>
+
+
+    <div class="col-sm-10 text-left" style="margin-top:1%">
+        <div class="form-group">
+            <b>
+                <h2 style="font-family:montserrat; font-weight:bold">
+                    View Transactions Hourly Analysis
+                </h2>
+            </b>
+        </div>
+
+        @if (showSpinner)
+        {
+            <div class="spinner" style="z-index:4"></div>
+        }
+
+        @if (showGrid)
+        {
+            <DataGrid @ref="@dataGridRef"
+                  TItem="ViewTransHourlyViewModel"
+                  Data="@filtertransHourlyViewModels"
+                  Editable
+                  Responsive="true"
+                  ShowPager
+                  Bordered
+                  PageSize="50"
+                  FixedHeader
+                  FixedHeaderDataGridHeight="570px"
+                  FixedHeaderDataGridMaxHeight="570px"
+                  Narrow="true"
+                  Sortable  SortMode="DataGridSortMode.Single"
+                  HeaderThemeContrast="@ThemeContrast.Light">
+
+
+                <DataGridColumn Field="@nameof(ViewTransHourlyViewModel.Title)" Caption="Atm Title" />
+                <DataGridColumn Field="@nameof(ViewTransHourlyViewModel.Ip)" Caption="IP" />
+                <DataGridColumn Field="@nameof(ViewTransHourlyViewModel.Location)" Caption="Location" />
+                <DataGridDateColumn Field="@nameof(ViewTransHourlyViewModel.GenerationTime)" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" Caption="Generated At" />
+                <DataGridNumericColumn Field="@nameof(ViewTransHourlyViewModel.Amount)" Caption="Amount" />
+                <DataGridDateColumn Field="@nameof(ViewTransHourlyViewModel.LastHeartBeatAt)" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" Caption="Last Heart Beat At" />
+                <DataGridCheckColumn Field="@nameof(ViewTransHourlyViewModel.IsHealthy)" Caption="IsHealthy" />
+            </DataGrid>
+        }
+    </div>
+</div>
+
+
+
+<style>
+
+    .table-primary .showAnimation {
+        animation: spin 1200ms linear infinite;
+    }
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        margin-top: 20px;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        width: 170px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+
+</style>
+
+

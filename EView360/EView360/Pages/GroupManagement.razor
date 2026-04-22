@@ -1,0 +1,710 @@
+﻿@page "/GroupManagement"
+@using EView360.Services;
+@using EView360Models.ViewModels;
+@using EView360Models.Core;
+@using static EView360.Data.Enumerations;
+@inject GroupRepository service
+@inject ILogger<GroupManagement> logger
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+
+<div class="row content">
+    <div class="col-sm-2 filter_bar border-right-2">
+        <form style="margin-top: 20px;">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <h5>Filters: </h5>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-10">
+                    <label for="inputEmail4">Group name: </label>
+                    <input type="email" class="form-control" @bind="filterGroupName" id="searchGroupName" placeholder="Search name..">
+                </div>
+            </div>
+            <input class="btn btn-success" type="button" onclick="@FilterSubmit" value="Search">
+            <input class="btn btn-success" type="button" onclick="@ResetFilter" value="Reset">
+            @if (CheckPermission((int)Permissions.CreateGroup))
+            {
+                <input class="btn btn-success" style="margin-left: 3px;" type="button" onclick="@Add" value="Add">
+            }
+        </form>
+    </div>
+
+
+    <div class="col-sm-10 text-left" style="margin-top:1%">
+        <div class="form-group">
+            <h2>Group Management</h2>
+        </div>
+        @if (showSpinner)
+        {
+            <div class="spinner" style="z-index:4"></div>
+        }
+
+        @if (showGrid)
+        {
+            <DataGrid @ref="@dataGridRef"
+                      TItem="GroupViewModel"
+                      Data="@filterGrpList"
+            @bind-SelectedRow="@selectedGrp"
+                            Editable
+                       Responsive="true"
+                            ShowPager
+                            UseValidation
+                       RowRemoving="@OnRowRemoving"
+                       RowRemoved="@OnRowRemoved"
+                       ShowValidationsSummary="false"
+                            ShowValidationFeedback
+                       PopupSize="ModalSize.Large"
+                            Bordered
+                       PageSize="50"
+                            FixedHeader
+                       FixedHeaderDataGridHeight="570px"
+                       FixedHeaderDataGridMaxHeight="570px"
+                       Narrow="true"
+                            Sortable SortMode="DataGridSortMode.Single"
+                       HeaderThemeContrast="@ThemeContrast.Light">
+
+
+                 <DataGridColumn TItem="GroupViewModel" Field="group.GroupName" Caption="Group Name" />
+                 <DataGridColumn TItem="GroupViewModel" Field="group.Description" Caption="Description" />
+                 <DataGridColumn TItem="GroupViewModel" Field="groupUsers" Caption="Group Users">
+                     <DisplayTemplate>
+                         <Button Clicked="@(()=>ShowUserByGroup(context.groupUsers))">
+                             <Icon Name="@("fa-group")" TextColor="TextColor.Success" />
+                         </Button>
+                     </DisplayTemplate>
+                 </DataGridColumn>
+                 <DataGridColumn TItem="GroupViewModel" Field="group.GroupId" Caption="Group Rights">
+                     <DisplayTemplate>
+                         <Button Clicked="@(()=>ShowRightsByGroup(context.group.GroupId))">
+                             <Icon Name="@("fa-universal-access")" TextColor="TextColor.Info" />
+                         </Button>
+                     </DisplayTemplate>
+                 </DataGridColumn>
+
+                 <DataGridCommandColumn CellClass="@((item)=> item.group.GroupName)" ClearFilterCommandAllowed="false">
+                     <NewCommandTemplate>
+
+                     </NewCommandTemplate>
+                     <EditCommandTemplate>
+                         @if (CheckPermission((int)Permissions.ModifyGroup))
+                        {
+                            <Button Clicked="@(()=>OnCustomEditCommand(context))" title="Edit"><Icon Name="IconName.Edit" TextColor="TextColor.Success" /></Button>
+                        }
+                    </EditCommandTemplate>
+                    <DeleteCommandTemplate>
+                        @if (CheckPermission((int)Permissions.DeleteGroup))
+                        {
+                            <Button Class="DeleteBtn" Clicked="@context.Clicked" title="Delete"><Icon Name="IconName.Delete" TextColor="TextColor.Danger" /></Button>
+                        }
+                    </DeleteCommandTemplate>
+                </DataGridCommandColumn>
+            </DataGrid>
+        }
+
+        @*group rights*@
+        <Modal @ref="userRightsmodalRef">
+            <ModalContent Centered>
+                <ModalHeader>
+                    <ModalTitle>Group Rights</ModalTitle>
+                    <CloseButton />
+                </ModalHeader>
+                <ModalBody>
+                    <div>
+                        <ListView TItem="string"
+                                  Data="permissions?.ToList().Distinct()"
+                                  TextField="(item) => item"
+                                  ValueField="(item) => item"
+                                  Mode="ListGroupMode.Static"
+                                  MaxHeight="480px">
+                        </ListView>
+                    </div>
+                </ModalBody>
+            </ModalContent>
+        </Modal>
+
+
+        @*group users*@
+        <Modal @ref="userGrpModalRef">
+            <ModalContent Centered Size="ModalSize.Small">
+                 <ModalHeader>
+                     <ModalTitle>Group Users</ModalTitle>
+                     <CloseButton />
+                 </ModalHeader>
+                 <ModalBody MaxHeight="30">
+                     <div>
+                         <ListView TItem="string"
+                                   Data="users"
+                                   TextField="(item) => item"
+                                   ValueField="(item) => item"
+                                   Mode="ListGroupMode.Static"
+                                   MaxHeight="480px">
+                         </ListView>
+                     </div>
+                 </ModalBody>
+             </ModalContent>
+         </Modal>
+
+
+         @if (showModal)
+        {
+            <div id="modalDialog" class="modal" tabindex="-1" role="dialog" style="display:block">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header" style="background-color:green;color:white;">
+                            <h5 class="modal-title">@title</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="@CloseEditForm">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <EditForm id="EditGroups" EditContext="editContext" OnValidSubmit=@SubmitHandler Context="parentContext">
+                                <DataAnnotationsValidator />
+                                <Microsoft.AspNetCore.Components.Forms.ValidationSummary />
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="setTypeName" class="col-sm-6 col-form-label">Group Name</label>
+                                        <InputText class="form-control" id="setTypeName" @bind-Value="group.GroupName" />
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="setTypeName" class="col-sm-6 col-form-label">Description</label>
+                                        <InputText class="form-control" id="setTypeName" @bind-Value="group.Description" />
+                                    </div>
+                                </div>
+
+                                <Tabs SelectedTab="@selectedTab" SelectedTabChanged="@OnSelectedTabChanged">
+                                    <Items>
+                                        <Tab Name="Administration">Administration</Tab>
+                                        <Tab Name="Operations">Operations</Tab>
+                                        <Tab Name="Reports">Reports</Tab>
+                                    </Items>
+                                    <Content>
+                                        <TabPanel Name="Administration">
+                                            <Switch TValue="bool" Color="Color.Success" Style="margin-top: 2%" CheckedChanged="@AdminAllCheckChanged">select all admin rights</Switch>
+
+                                            <Autocomplete TItem="Right"                                                
+                                                          TValue="string"
+                                                          Data="adminRights.Distinct()"
+                                                          TextField="(item) => item.Name"
+                                                          ValueField="(item) => item.RightId.ToString()"
+                                                          Placeholder="Search..."
+                                                          SelectionMode="AutocompleteSelectionMode.Checkbox"
+                                                          CloseOnSelection="false"
+                                                          @bind-SelectedValues="adminSelectedData"
+                                                          CurrentSearchChanged="HandleAdminRightSearch">
+                                            </Autocomplete>
+
+                                            <ListView TItem="Right"
+                                                      Data="adminRights.Distinct()"
+                                                      TextField="(item) => item.Name"
+                                                      ValueField="(item) => item.RightId.ToString()"
+                                                      Mode="ListGroupMode.Static"
+                                                      MaxHeight="305px"
+                                                      Style="margin-top: 2%">
+                                                <ItemTemplate>
+                                                    <Check TValue="bool" @bind-Checked="context.Item.IsSelected">@context.Text</Check>
+                                                </ItemTemplate>
+                                            </ListView>
+                                        </TabPanel>
+                                        <TabPanel Name="Operations">
+                                            <Switch TValue="bool" Color="Color.Success" Style="margin-top: 2%" CheckedChanged="@OperationAllCheckChanged">select all operation rights</Switch>
+                                            <Autocomplete TItem="Right"
+                                                          TValue="string"
+                                                          Data="operationsRights.Distinct()"
+                                                          TextField="(item) => item.Name"
+                                                          ValueField="(item) => item.RightId.ToString()"
+                                                          Placeholder="Search..."
+                                                          SelectionMode="AutocompleteSelectionMode.Checkbox"
+                                                          CloseOnSelection="false"
+                                            @bind-SelectedValues="opSelectedData"
+                                                          CurrentSearchChanged="HandleOpRightSearch">
+                                            </Autocomplete>
+                                            <ListView TItem="Right"
+                                                      Data="operationsRights.Distinct()"
+                                                      TextField="(item) => item.Name"
+                                                      ValueField="(item) => item.RightId.ToString()"
+                                                      Mode="ListGroupMode.Static"
+                                                      MaxHeight="305px"
+                                                      Style="margin-top: 2%">
+                                                <ItemTemplate>
+                                                    <Check TValue="bool" @bind-Checked="context.Item.IsSelected">@context.Text</Check>
+                                                </ItemTemplate>
+                                            </ListView>
+                                        </TabPanel>
+                                        <TabPanel Name="Reports">
+                                            <Switch TValue="bool" Color="Color.Success" Style="margin-top: 2%" CheckedChanged="@ReportAllCheckChanged">select all reporting rights</Switch>
+                                            <Autocomplete TItem="Right"
+                                                          TValue="string"
+                                                          Data="reportRights.Distinct()"
+                                                          TextField="(item) => item.Name"
+                                                          ValueField="(item) => item.RightId.ToString()"
+                                                          Placeholder="Search..."
+                                                          SelectionMode="AutocompleteSelectionMode.Checkbox"
+                                                          CloseOnSelection="false"
+                                            @bind-SelectedValues="rptSelectedData"
+                                                          CurrentSearchChanged="HandleRptRightSearch">
+                                            </Autocomplete>
+                                            <ListView TItem="Right"
+                                                      Data="reportRights.Distinct()"
+                                                      TextField="(item) => item.Name"
+                                                      ValueField="(item) => item.RightId.ToString()"
+                                                      Mode="ListGroupMode.Static"
+                                                      MaxHeight="305px"
+                                                      Style="margin-top: 2%">
+                                                <ItemTemplate>
+                                                    <Check TValue="bool" @bind-Checked="context.Item.IsSelected">@context.Text</Check>
+                                                </ItemTemplate>
+                                            </ListView>
+                                        </TabPanel>
+                                    </Content>
+                                </Tabs>
+                            </EditForm>
+                        </div>
+                        <div class="modal-footer">
+                            <input type="submit" form="EditGroups" class="btn btn-success" value="Save" />
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="@CloseEditForm">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        }
+
+
+    </div>
+</div>
+
+
+
+<style>
+
+    .Administration > .DeleteBtn {
+        display: none;
+    }
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        margin-top: 20px;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        width: 170px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    /*.modal-body {
+            height: 70vh;
+            overflow-y: auto;
+        }*/
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+</style>
+
+
+
+@code {
+
+    public List<GroupViewModel> grpList = new();
+    public List<GroupViewModel> filterGrpList = new();
+
+    private List<Right> rights = new();
+    private List<Right> adminRights = new();
+    private List<Right> reportRights = new();
+    private List<Right> operationsRights = new();
+    private string filterGroupName = string.Empty;
+    private bool showSpinner = true;
+    private bool showGrid = false;
+    private bool showModal = false;
+    private DataGrid<GroupViewModel>? dataGridRef;
+    private GroupViewModel selectedGrp;
+    private List<string>? permissions;
+    private Modal? userRightsmodalRef;
+    private Modal? userGrpModalRef;
+    string selectedTab = "Administration";
+    string title = string.Empty;
+    private EditContext? editContext;
+    private Group group = new();
+    List<string> users = new();
+    private bool isEdit = false;
+    [Inject] INotificationService NotificationService { get; set; }
+    [Inject] IMessageService MessageService { get; set; }
+    Dictionary<int, string> userRights;
+
+    List<string> adminSelectedData = new();
+    List<string> rptSelectedData = new();
+    List<string> opSelectedData = new();
+
+    protected async override void OnInitialized()
+    {
+        service.userId = (await localStorage.GetItemAsync<EView360Models.Core.AppUser>("AppUser")).UserId;
+
+        editContext = new(group);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                userRights = await localStorage.GetItemAsync<Dictionary<int, string>>("userRights");
+                await LoadData();
+                rights = await service.GetRightsAsync();
+
+                if (rights is null || rights.Count == 0)
+                {
+                    await NotificationService.Error("Unable to find all Rights or check logs for error", "Error", (options) =>
+                    {
+                        options.IntervalBeforeClose = 4000;
+                    });
+                }
+
+                await BuildCustomRights();
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at GroupManagement, OnAfterRenderAsync as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    private bool CheckPermission(int right)
+    {
+        try
+        {
+            if (userRights is not null)
+                return userRights.ContainsKey(right);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at Group, CheckPermission as: {ex.Message}");
+
+            NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+        return false;
+    }
+
+    private async Task LoadData()
+    {
+        grpList = filterGrpList = await service.GetGroupDetailAsync();
+        showSpinner = false;
+        showGrid = true;
+        this.InvokeAsync(() => this.StateHasChanged());
+
+        if (grpList is null || grpList.Count == 0)
+        {
+            await NotificationService.Error("No record found or check logs for error", "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    private Task BuildCustomRights()
+    {
+        if (rights?.Count > 0)
+        {
+            adminRights = rights.Where(x => x.RightType?.Trim().ToLower() == "administration").ToList();
+            reportRights = rights.Where(x => x.RightType?.Trim().ToLower() == "operations").ToList();
+            operationsRights = rights.Where(x => x.RightType?.Trim().ToLower() == "reports").ToList();
+        }
+        return Task.CompletedTask;
+    }
+
+    // Edit Form...........................
+
+    private void AdminAllCheckChanged(bool value)
+    {
+        if (value)
+        {
+            adminRights.Select(x => { x.IsSelected = true; return x; }).ToList();
+        }
+        else
+        {
+            adminRights.Select(x => { x.IsSelected = false; return x; }).ToList();
+        }
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    async Task OnCustomEditCommand(EditCommandContext<GroupViewModel> context)
+    {
+        selectedTab = "Administration";
+        group = context.Item?.group; title = "Edit group"; isEdit = true;
+        editContext = new(group);
+        rights.Select(x => { x.IsSelected = false; return x; }).ToList();
+        rights.Where(x => context.Item.groupRights.Any(y => x.Name.Trim() == y.Trim())).Select(z => { z.IsSelected = true; return z; }).ToList();
+        await BuildCustomRights();
+        showModal = true;
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    public async Task RenderErrorBox(string title, string message)
+    {
+        await NotificationService.Error(message, title, (options) =>
+        {
+            options.IntervalBeforeClose = 4000;
+        });
+    }
+
+    async Task OnRowRemoved(GroupViewModel grpDelete)
+    {
+        string response = await service.DeleteGroupAndRights(grpDelete.group.GroupId, grpDelete.group.GroupName);
+        if (response == "error")
+        {
+            await NotificationService.Error("An error occured while deleting group, check logs..", "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+        else
+        {
+            await NotificationService.Success("Group deleted successfully.", "Success", (options) =>
+                {
+                    options.IntervalBeforeClose = 4000;
+                });
+        }
+
+        await Task.Delay(300);
+        await LoadData();
+    }
+
+    async Task OnRowRemoving(CancellableRowChange<GroupViewModel> cancellableRow)
+    {
+        if (await MessageService.Confirm("Are you sure you want to delete this group?", "Confirmation", (options) => { options.ConfirmButtonColor = Color.Success; }))
+        {
+            if (cancellableRow.Item.groupUsers?.Count > 0)
+            {
+                cancellableRow.Cancel = true;
+                await RenderErrorBox("Error", "Can not delete this group, as user exist here !");
+            }
+        }
+        else
+        {
+            cancellableRow.Cancel = true;
+        }
+    }
+
+    private void OperationAllCheckChanged(bool value)
+    {
+        if (value)
+        {
+            operationsRights.Select(x => { x.IsSelected = true; return x; }).ToList();
+        }
+        else
+        {
+            operationsRights.Select(x => { x.IsSelected = false; return x; }).ToList();
+        }
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private void ReportAllCheckChanged(bool value)
+    {
+        if (value)
+        {
+            reportRights.Select(x => { x.IsSelected = true; return x; }).ToList();
+        }
+        else
+        {
+            reportRights.Select(x => { x.IsSelected = false; return x; }).ToList();
+        }
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private Task OnSelectedTabChanged(string name)
+    {
+        selectedTab = name;
+
+        return Task.CompletedTask;
+    }
+
+    private void HandleAdminRightSearch()
+    {
+        if (adminSelectedData?.Count > 0)
+        {
+            adminRights.Where(x => adminSelectedData.Any(y => int.Parse(y) == x.RightId)).Select(x => { x.IsSelected = true; return x; }).ToList();
+            adminSelectedData = new();
+            this.InvokeAsync(() => this.StateHasChanged());
+        }
+    }
+
+    private void HandleOpRightSearch()
+    {
+        if (opSelectedData?.Count > 0)
+        {
+            operationsRights.Where(x => opSelectedData.Any(y => int.Parse(y) == x.RightId)).Select(x => { x.IsSelected = true; return x; }).ToList();
+            opSelectedData = new();
+            this.InvokeAsync(() => this.StateHasChanged());
+        }
+    }
+
+    private void HandleRptRightSearch()
+    {
+        if (rptSelectedData?.Count > 0)
+        {
+            reportRights.Where(x => rptSelectedData.Any(y => int.Parse(y) == x.RightId)).Select(x => { x.IsSelected = true; return x; }).ToList();
+            rptSelectedData = new();
+            this.InvokeAsync(() => this.StateHasChanged());
+        }
+    }
+
+    private void HideModal()
+    {
+        showModal = false;
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private async Task SubmitHandler()
+    {
+        try
+        {
+            List<GroupRight> groupRights = new();
+            showSpinner = true;
+            showGrid = false;
+            string response = string.Empty;
+            HideModal();
+
+            List<Right> selectedRights = adminRights.Where(x => x.IsSelected).Concat(operationsRights.Where(x => x.IsSelected)).Concat(reportRights.Where(x => x.IsSelected)).ToList();
+
+            if (selectedRights?.Count > 0)
+            {
+                groupRights = (from singleRight in selectedRights
+                               select new GroupRight
+                                   {
+                                       RightId = singleRight.RightId
+                                   }).ToList();
+            }
+
+            if (isEdit)
+            {
+                response = await service.UpdateGroupAndRights(group, group.GroupId, groupRights.Select(x => { x.GroupId = group.GroupId; return x; }).ToList());
+                if (response == "error")
+                {
+                    await NotificationService.Error("An error occured while updating group, check logs..", "Error", (options) =>
+                    {
+                        options.IntervalBeforeClose = 4000;
+                    });
+                }
+            }
+            else
+            {
+                response = await service.CreateGroupAndRights(group, groupRights);
+                if (response == "error")
+                {
+                    await NotificationService.Error("An error occured while creating group, check logs..", "Error", (options) =>
+                    {
+                        options.IntervalBeforeClose = 4000;
+                    });
+                }
+            }
+            if (response != "error")
+            {
+                await NotificationService.Success("Row changes completed successfully.", "Success", (options) =>
+                {
+                    options.IntervalBeforeClose = 4000;
+                });
+            }
+            await Task.Delay(300);
+            await LoadData();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at GroupManagement, SubmitHandler as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+    private void CloseEditForm()
+    {
+        showModal = false;
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+
+
+    async Task OnCustomNewCommand(NewCommandContext<GroupViewModel> context)
+    {
+        selectedTab = "Administration";
+        editContext = new(group = new());
+        rights.Select(x => { x.IsSelected = false; return x; }).ToList();
+        title = "Add new group"; isEdit = false;
+        showModal = true;
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    async Task Add()
+    {
+        selectedTab = "Administration";
+        editContext = new(group = new());
+        rights.Select(x => { x.IsSelected = false; return x; }).ToList();
+        title = "Add new group"; isEdit = false;
+        showModal = true;
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private void ShowRightsByGroup(long groupId)
+    {
+        GroupViewModel model = filterGrpList.Where(x => x.group.GroupId == groupId).FirstOrDefault();
+        if (model is not null)
+        {
+            permissions = model.groupRights;
+            userRightsmodalRef.Show();
+        }
+    }
+
+    private void ShowUserByGroup(List<string> _users)
+    {
+        users = _users;
+        userGrpModalRef.Show();
+    }
+
+    private void FilterSubmit()
+    {
+        filterGrpList = grpList;
+
+        //group name
+        if (!string.IsNullOrEmpty(filterGroupName))
+        {
+            filterGrpList = filterGrpList.Where(x => x.group.GroupName.Trim().ToLower().Contains(filterGroupName.Trim().ToLower())).ToList();
+        }
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private void ResetFilter()
+    {
+        filterGrpList = grpList;
+        filterGroupName = string.Empty;
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+}

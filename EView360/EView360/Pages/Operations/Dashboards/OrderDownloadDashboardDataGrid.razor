@@ -1,0 +1,235 @@
+﻿@page "/OrderDownloadDashboardDataGrid"
+@layout EmptyLayout
+@using EView360.Common;
+@using EView360.Services.Operations;
+@using EView360.Services.Operations.DashBoard;
+@using EView360.Services;
+@using EView360Models.RequestModel;
+@using EView360Models.ViewModels;
+@using static EView360.Common.Constants;
+@inject ILogger<OrderDownloadDashboardDataGrid> logger
+@inject OrderDownloadDashboardService service;
+@inject CommonServices common;
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject ATMTreeViewRepository treeService
+@implements IDisposable;
+
+
+<html>
+<head>
+    <!-- 'title' tag with content of 'Home' -->
+    <title>Order Download And Daily Feed Dashboard - Total No. of Records = @feeds?.Count  -  Data Generated At: @refreshCurrentTime - Next Refresh Countdown: @counter</title>
+</head>
+
+<body>
+    <div class="row content">
+        <div class="col-sm-12 text-left">
+            @if (showSpinner)
+            {
+                <div class="spinner" style="z-index:4"></div>
+            }
+            @if (showGrid)
+            {
+                <DataGrid @ref="@dataGridRef"
+                    TItem="DailyFeedStatusViewModel"
+                    Data="@_feeds"
+                    ReadData="@OnReadData"
+                    TotalItems="@feeds?.Count"
+                    Responsive
+                    Bordered
+                    Narrow="true"
+                    HeaderThemeContrast="@ThemeContrast.Light"
+                    FixedHeader
+                    SortChanged="SortData"
+                    Virtualize
+                    VirtualizeOptions="@(new() { DataGridMaxHeight = "735px", DataGridHeight="735px" })">
+
+                    <DataGridDateColumn Field="@nameof(DailyFeedStatusViewModel.CreationTime)" Caption="Creation Time" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" />
+                    <DataGridColumn Field="@nameof(DailyFeedStatusViewModel.TaskType)" Caption="Type" />
+                    <DataGridColumn Field="@nameof(DailyFeedStatusViewModel.Status)" Caption="Status" />
+                    <DataGridDateColumn Field="@nameof(DailyFeedStatusViewModel.EndTime)" Caption="End Time" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" />
+                    <DataGridColumn Field="@nameof(DailyFeedStatusViewModel.LastInvokedAt)" Caption="Last Invoked" />
+                    <DataGridColumn Field="@nameof(DailyFeedStatusViewModel.RetryCount)" Caption="Retry" />
+                    <DataGridColumn Field="@nameof(DailyFeedStatusViewModel.FailureReason)" Caption="Failure Reason" />
+                </DataGrid>
+            }
+        </div>
+    </div>
+</body>
+</html>
+
+<style>
+    .col, .col-1, .col-10, .col-11, .col-12, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-auto, .col-lg, .col-lg-1, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-auto, .col-md, .col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-auto, .col-sm, .col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-auto, .col-xl, .col-xl-1, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-auto {
+        padding-right: 0px;
+        padding-left: 0px;
+    }
+
+    *, ::after, ::before {
+        box-sizing: content-box;
+    }
+
+
+    .table-primary .showAnimation {
+        animation: spin 1200ms linear infinite;
+    }
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        width: 170px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+
+</style>
+@code {
+    [Inject] INotificationService? NotificationService { get; set; }
+    [Inject] IMessageService? MessageService { get; set; }
+
+    private bool showGrid = true, showSpinner = false;
+    private List<DailyFeedStatusViewModel> feeds = new();
+    private List<DailyFeedStatusViewModel> _feeds = new();
+    private DataGrid<DailyFeedStatusViewModel>? dataGridRef;
+    PeriodicTimer? timer;
+    private string refreshCurrentTime = string.Empty;
+    private int counter = 0;
+    private static System.Timers.Timer aTimer;
+    private int dashboardRefreshInterval = 0;
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                dashboardRefreshInterval = await common.GetDashhboardRefreshInterval();
+                counter = dashboardRefreshInterval * 60;
+                StartTimer();
+                timer = new PeriodicTimer(TimeSpan.FromMinutes(dashboardRefreshInterval));
+                if (feeds is null || feeds.Count == 0)
+                {
+                    await LoadData();
+                }
+                await RefreshDashboard();
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at Order Download Dashboard DataGrid, OnAfterRenderAsync as: {ex.Message}");
+
+            await common.RenderErrorBox(ex.Message);
+        }
+    }
+
+    private async Task LoadData()
+    {
+        showSpinner = true;
+        showGrid = false;
+        await this.InvokeAsync(() => this.StateHasChanged());
+        await common.TaskDelay();
+        logger.LogWarning($"[OrderDownloadDashboardDataGridPage:LoadData] going in GetDailyFeed ");
+        feeds = await service.GetDailyFeed();
+        logger.LogWarning($"[OrderDownloadDashboardDataGridPage:LoadData] returning from GetDailyFeed ");
+        showSpinner = false;
+        showGrid = true;
+        counter = dashboardRefreshInterval * 60;
+        refreshCurrentTime = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+        await this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private async Task OnReadData(DataGridReadDataEventArgs<DailyFeedStatusViewModel> e)
+    {
+        if (!e.CancellationToken.IsCancellationRequested)
+        {
+            List<DailyFeedStatusViewModel> response = null;
+
+            if (e.ReadDataMode is DataGridReadDataMode.Virtualize)
+                response = feeds.Skip(e.VirtualizeOffset).Take(e.VirtualizeCount).ToList();
+            else
+                throw new Exception("Unhandled ReadDataMode");
+
+            if (!e.CancellationToken.IsCancellationRequested)
+            {
+                _feeds = new List<DailyFeedStatusViewModel>(response); 
+            }
+        }
+    }
+
+    private void SortData(DataGridSortChangedEventArgs e)
+    {
+        string sortedColumn = e.FieldName;
+        var sortDirection = e.SortDirection;
+
+        if (sortDirection == SortDirection.Ascending)
+        {
+            feeds = feeds.OrderBy(item => item.GetType().GetProperty(sortedColumn).GetValue(item, null)).ToList();
+        }
+        else if (sortDirection == SortDirection.Descending)
+        {
+            feeds = feeds.OrderByDescending(item => item.GetType().GetProperty(sortedColumn).GetValue(item, null)).ToList();
+        }
+    }
+
+    private async Task RefreshDashboard()
+    {
+        while (await timer.WaitForNextTickAsync())
+        {
+            showSpinner = true;
+            showGrid = false;
+            await LoadData();
+            await this.InvokeAsync(() => this.StateHasChanged());
+        }
+    }
+
+    public void StartTimer()
+    {
+        aTimer = new System.Timers.Timer(1000);
+        aTimer.Elapsed += CountDownTimer;
+        aTimer.Enabled = true;
+    }
+
+    public void CountDownTimer(Object source, System.Timers.ElapsedEventArgs e)
+    {
+        if (counter > 0)
+        {
+            counter -= 1;
+        }
+        else
+        {
+            aTimer.Enabled = false;
+        }
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        if (timer != null)
+        {
+            timer.Dispose();
+        }
+    }
+}

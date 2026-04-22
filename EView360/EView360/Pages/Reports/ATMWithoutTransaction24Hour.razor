@@ -1,0 +1,247 @@
+﻿@page "/ATMWithoutTransaction24Hour"
+@using DataRequestor;
+@using DataRequestorMiddleware;
+@using EView360.Data;
+@using EView360.Services;
+@using EView360Models.Core;
+@using System.Text;
+@using System.Net;
+@using Microsoft.Extensions.Caching.Distributed;
+@using Microsoft.Extensions.Options;
+@using Newtonsoft.Json;
+@using System.Data;
+@using global::Common.RequestModel;
+@inject ILogger<ATMWithoutTransaction24Hour> logger
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject NoteSetTypeService noteSetTypeService
+@inject AtmService atmService
+@inject HttpClient client
+@inject IJSRuntime jsRuntime
+@inject IOptions<ApiUrl> apiUrl
+@inject ATMWithoutTransaction24HourService reportService
+@inject IDistributedCache _distributedCache
+@inject IConfiguration _configuration
+
+
+<div class="row content">
+    @if (showSpinner)
+    {
+        <div class="spinner" style="z-index:4"></div>
+    }
+    <div class="col-sm-12">
+        <div class="form-group">
+            <b><h2 style="font-family:montserrat; font-weight:bold; margin-top: 1%;">ATM Without Transaction 24 Hour</h2></b>
+        </div>
+        <div class="card" style="border-width: medium;border-color: orange; margin-top:3%;">
+            <div class="card-body">
+                <form style="margin-top: 20px;">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <h5>Filters: </h5>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-1">
+                            <label>For: </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <DatePicker TValue="DateTime" @ref="@dateRef" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" TimeAs24hr="true" Placeholder="Selete Date" @bind-Date="@fromDate"></DatePicker>
+                        </div>
+                        <div class="form-group col-md-4 text-right">
+                            <label>Group :</label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <select @bind="filterNoteSetTypeBy" class="form-control">
+                                <option value="*">Any</option>
+                                @if (noteSetType != null)
+                                {
+                                    @foreach (var noteSetType in noteSetType?.ToList().Distinct())
+                                    {
+                                        <option value="@noteSetType.NoteSetTypeId">@noteSetType.NoteSetTypeName</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <input class="btn btn-success" type="button" onclick="@FilterSubmit" value="Generate Report">
+                    <input class="btn btn-success" type="button" onclick="@ResetFilter" value="Reset">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<style>
+
+    form {
+        max-width: 100%;
+    }
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+
+</style>
+
+@code {
+    private bool showSpinner = false;
+    private bool showGrid = false;
+    DateTime fromDate = DateTime.Now.Date;
+    DatePicker<DateTime>? dateRef;
+    private string? filterNoteSetTypeBy = "*";
+    private List<NoteSetType>? noteSetType;
+    [Inject] INotificationService NotificationService { get; set; }
+    [Inject] IMessageService MessageService { get; set; }
+    private AppUser appUser = null;
+    private DotNetObjectReference<ATMWithoutTransaction24Hour>? objRef;
+
+    protected override async Task OnInitializedAsync()
+    {
+        objRef = DotNetObjectReference.Create(this);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                await jsRuntime.InvokeVoidAsync("handleDatePicker", objRef);
+                appUser = await localStorage.GetItemAsync<AppUser>("AppUser");
+                if (appUser is not null)
+                {
+                    noteSetTypeService.UserId = appUser.UserId;
+                }
+                noteSetType = await noteSetTypeService.GetNoteSetTypeListAsync();
+                this.InvokeAsync(() => this.StateHasChanged());
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at Dead Atm Report, OnAfterRenderAsync as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    private async void FilterSubmit()
+    {
+        try
+        {
+            var selectAtmResponse = await atmService.GetMultipleSelectedAtms();
+            if (!selectAtmResponse.IsSuccess)
+            {
+                await NotificationService.Error($"{selectAtmResponse.Message}", "Error", (options) =>
+                {
+                    options.IntervalBeforeClose = 4000;
+                });
+            }
+            else
+            {
+                showSpinner = true;
+                this.InvokeAsync(() => this.StateHasChanged());
+
+                await Task.Delay(5);
+
+                var atms = ((List<string>)selectAtmResponse.Data);
+                string selectedAtms = string.Join(",", atms);
+
+                DeadAtmRptRequestModel requestModel = new()
+                    {
+                        FromDate = fromDate,
+                        SelectedAtms = atms,
+                        ToDate = fromDate,
+                        SelectedNoteSetType = filterNoteSetTypeBy == "*" ? string.Empty : filterNoteSetTypeBy
+                    };
+
+                logger.LogWarning($"AtmWithout24: going in GetATMWithoutTransaction24Hour  : {DateTime.Now.ToString()}");
+                DataTableResult dataResult = reportService.GetATMWithoutTransaction24Hour(requestModel);
+                logger.LogWarning($"AtmWithout24: return from GetATMWithoutTransaction24Hour  : {DateTime.Now.ToString()}");
+
+
+
+                showSpinner = false;
+                this.InvokeAsync(() => this.StateHasChanged());
+
+                if (!string.IsNullOrEmpty(dataResult.ExceptionMessage))
+                {
+                    await NotificationService.Error($"{dataResult.ExceptionMessage}", "Error", (options) =>
+                    {
+                        options.IntervalBeforeClose = 4000;
+                    });
+                }
+                if (dataResult?.Table?.Rows?.Count > 0)
+                {
+                    dataResult.Table.Columns.Add("organization");
+
+
+                    logger.LogWarning($"AtmWithout24HrRpt: DataTable's row Count =  : {dataResult.Table.Rows.Count}");
+
+                    logger.LogWarning($"AtmWithout24HrRpt: going to SerializeObject");
+                    string value = JsonConvert.SerializeObject(dataResult.Table);
+                    logger.LogWarning($"AtmWithout24HrRpt: return from SerializeObject");
+
+                    logger.LogWarning($"AtmWithout24HrRpt: going to Encoding the string");
+                    byte[] bytes = Encoding.ASCII.GetBytes(value);
+                    logger.LogWarning($"AtmWithout24HrRpt: return from Encoding the string");
+
+                    string redisKey = $"AtmWithout24HrTransRpt{appUser.UserId}";
+
+                    logger.LogWarning($"AtmWithout24HrRpt: going to cache the data");
+                    _distributedCache.Set(redisKey, bytes, new DistributedCacheEntryOptions()
+                        {
+                            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_configuration.GetValue<int>("RedisKeyExpirationTimeInMinutes"))
+                        });
+                    logger.LogWarning($"AtmWithout24HrRpt: return from cache the data");
+
+                    var reports = new ReportsRequestModel()
+                        {
+                            redisKey = redisKey
+                        };
+                    string url = $"{apiUrl.Value.ReportingProjectUrl}ReportPopup.aspx?Report=ATMWithoutWithdrawal.rpt&ReportTitle=No%20Withdrawal&FromDate={fromDate.Date.ToString("MM/dd/yyyy")}&ToDate={fromDate.Date.ToString("MM/dd/yyyy")}&GeneratedBy={appUser.UserLogin}&userId={appUser.UserId}";
+
+                    logger.LogWarning($"AtmWithout24: going in openWindowWithPost  : {DateTime.Now.ToString()}");
+                    await jsRuntime.InvokeVoidAsync("openWindowWithPost", url, reports);
+                }
+                else
+                {
+                    await NotificationService.Info("No record found, check filters..", "Information", (options) =>
+                    {
+                        options.IntervalBeforeClose = 4000;
+                    });
+                }
+            }
+        }
+        catch(Exception ex)
+        {
+            await NotificationService.Error("Exception came at Submit as: " + ex.Message, "Error", (options) =>
+                    {
+                        options.IntervalBeforeClose = 4000;
+                    });
+            logger.LogError("Exception came at ATMWithoutTransaction24HourRpt Submit as: " + ex.Message);
+        }        
+    }
+
+    private async void ResetFilter()
+    {
+        filterNoteSetTypeBy = "*";
+        fromDate = DateTime.Now.Date;
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+}
+

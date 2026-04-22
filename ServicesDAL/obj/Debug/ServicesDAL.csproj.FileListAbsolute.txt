@@ -1,0 +1,24 @@
+C:\Jabbar\GitProject\ServicesDAL\bin\Debug\ServicesDAL.dll
+C:\Jabbar\GitProject\ServicesDAL\bin\Debug\ServicesDAL.pdb
+C:\Jabbar\GitProject\ServicesDAL\obj\Debug\ServicesDAL.csproj.AssemblyReference.cache
+C:\Jabbar\GitProject\ServicesDAL\obj\Debug\ServicesDAL.csproj.CoreCompileInputs.cache
+C:\Jabbar\GitProject\ServicesDAL\obj\Debug\ServicesDAL.dll
+C:\Jabbar\GitProject\ServicesDAL\obj\Debug\ServicesDAL.pdb
+C:\Jabbar\Git Repository\ServicesDAL\bin\Debug\ServicesDAL.dll
+C:\Jabbar\Git Repository\ServicesDAL\bin\Debug\ServicesDAL.pdb
+C:\Jabbar\Git Repository\ServicesDAL\obj\Debug\ServicesDAL.csproj.AssemblyReference.cache
+C:\Jabbar\Git Repository\ServicesDAL\obj\Debug\ServicesDAL.csproj.CoreCompileInputs.cache
+C:\Jabbar\Git Repository\ServicesDAL\obj\Debug\ServicesDAL.dll
+C:\Jabbar\Git Repository\ServicesDAL\obj\Debug\ServicesDAL.pdb
+D:\View360\Repository - View360 Depart\ServicesDAL\bin\Debug\ServicesDAL.dll
+D:\View360\Repository - View360 Depart\ServicesDAL\bin\Debug\ServicesDAL.pdb
+D:\View360\Repository - View360 Depart\ServicesDAL\obj\Debug\ServicesDAL.csproj.CoreCompileInputs.cache
+D:\View360\Repository - View360 Depart\ServicesDAL\obj\Debug\ServicesDAL.dll
+D:\View360\Repository - View360 Depart\ServicesDAL\obj\Debug\ServicesDAL.pdb
+D:\View360\Repository - View360 Depart\ServicesDAL\obj\Debug\ServicesDAL.csproj.AssemblyReference.cache
+D:\View360\View360-UI\ServicesDAL\bin\Debug\ServicesDAL.dll
+D:\View360\View360-UI\ServicesDAL\bin\Debug\ServicesDAL.pdb
+D:\View360\View360-UI\ServicesDAL\obj\Debug\ServicesDAL.csproj.AssemblyReference.cache
+D:\View360\View360-UI\ServicesDAL\obj\Debug\ServicesDAL.csproj.CoreCompileInputs.cache
+D:\View360\View360-UI\ServicesDAL\obj\Debug\ServicesDAL.dll
+D:\View360\View360-UI\ServicesDAL\obj\Debug\ServicesDAL.pdb

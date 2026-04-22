@@ -1,0 +1,311 @@
+﻿@page "/WithdrawalTransaction"
+@page "/WithdrawalTransaction/{mode}"
+
+@using EView360.Common;
+@using EView360Models.Core;
+@using EView360.Services.Operations;
+@using EView360.Services;
+@using EView360Models.RequestModel;
+@using EView360Models.ViewModels;
+@using static EView360.Data.Enumerations;
+@inject AtmWithdrawalTransactionService service
+@inject AtmTaskService taskService
+@inject ATMTreeViewRepository treeService
+@inject NoteSetTypeService noteSetTypeService
+@inject ILogger<WithdrawalTransaction> logger
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject ATMTreeViewRepository atmRepository 
+ @inject NotifyService notifyService
+@inject YearService yearService
+@inject CommonServices common
+@implements IDisposable
+@inject IJSRuntime jsRuntime
+
+<div class="row content">
+    @if (showSpinner)
+    {
+        <div class="spinner" style="z-index:4"></div>
+    }
+    <div class="col-sm-2 filter_bar border-right-2">
+        <form style="margin-top: 20px;">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <h5>Filters: </h5>
+                </div>
+            </div>
+            @if (@mode is not null && mode.Equals("Archive"))
+            {
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label>Archive Year: </label>
+                        <Select TValue="int" SelectedValue="@ArchiveYear" class="form-control" SelectedValueChanged="@DateChanged">
+                            @foreach (int year in archiveYears)
+                            {
+                                <SelectItem Value=year>@year</SelectItem>
+                            }
+                        </Select>
+                    </div>
+                </div>
+            }
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <div class="input-sm">
+                        <RadioGroup TValue="int" Name="Transactions" @bind-CheckedValue="@indexId">
+                            <Radio Value="0">All Transaction</Radio>
+                            <Radio Value="1">Last Replenishment Till Now</Radio>
+                            <Radio Value="2">Transaction Between Replenishments</Radio>
+                        </RadioGroup>
+                    </div>
+                </div>
+            </div>
+
+            @if (showTransactionsBetweenReplenishmentsRow)
+            {
+                @*<div class="form-row">
+            <div class="form-group col-md-12">
+            <label>Selected ATM : </label>
+            <InputText readonly @bind-Value="Atm" class="form-control-plaintext font-weight-bold" />
+            </div>
+            </div>*@
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label>No of Cycles : </label>
+                        <InputNumber @bind-Value="numberOfCycle" class="form-control" />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label>Sort Order : </label>
+                        <RadioGroup TValue="int" Name="order" @bind-CheckedValue="@orderId">
+                            <Radio Value="0">Oldest</Radio>
+                            <Radio Value="1">Latest</Radio>
+                        </RadioGroup>
+                    </div>
+                </div>
+            }
+            @if (showFromDateAndToDateRow)
+            {
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label>From Date: </label>
+                        @if (@mode is not null && mode.Equals("Archive"))
+                        {
+                            <DatePicker TValue="DateTime" @ref="@dateRef" DisplayFormat="dd/MM H:m" InputMode="DateInputMode.DateTime" Placeholder="Selete Date" @bind-Date="@fromDate" TimeAs24hr="true"></DatePicker>
+
+                        }
+                        else
+                        {
+                            <DatePicker TValue="DateTime" @ref="@dateRef" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" Placeholder="Selete Date" @bind-Date="@fromDate" TimeAs24hr="true"></DatePicker>
+                        }
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label>To Date: </label>
+                        @if (@mode is not null && mode.Equals("Archive"))
+                        {
+                            <DatePicker TValue="DateTime" @ref="@dateRef" DisplayFormat="dd/MM H:m" InputMode="DateInputMode.DateTime" Placeholder="Selete Date" @bind-Date="@toDate" TimeAs24hr="true"></DatePicker>
+
+                        }
+                        else
+                        {
+                            <DatePicker TValue="DateTime" @ref="@dateRef" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" Placeholder="Selete Date" @bind-Date="@toDate" TimeAs24hr="true"></DatePicker>
+                        }
+                    </div>
+                </div>
+            }
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label>Purged Note From: </label>
+                    <InputNumber @bind-Value="purgedFrom" class="form-control" />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label>Purged Note To: </label>
+                    <InputNumber @bind-Value="purgedTo" class="form-control" />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label>Amount From: </label>
+                    <InputNumber @bind-Value="amountFrom" class="form-control" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label>Amount To: </label>
+                    <InputNumber @bind-Value="amountTo" class="form-control" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label>Dispensed[Type 1]: </label>
+                    <InputNumber @bind-Value="dispensed1" class="form-control" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label>Dispensed[Type 2]: </label>
+                    <InputNumber @bind-Value="dispensed2" class="form-control" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label>Dispensed[Type 3]: </label>
+                    <InputNumber @bind-Value="dispensed3" class="form-control" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label>Dispensed[Type 4]: </label>
+                    <InputNumber @bind-Value="dispensed4" class="form-control" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label class="float-left">Group :</label>
+                    <select @bind="filterNoteSetTypeBy" class="form-control">
+                        <option value="*">Any</option>
+                        @if (noteSetType != null)
+                        {
+                            @foreach (var noteSetType in noteSetType?.ToList().Distinct())
+                            {
+                                <option value="@noteSetType.NoteSetTypeId">@noteSetType.NoteSetTypeName</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+            <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@FilterSubmit" value="Search">
+            <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@ResetFilter" value="Reset">
+        </form>
+    </div>
+
+
+    <div class="col-sm-10 text-left" style="margin-top:1%">
+        <div class="form-group">
+            @if (@mode is not null && mode.Equals("Archive"))
+            {
+                <b><h2 style="font-family:montserrat; font-weight:bold">Withdrawal Transaction (History) - Archive</h2></b>
+            }
+            else
+            {
+                <b><h2 style="font-family:montserrat; font-weight:bold">Withdrawal Transaction (History)</h2></b>
+            }
+        </div>
+
+
+
+        @if (showGrid)
+        {
+            <DataGrid @ref="@dataGridRef"
+                  TItem="WithdrawalTransactionViewModel"
+                  Data="@filteredWithdrawalTransaction"
+                            Editable
+                  Responsive="true"
+                  ShowPager="false"
+                            Bordered
+                  PageSize="50"
+                            FixedHeader
+                  FixedHeaderDataGridHeight="500px"
+                  FixedHeaderDataGridMaxHeight="500px"
+                       SortChanged="SortData"
+                  Narrow="true"
+                            Sortable  SortMode="DataGridSortMode.Single"
+                  HeaderThemeContrast="@ThemeContrast.Light">
+
+
+            <DataGridColumn Field="@nameof(WithdrawalTransactionViewModel.Tittle)" Caption="Title" />
+            <DataGridColumn Field="@nameof(WithdrawalTransactionViewModel.Location)" Caption="Location" />
+            <DataGridColumn Field="@nameof(WithdrawalTransactionViewModel.IP)" Caption="IP" />
+            <DataGridColumn Field="@nameof(WithdrawalTransactionViewModel.Group)" Caption="Group" />
+            <DataGridColumn Field="@nameof(WithdrawalTransactionViewModel.DateTime)" Caption="DateTime" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" />
+            <DataGridColumn Field="@nameof(WithdrawalTransactionViewModel.ProcessingDateTime)" Caption="Processing DateTime" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" />
+            <DataGridColumn Field="@nameof(WithdrawalTransactionViewModel.Amount)" Caption="Amount" />
+            <DataGridColumn Field="@nameof(WithdrawalTransactionViewModel.Dispensed1)" Caption="Dispensed 1" />
+            <DataGridColumn Field="@nameof(WithdrawalTransactionViewModel.Dispensed2)" Caption="Dispensed 2" />
+            <DataGridColumn Field="@nameof(WithdrawalTransactionViewModel.Dispensed3)" Caption="Dispensed 3" />
+            <DataGridColumn Field="@nameof(WithdrawalTransactionViewModel.Dispensed4)" Caption="Dispensed 4" />
+            <DataGridColumn Field="@nameof(WithdrawalTransactionViewModel.Purged1)" Caption="Purged 1" />
+            <DataGridColumn Field="@nameof(WithdrawalTransactionViewModel.Purged2)" Caption="Purged 2" />
+            <DataGridColumn Field="@nameof(WithdrawalTransactionViewModel.Purged3)" Caption="Purged 3" />
+            <DataGridColumn Field="@nameof(WithdrawalTransactionViewModel.Purged4)" Caption="Purged 4" />
+            <DataGridColumn Field="@nameof(WithdrawalTransactionViewModel.PurgedNotes)" Caption="Purged Noted" />
+            <DataGridColumn Field="@nameof(WithdrawalTransactionViewModel.Remaining1)" Caption="Remaining 1" />
+            <DataGridColumn Field="@nameof(WithdrawalTransactionViewModel.Remaining2)" Caption="Remaining 2" />
+            <DataGridColumn Field="@nameof(WithdrawalTransactionViewModel.Remaining3)" Caption="Remaining 3" />
+            <DataGridColumn Field="@nameof(WithdrawalTransactionViewModel.Remaining4)" Caption="Remaining 4" />
+            <DataGridColumn Field="@nameof(WithdrawalTransactionViewModel.IsBillDispenser)" Caption="Is Bill Dispenser" />
+            </DataGrid>
+
+            <EView360.Pages.Pagination pageNo="pageNo" maxPageNo="maxPageNo" totalRecords="totalRecords" OnSubmitCallback="GetDataByPageNo" />
+        }
+
+    </div>
+</div>
+
+
+<style>
+
+    form {
+        max-width: 100%;
+    }
+
+    .table-primary .showAnimation {
+        animation: spin 1200ms linear infinite;
+    }
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        width: 170px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    .modal-body {
+        height: 70vh;
+        overflow-y: auto;
+    }
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+</style>
+
+@if (@mode is not null)
+{
+    <style>
+        .flatpickr-prev-month, .flatpickr-month .numInputWrapper, .flatpickr-next-month {
+            visibility: hidden;
+        }
+
+        .flatpickr-month {
+            font-size: large;
+        }
+    </style>
+}
+
+

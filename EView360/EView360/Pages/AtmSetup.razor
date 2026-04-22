@@ -1,0 +1,551 @@
+﻿@page "/AtmSetup"
+@using EView360.Services;
+@using EView360.Services.Operations;
+@using EView360Models.Core;
+@using static EView360.Data.Enumerations;
+@using static EView360.Common.Constants;
+@inject AtmSetupService service
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject IJSRuntime jsRuntime
+@inject ILogger<AtmSetup> logger
+@inject ATMTreeViewRepository atmRepository 
+ @inject NotifyService notifyService
+@inject AtmTaskService atmTaskService
+@implements IDisposable
+
+
+<div class="row content">
+    @if (showFilter)
+    {
+        <div class="col-sm-2 filter_bar border-right-2">
+            <form style="margin-top: 20px;">
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <h5>Filters: </h5>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="AtmTitle" class="float-left">ATM Title :</label>
+                        <input type="email" class="form-control" id="AtmTitle" placeholder="ATM Title" @bind="filterTitle">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="AtmIP" class="float-left">IP :</label>
+                        <input type="email" class="form-control" id="AtmIP" placeholder="ATM IP Address" @bind="@filterIp">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="float-left">Created By:</label>
+                        <select @bind="filterCreatedBy" class="form-control">
+                            <option value="*">Any</option>
+                            @foreach (var user in atms.Select(x => new { x.UserFullName, x.CreatedBy }).ToList().DistinctBy(x => x.UserFullName))
+                            {
+                                <option value="@user.CreatedBy">@user.UserFullName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="float-left" for="Status">Status:</label>
+                        <select @bind="filterStatus" class="form-control">
+                            <option value="*">Any</option>
+                            <option value="True">Active</option>
+                            <option value="False">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="float-left" for="ATM Type:">ATM Type:</label>
+                        <select @bind="filterType" class="form-control">
+                            <option value="*">Any</option>
+                            @foreach (string type in atms.Select(x => x.AtmType).ToList().Distinct())
+                            {
+                                <option value="@type">@type</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@LoadData" value="Search">
+                <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@ResetFilter" value="Reset">
+                @if (CheckPermission((int)Permissions.CreateATMs))
+                {
+                    <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@AddNewAtm" value="Add" style="margin-left: 3px;">
+                }
+            </form>
+
+        </div>
+    }
+
+    @if (showSpinner)
+    {
+        <div class="spinner" style="z-index:4"></div>
+    }
+
+    @if (showGrid)
+    {
+        <div class="col-sm-10 text-left" style="margin-top:1%">
+            <div class="form-group">
+                <b><h2 style="font-family:montserrat; font-weight:bold">ATM Management</h2></b>
+            </div>
+            <DataGrid @ref="@dataGridRef"
+                  TItem="EView360Models.Core.Atm"
+                  Data="@filteredAtms"
+                  @bind-SelectedRow="@selectedAtm"
+                  Editable
+                  EditMode="DataGridEditMode.Popup"
+                  Responsive="true"
+                  ShowPager
+                  RowRemoving="@OnRowRemoving"
+                  RowRemoved="@OnRowRemoved"
+                  UseValidation
+                  ShowValidationsSummary="false"
+                  ShowValidationFeedback
+                  PopupSize="ModalSize.Large"
+                  Bordered
+                  PageSize="50"
+                  FixedHeader
+                  FixedHeaderDataGridHeight="570px"
+                  FixedHeaderDataGridMaxHeight="570px"
+                  Narrow="true"
+                  Sortable  SortMode="DataGridSortMode.Single"
+                  Resizable
+                  HeaderThemeContrast="@ThemeContrast.Light">
+
+
+
+                <DataGridColumn PopupFieldColumnSize="ColumnSize.Is12" Field="@nameof(EView360Models.Core.Atm.Title)" Validator="@CheckName" Caption="Title" Sortable="true" Editable CellClass="@((item)=> "otherFields")">
+                    <FilterTemplate>
+                        <TextEdit Placeholder="Search Title" Text="@context.SearchValue?.ToString()" TextChanged="@(v=> context.TriggerFilterChange(v))" />
+                    </FilterTemplate>
+                </DataGridColumn>
+
+                @*<DataGridNumericColumn Field="@nameof(EView360Models.Core.Atm.RegionId)" Caption="Region id" />*@
+                <DataGridColumn Field="@nameof(EView360Models.Core.Atm.AtmType)" Caption="Atm Type" />
+                <DataGridColumn Field="@nameof(EView360Models.Core.Atm.Location)" Caption="Location" />
+                <DataGridColumn Field="@nameof(EView360Models.Core.Atm.Ip)" Caption="IP" />
+                <DataGridColumn Field="@nameof(EView360Models.Core.Atm.Port)" Caption="Port" />
+                <DataGridColumn Field="@nameof(EView360Models.Core.Atm.NoteSetTypeName)" Caption="NoteSetType" />
+                <DataGridColumn Field="@nameof(EView360Models.Core.Atm.CreationTime)" Caption="Creation Time" />
+                <DataGridCheckColumn Field="@nameof(EView360Models.Core.Atm.IsAtm)" Caption="ATM" />
+                <DataGridCheckColumn Field="@nameof(EView360Models.Core.Atm.IsCdm)" Caption="BNA" />
+                <DataGridCheckColumn Field="@nameof(EView360Models.Core.Atm.IsRecycler)" Caption="Recycler" />
+                @*<DataGridColumn Field="@nameof(EView360Models.Core.Atm.Latitude)" Caption="Latitude" />*@
+                @*<DataGridColumn Field="@nameof(EView360Models.Core.Atm.Longitude)" Caption="Longitude"/>*@
+                <DataGridCheckColumn Field="@nameof(EView360Models.Core.Atm.IsActive)" Caption="Active" />
+
+
+                <DataGridCommandColumn CellClass="@((item)=> "all_headers")" ClearFilterCommandAllowed="false">
+                    <NewCommandTemplate />
+                    <EditCommandTemplate>
+                        @if (CheckPermission((int)Permissions.ModifyATM))
+                        {
+                            <Button Clicked="@(()=>OnCustomEditCommand(context))" title="Edit"><Icon Name="IconName.Edit" TextColor="TextColor.Success" IconSize=IconSize.Small /></Button>
+                        }
+                    </EditCommandTemplate>
+                    <DeleteCommandTemplate>
+                        @if (CheckPermission((int)Permissions.DeleteATM))
+                        {
+                            <Button Clicked="@context.Clicked" title="Delete"><Icon Name="IconName.Delete" TextColor="TextColor.Danger" IconSize=IconSize.Small /></Button>
+                        }
+                    </DeleteCommandTemplate>
+                    <CancelCommandTemplate>
+                        <Button Color="Color.Secondary" Clicked="@context.Clicked">Cancel</Button>
+                    </CancelCommandTemplate>
+                    <SaveCommandTemplate>
+                        <Button Color="Color.Success" Clicked="@context.Clicked">Save</Button>
+                    </SaveCommandTemplate>
+                </DataGridCommandColumn>
+
+            </DataGrid>
+        </div>
+
+    }
+    @if (showModal)
+    {
+        <div class="col-sm-12 text-left">
+            <AtmSetupForm OnSubmitCallback="LoadData" OnCancelCallback="HideModal" thisAtm="thisAtm" isEdit="isEdit" atms="atms" selectedTreeRegion="selectedTreeRegion" noteSetTypes="noteSetTypes" assignedUsers="appUsers" userId="appUser.UserId" vendors=vendorList />
+        </div>
+    }
+</div>
+
+
+<style>
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        margin-top: 20px;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    .modal-body {
+        max-height: 75vh;
+        overflow-y: auto;
+    }
+
+    .form-group {
+        width: 100%;
+    }
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+</style>
+
+@code {
+    private bool showSpinner = true;
+    private bool showGrid = false;
+    private bool showFilter = false;
+    private bool IsDisabled = false;
+    private List<EView360Models.Core.Atm> atms = new();
+    private List<EView360Models.Core.Atm> filteredAtms = new();
+    private EView360Models.Core.Atm? selectedAtm;
+    private bool showEditFields = false;
+    private DataGrid<EView360Models.Core.Atm>? dataGridRef;
+    int editAtmId = 0;
+    private bool showModal = false;
+    private EView360Models.Core.Atm thisAtm { get; set; }
+    private bool isEdit = false;
+
+    private string filterCreatedBy = "*";
+    private string filterStatus = "*";
+    private string filterType = "*";
+    private string filterTitle = string.Empty;
+    private string filterIp = string.Empty;
+    private EView360Models.Core.AppUser appUser;
+    private DotNetObjectReference<AtmSetup>? objRef;
+    private long? selectedTreeRegion;
+    private List<long>? selectedTreeAtm;
+    private List<long>? selectedTreeRegionHierarchy;
+    private List<EView360Models.Core.NoteSetType> noteSetTypes;
+    private List<EView360Models.Core.AppUser> appUsers;
+    List<TerminalType> vendorList;
+    Dictionary<int, string> userRights;
+
+    [Inject] INotificationService NotificationService { get; set; }
+    [Inject] IMessageService MessageService { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            showSpinner = true;
+            showGrid = false;
+            notifyService.OnAtmChange += AtmSelected;
+            notifyService.OnRegionChange += RegionSelected;
+            notifyService.OnNodeChange += ReloadOnNodeChange;
+            selectedTreeRegion = await atmRepository.GetSelectedRegionId();
+            objRef = DotNetObjectReference.Create(this);
+            appUser = await localStorage.GetItemAsync<EView360Models.Core.AppUser>("AppUser");
+            userRights = await localStorage.GetItemAsync<Dictionary<int, string>>("userRights");
+            service.userId = appUser.UserId;
+            noteSetTypes = await service.GetNoteSetTypeListAsync();
+            vendorList = await service.GetAtmTerminalType();
+            if ((atms is null || atms.Count == 0))
+            {
+                await LoadData();
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at AtmSetup, OnAfterRenderAsync as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    private bool CheckPermission(int right)
+    {
+        try
+        {
+            if (userRights is not null)
+                return userRights.ContainsKey(right);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at AtmSetup, CheckPermission as: {ex.Message}");
+
+            NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+        return false;
+    }
+
+    private async void HideModal()
+    {
+        showModal = false;
+        showFilter = true;
+        showGrid = true;
+        isEdit = false;
+        await this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private async void FilterSubmit()
+    {
+        showSpinner = IsDisabled = showFilter = true;
+        showGrid = false;
+
+        filteredAtms = atms;
+
+        //Atm Title
+        if (!string.IsNullOrEmpty(filterTitle))
+        {
+            filteredAtms = atms = filteredAtms.Where(x => x.Title.Trim().ToLower().Contains(filterTitle.Trim().ToLower())).ToList();
+        }
+        //Atm IP
+        if (!string.IsNullOrEmpty(filterIp))
+        {
+            filteredAtms = atms = filteredAtms.Where(x => x.Ip.Trim().ToLower().Contains(filterIp.Trim().ToLower())).ToList();
+        }
+        //created By dropDown
+        if (filterCreatedBy != "*")
+        {
+            filteredAtms = atms = filteredAtms.Where(x => x.CreatedBy.ToString() == filterCreatedBy).ToList();
+        }
+        //Status dropDown
+        if (filterStatus != "*")
+        {
+            filteredAtms = atms = filteredAtms.Where(x => x.IsActive.ToString().Contains(filterStatus)).ToList();
+        }
+        //Type dropDown
+        if (filterType != "*")
+        {
+            filteredAtms = atms = filteredAtms.Where(x => x.AtmType.Contains(filterType)).ToList();
+        }
+
+        //filter on already selected Atms on tree
+        selectedTreeAtm = await atmRepository.GetSelectedAtmId();
+        selectedTreeRegionHierarchy = await atmRepository.GetSelectedRegionIdWithAllChildRegions();
+        if (selectedTreeAtm != null)
+        {
+            //Single atm already selected on tree
+            if (selectedTreeAtm.Count == 1)
+                filteredAtms = filteredAtms.Where(x => selectedTreeAtm.Contains(x.AtmId)).ToList();
+
+            //Region already selected on tree
+            else if (selectedTreeRegionHierarchy != null && selectedTreeRegionHierarchy.Count != 0)
+                filteredAtms = filteredAtms.Where(x => selectedTreeRegionHierarchy.Contains((long)x.RegionId)).ToList();
+        }
+
+        showGrid = showFilter = true;
+        showSpinner = IsDisabled = false;
+        await this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private void ResetFilter()
+    {
+        filterTitle = string.Empty;
+        filterIp = string.Empty;
+        filterCreatedBy = "*";
+        filterStatus = "*";
+        filterType = "*";
+
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private async Task LoadData()
+    {
+        showSpinner = IsDisabled = showFilter = true;
+        showModal = showGrid = false;
+
+        logger.LogWarning($"[AtmSetupPage:LoadData] going in GetAtmsListAsync ");
+        atms = filteredAtms = await service.GetAtmsListAsync();
+        logger.LogWarning($"[AtmSetupPage:LoadData] returning from GetAtmsListAsync ");
+
+        FilterSubmit(); //to filter for selected Atms if selections already on tree before loading Atms
+
+        if (atms is null || atms.Count == 0)
+        {
+            await NotificationService.Info("No records found", "Information", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    async Task OnCustomEditCommand(EditCommandContext<EView360Models.Core.Atm> context)
+    {
+        isEdit = true;
+        thisAtm = context.Item;
+        selectedTreeRegion = thisAtm.RegionId;
+        appUsers = await service.GetAppUsersListAsync(thisAtm.AtmId);
+        showModal = true;
+        showGrid = false;
+        showFilter = false;
+        showSpinner = false;
+        await jsRuntime.InvokeVoidAsync("DeselectAll", objRef);
+        List<long?> parentRegionIds = new();
+
+        GetOrganization(thisAtm.RegionId, parentRegionIds);
+        parentRegionIds.Reverse();
+        if(thisAtm.IsActive)
+            await jsRuntime.InvokeVoidAsync("AtmTreeSearchHandler", objRef, "", thisAtm.AtmId, thisAtm.RegionId, parentRegionIds);
+    }
+
+    public long GetOrganization(long? region_id, List<long?> parentRegionIds)
+    {
+        parentRegionIds.Add(region_id);
+        Region region = atmRepository.RegionList.FirstOrDefault(x => x.RegionId == region_id)!;
+
+        if (region.ParentRegionId is null)
+        {
+            return region.RegionId;
+        }
+        else
+        {
+            return GetOrganization(region.ParentRegionId.Value, parentRegionIds);
+        }
+    }
+
+    async Task AddNewAtm()
+    {
+        thisAtm = new EView360Models.Core.Atm();
+        thisAtm.NoteSetTypeId = -1;
+        thisAtm.IsActive = true;
+        thisAtm.IsAtm = true;
+        thisAtm.IsCcdm = thisAtm.IsCdm = thisAtm.IsRecycler = isEdit = false;
+        appUsers = await service.GetAppUsersListAsync(thisAtm.AtmId);
+        showModal = true;
+        showGrid = showFilter = showSpinner = false;
+        await this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    public void CheckName(ValidatorEventArgs validationArgs)
+    {
+        ValidationRule.IsNotEmpty(validationArgs);
+
+        if (validationArgs.Status == ValidationStatus.Error)
+        {
+            validationArgs.ErrorText = "This field is required";
+        }
+        else if (editAtmId != 0)
+        {
+            if (atms.Any(x => x.Title.Trim().ToLower() == validationArgs.Value?.ToString()?.Trim().ToLower() && x.AtmId != editAtmId))
+            {
+                validationArgs.ErrorText = "Atm name already exists. Please provide unique name";
+                validationArgs.Status = ValidationStatus.Error;
+            }
+        }
+        else if (editAtmId == 0)
+        {
+            if (atms.Any(x => x.Title.Trim().ToLower() == validationArgs.Value?.ToString()?.Trim().ToLower()))
+            {
+                validationArgs.ErrorText = "Atm name already exists. Please provide unique name";
+                validationArgs.Status = ValidationStatus.Error;
+            }
+        }
+    }
+
+    async Task OnRowRemoving(CancellableRowChange<EView360Models.Core.Atm> cancellableRow)
+    {
+        if (!await MessageService.Confirm("Are you sure you want to delete ATM?", "Confirmation", (options) => { options.ConfirmButtonColor = Color.Success; }))
+        {
+            cancellableRow.Cancel = true;
+        }
+    }
+
+    async Task OnRowRemoved(EView360Models.Core.Atm atm)
+    {
+        string response = await service.DeleteAtm(atm.AtmId, atm.Title);
+        if (response == "success")
+        {
+            await jsRuntime.InvokeVoidAsync("DeleteNode", objRef, 'a' + atm.AtmId.ToString());
+            //remove from atm list and auto complete list
+            atmRepository.SelectedAtmIds.Remove(atm.AtmId);
+            atmRepository.AtmList.RemoveAll(x => x.AtmId == atm.AtmId);
+            await notifyService.NotifySearchListChanged();
+        }
+
+        if (response != "success")
+        {
+            await NotificationService.Error(response, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+        await LoadData();
+    }
+
+    private async void AtmSelected()
+    {
+        await InvokeAsync(async () =>
+        {
+            selectedTreeAtm = await atmRepository.GetSelectedAtmId();
+            selectedTreeRegion = (await atmRepository.GetSelectedAtmParentId())?.FirstOrDefault();
+            filteredAtms = atms;
+            filteredAtms = filteredAtms.Where(x => selectedTreeAtm.Contains(x.AtmId)).ToList();
+            await this.InvokeAsync(() => this.StateHasChanged());
+        });
+    }
+
+    private async void RegionSelected()
+    {
+        await InvokeAsync(async () =>
+        {
+            selectedTreeAtm = await atmRepository.GetSelectedAtmId();
+            selectedTreeRegion = await atmRepository.GetSelectedRegionId();
+            selectedTreeRegionHierarchy = await atmRepository.GetSelectedRegionIdWithAllChildRegions();
+            filteredAtms = atms;
+            filteredAtms = filteredAtms.Where(x => selectedTreeRegionHierarchy.Contains((long)x.RegionId)).ToList();
+            await this.InvokeAsync(() => this.StateHasChanged());
+        });
+    }
+
+    //event to occour when tree node renamed, deleted, moved or region added
+    private async void ReloadOnNodeChange()
+    {
+        atms = filteredAtms = await service.GetAtmsListAsync();
+        string? modifiedNodeType = await atmRepository.GetSelectedType();
+        if (modifiedNodeType != null)
+        {
+            if (modifiedNodeType.Equals(SessionStorageKeys.TypeRegion))
+                RegionSelected();
+            else
+                AtmSelected();
+        }
+        else
+        {
+            await LoadData();
+        }
+    }
+
+    public void Dispose()
+    {
+        objRef?.Dispose();
+        notifyService.OnAtmChange -= AtmSelected;
+        notifyService.OnRegionChange -= RegionSelected;
+        notifyService.OnNodeChange -= ReloadOnNodeChange;
+    }
+}

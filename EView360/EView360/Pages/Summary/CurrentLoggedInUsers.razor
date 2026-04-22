@@ -1,0 +1,88 @@
+﻿@using EView360.Services.Summary;
+@using global::Common.ViewModel;
+@inject ILogger<CurrentLoggedInUsers> logger
+
+<div>
+    <DataGrid @ref="@dataGridRef"
+              TItem="CurrentLoggedInUsersViewModel"
+              Data="@loggedInUsers"
+              Editable
+              Responsive="true"
+              Bordered
+              PageSize="10000"
+              FixedHeader
+              FixedHeaderDataGridHeight="100%"
+              FixedHeaderDataGridMaxHeight="100%"
+              Narrow="true"
+              Sortable  SortMode="DataGridSortMode.Single"
+              HeaderThemeContrast="@ThemeContrast.Light">
+
+
+        <DataGridColumn Field="@nameof(CurrentLoggedInUsersViewModel.UserName)" Caption="User" />
+        <DataGridColumn Field="@nameof(CurrentLoggedInUsersViewModel.LoggedInAt)" Caption="Logged In At" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}"/>
+        @*<DataGridColumn Field="@nameof(CurrentLoggedInUsersViewModel.LastRequestAt)" Caption="Last Request At" />*@
+    </DataGrid>
+</div>
+
+
+<style>
+
+    form {
+        max-width: 100%;
+    }
+
+    .table-primary .showAnimation {
+        animation: spin 1200ms linear infinite;
+    }
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        width: 100%;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    .modal-body {
+        height: 70vh;
+        overflow-y: auto;
+    }
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+
+</style>
+
+@code {
+    public List<CurrentLoggedInUsersViewModel>? loggedInUsers = new();
+    private DataGrid<CurrentLoggedInUsersViewModel>? dataGridRef;
+
+
+    public async Task LoadData()
+    {
+        logger.LogWarning($"[CurrentLoggedInUsersPage:LoadData] going in GetActiveUsers ");
+        loggedInUsers = CurrentLoggedInUserService.GetActiveUsers();
+        logger.LogWarning($"[CurrentLoggedInUsersPage:LoadData] returning from GetActiveUsers ");
+        await this.InvokeAsync(() => this.StateHasChanged());
+    }
+}

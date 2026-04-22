@@ -1,0 +1,223 @@
+﻿@using DataRequestorMiddleware.Services.Summary;
+@using EView360.Services.Summary;
+@using EView360.Services;
+@using EView360Models.Core;
+@using EView360Models.ViewModels;
+@using static EView360.Data.Enumerations;
+@inject BnaStatusService service
+@inject ILogger<AtmStatus> logger
+@inject AtmSummaryStatusService atmStatusService
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject ATMTreeViewRepository atmRepository
+
+
+
+
+<div class="card-body">
+    @if (showChart)
+    {
+        <div class="mb-2">
+            <PieChart @ref="pieChart" Type="ChartType.Pie" TItem="float" Options="@chartOptions" />
+        </div>
+    }
+    else
+    {
+        <div class="spinner" style="z-index:4; margin-top:10%;"></div>
+    }
+</div>
+<div class="card-footer" style="min-height: 170px;">
+    <table class="table table-sm">
+        <tbody>
+            <tr>
+                <td>Cash Deposited At CDMs:</td>
+                <td>@transactingCount</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>CDMs With No Deposit Activity:</td>
+                <td class="web-link" @onclick="ShowDetails">@noTransactingATM</td>
+                <td class="fas fa-spinner @animationClass" style="display:@displayClass">
+                </td>
+            </tr>
+            <tr>
+                <td>Total No.Of Cash Deposit Machines:</td>
+                <td>@totalNotesDepositMachines</td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+<Modal @ref="DetailsModalDataGridRef">
+    <ModalContent Centered Size="ModalSize.Large">
+         <ModalHeader>
+             <ModalTitle>
+                 Information
+             </ModalTitle>
+             <CloseButton />
+         </ModalHeader>
+
+         <ModalBody>
+             <DataGrid TItem="AtmStatusViewModel"
+                       Data="@atmStatusViews"
+                       TotalItems="@atmStatusViews?.Count"
+                      Responsive
+                      Bordered
+                       Sortable  SortMode="DataGridSortMode.Single"
+                       Narrow="true"
+                       HeaderThemeContrast="@ThemeContrast.Light"
+                      FixedHeader
+                      Virtualize
+                       VirtualizeOptions="@(new() { DataGridMaxHeight = "480px"})">
+
+                 <DataGridColumn Field="@nameof(AtmStatusViewModel.Title)" Caption="Title" />
+                 <DataGridColumn Field="@nameof(AtmStatusViewModel.LastTransaction)" Caption="Last Transaction" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" />
+                 <DataGridColumn Field="@nameof(AtmStatusViewModel.LastTaskStatus)" Caption="Last Task Status" />
+                 <DataGridColumn Field="@nameof(AtmStatusViewModel.LastInvoked)" Caption="Last Invoked" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" />
+             </DataGrid>
+         </ModalBody>
+     </ModalContent>
+ </Modal>
+
+
+ <style>
+     .showAnimation {
+         animation: spin 1200ms linear infinite;
+     }
+
+     .web-link {
+         color: blue;
+         cursor: pointer;
+         text-decoration: underline;
+     }
+ </style>
+
+ @code {
+
+    public List<AtmAlertViewModel> atmAlerts = new();
+    [Inject] INotificationService NotificationService { get; set; }
+    int transactingCount = 0;
+    int noTransactingATM = 0;
+    int totalNotesDepositMachines = 0;
+    bool showChart = true;
+
+    private Modal? DetailsModalDataGridRef;
+    public List<AtmStatusViewModel> atmStatusViews = new();
+    private DataGrid<AtmStatusViewModel>? dataGridRef;
+    private string animationClass = string.Empty;
+    private string displayClass = "none";
+
+    PieChart<float>? pieChart = new();
+
+    Blazorise.Charts.PieChartOptions chartOptions = new() { AspectRatio = 1, MaintainAspectRatio = false };
+    private string[] Labels = { "Total Transacting ATMs", "No Transactions" };
+    private List<string> backgroundColors = new() { ChartColor.FromHtmlColorCode("#54b948"), ChartColor.FromHtmlColorCode("#FF2822") };
+    private List<string> borderColors = new() { ChartColor.FromHtmlColorCode("#509049"), ChartColor.FromHtmlColorCode("#B12230") };
+
+    private async Task ShowDetails()
+    {
+        displayClass = "inline-block";
+        animationClass = "showAnimation";
+        this.InvokeAsync(() => this.StateHasChanged());
+
+        await Task.Delay(5);
+
+        string error = string.Empty;
+        List<string> atmIDs = new();
+        List<string> regionIDs = new();
+        (atmIDs, regionIDs) = await atmRepository.GetSelectedAtmOrRegionList();
+
+        string filter = string.Empty;
+
+        filter = " and ua.user_id = " + service.UserId;
+
+        if (regionIDs?.Count > 0)
+        {
+            filter += " and outerATM.region_id in " + "(" + string.Join(",", regionIDs) + ")";
+        }
+        else
+        {
+            filter += " and outerATM.atm_id in " + "(" + string.Join(",", atmIDs) + ")";
+        }
+        atmStatusViews = atmStatusService.GetAtmsStatus(atmIDs, filter, "GetBNALastTransaction", ref error);
+        DetailsModalDataGridRef?.Show();
+
+        displayClass = "none";
+        animationClass = "";
+        await this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                AppUser appUser = await localStorage.GetItemAsync<AppUser>("AppUser");
+                if (appUser is not null)
+                {
+                    service.UserId = appUser.UserId;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at bnaStatus, OnAfterRenderAsync as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    public async Task LoadData()
+    {
+        showChart = false;
+        transactingCount = 0;
+        totalNotesDepositMachines = 0;
+        noTransactingATM = 0;
+        this.InvokeAsync(() => this.StateHasChanged());
+
+        await Task.Delay(5);
+
+        var response = await service.GetBnaTransactingATMTitle();
+
+        if (response.isSucess)
+        {
+            transactingCount = response.atmTitles?.Count > 0 ? response.atmTitles.Count : 0;
+            totalNotesDepositMachines = response.totalNotesDepositMachines;
+            noTransactingATM = totalNotesDepositMachines - transactingCount;
+        }
+
+        showChart = true;
+        await this.InvokeAsync(() => this.StateHasChanged());
+        await Task.Delay(100);
+
+
+        await PieChartHandleRedraw(pieChart);
+        await this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+
+    private async Task PieChartHandleRedraw(PieChart<float> pieChart)
+    {
+        if (pieChart != null)
+        {
+            await pieChart.Clear();
+            await pieChart.AddLabelsDatasetsAndUpdate(Labels, GetPieChartDataset());
+        }
+    }
+
+    private PieChartDataset<float> GetPieChartDataset()
+    {
+        return new()
+            {
+                Data = new() { transactingCount, noTransactingATM },
+                BackgroundColor = backgroundColors,
+                BorderColor = borderColors,
+                BorderWidth = 1
+            };
+    }
+}

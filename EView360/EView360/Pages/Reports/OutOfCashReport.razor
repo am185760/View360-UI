@@ -1,0 +1,328 @@
+﻿@page "/OutOfCashReport"
+@page "/OutOfCashReport/{mode}"
+
+@using EView360.Common;
+@using EView360.Services.Reports;
+@using EView360.Services;
+@using Microsoft.Extensions.Caching.Distributed;
+@using Microsoft.Extensions.Options;
+@using Newtonsoft.Json;
+@using EView360.Data;
+@using System.Text;
+@using global::Common.RequestModel;
+@using global::Common.ViewModel;
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject OutOfCashReportService service
+@inject ILogger<OutOfCashReport> logger
+@inject AtmService atmService
+@inject IJSRuntime jsRuntime
+@inject IOptions<ApiUrl> apiUrl
+@inject HttpClient client
+@inject CommonServices common;
+@inject IConfiguration configuration;
+@inject IDistributedCache _distributedCache
+
+<div class="row content">
+    @if (showSpinner)
+    {
+        <div class="spinner" style="z-index:4"></div>
+    }
+
+    <div class="col-sm-12">
+        <div class="form-group">
+            <b><h2 style="font-family:montserrat; font-weight:bold; margin-top: 1%;">Out of Cash Report @(isArchive ? "- Archive" : "")</h2></b>
+        </div>
+
+        <div class="card" style="border-width: medium;border-color: orange; margin-top:2%;">
+            <div class="card-body">
+                <form style="margin-top: 20px;">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <h5>Filters: </h5>
+                        </div>
+                    </div>
+                    @if (@mode is not null && mode.Equals("Archive"))
+                    {
+                        <div class="form-row">
+                            <div class="form-group col-md-1">
+                                <label>Archive Year: </label>
+                            </div>
+                            <div class="form-group col-md-2">
+                                <Select TValue="int" SelectedValue="archiveYear" class="form-control" SelectedValueChanged="@OnarchiveYearChange">
+                                    @foreach (int year in archiveYears)
+                                    {
+                                        <SelectItem Value=year>@year</SelectItem>
+                                    }
+                                </Select>
+                            </div>
+                        </div>
+                    }
+                    <div class="form-row">
+                        <div class="form-group col-md-1">
+                            <label>From Date: </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            @if (isArchive)
+                            {
+                                <DatePicker TValue="DateTime" @bind-Date="@filteredFromDate" Disabled="@DisableDate" DisplayFormat="dd/MM H:m" InputMode="DateInputMode.DateTime" class="form-control" @oninput="ChangeToarchiveYear" TimeAs24hr="true" />
+                            }
+                            else
+                            {
+                                <DatePicker TValue="DateTime" @bind-Date="@filteredFromDate" Disabled="@DisableDate" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" class="form-control" TimeAs24hr="true" />
+                            }
+                        </div>
+                        <div class="form-group col-md-4 text-right">
+                            <label>To Date: </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            @if (isArchive)
+                            {
+                                <DatePicker TValue="DateTime" @bind-Date="@filteredToDate" Disabled="@DisableDate" DisplayFormat="dd/MM H:m" InputMode="DateInputMode.DateTime" class="form-control" @oninput="ChangeToarchiveYear" TimeAs24hr="true" />
+                            }
+                            else
+                            {
+                                <DatePicker TValue="DateTime" @bind-Date="@filteredToDate" Disabled="@DisableDate" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" class="form-control" TimeAs24hr="true" />
+                            }
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-1">
+                            <label>Current: </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <Check TValue="bool" Checked="@filteredIsCurrent" CheckedChanged="@OnCheckboxChanged"></Check>
+                        </div>
+
+                        <div class="form-group col-md-4 text-right">
+                            <label>Group: </label>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <ListView TItem="NoteSetTypeViewModel"
+                                      Data="noteSetTypes"
+                                      TextField="(item) => item.NoteSetTypeName"
+                                      ValueField="(item) => item.NoteSetTypeId.ToString()"
+                                      Mode="ListGroupMode.Static"
+                                      MaxHeight="125px"
+                                      Style="margin-top: 2%">
+                                <ItemTemplate>
+                                    <Check TValue="bool" @bind-Checked="context.Item.isSelected">@context.Text</Check>
+                                </ItemTemplate>
+                            </ListView>
+                        </div>
+
+                    </div>
+
+                    <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@FilterSubmit" value="Generate Report">
+                    <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@ResetFilter" value="Reset">
+                </form>
+            </div>
+        </div>
+
+
+
+    </div>
+</div>
+<style>
+
+    form {
+        max-width: 100%;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+
+</style>
+
+@if (@mode is not null)
+{
+    <style>
+        .flatpickr-prev-month, .flatpickr-month .numInputWrapper, .flatpickr-next-month {
+            visibility: hidden;
+        }
+
+        .flatpickr-month {
+            font-size: large;
+        }
+    </style>
+}
+
+@code {
+    private string userLogin;
+    private int archiveYear;
+    private long userId;
+    static DateTime currentTime = DateTime.Now;
+    private DateTime filteredFromDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0);
+    private DateTime filteredToDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 0);
+    private bool filteredIsCurrent = false;
+    private List<NoteSetTypeViewModel>? noteSetTypes = new();
+
+    [Parameter]
+    public string? mode { get; set; }
+    private List<int> archiveYears = new();
+    bool isArchive = false;
+    bool showSpinner = false;
+    bool IsDisabled = false;
+    bool DisableDate = false;
+
+    private DotNetObjectReference<OutOfCashReport>? objRef;
+
+    [Inject] INotificationService? NotificationService { get; set; }
+
+    protected async override void OnParametersSet()
+    {
+        if (mode is not null && mode.Equals("Archive"))
+        {
+            archiveYears = common.GetLastNYears();
+            archiveYear = archiveYears.FirstOrDefault();
+            filteredToDate = new DateTime(archiveYear, currentTime.Month, currentTime.Day, 23, 59, 0);
+            filteredFromDate = new DateTime(archiveYear, currentTime.Month, currentTime.Day, 0, 0, 0);
+            isArchive = true;
+        }
+        else
+        {
+            filteredFromDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0);
+            filteredToDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 0);
+            archiveYear = 0;
+        }
+        userId = (await localStorage.GetItemAsync<EView360Models.Core.AppUser>("AppUser")).UserId;
+    }
+
+
+    protected async override void OnInitialized()
+    {
+        objRef = DotNetObjectReference.Create(this);
+        userLogin = (await localStorage.GetItemAsync<EView360Models.Core.AppUser>("AppUser")).UserLogin;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                await jsRuntime.InvokeVoidAsync("handleDatePicker", objRef);
+
+                noteSetTypes = await service.GetNoteSetTypesByUser(userId);
+                this.InvokeAsync(() => this.StateHasChanged());
+            }
+        }
+        catch (Exception ex)
+        {
+            await service.RenderErrorBox("Error", ex.Message);
+            logger.LogError($"Exception at OutOfCashReport, OnAfterRenderAsync as: {ex.Message}");
+        }
+    }
+
+    private async void FilterSubmit()
+    {
+        showSpinner = IsDisabled = true;
+        await this.InvokeAsync(() => this.StateHasChanged());
+        await common.TaskDelay();
+
+        OutOfCashReportRequestModel filter = new()
+            {
+                FromDate = filteredFromDate,
+                ToDate = filteredToDate,
+                IsCurrent = filteredIsCurrent,
+                NoteSetTypeIds = noteSetTypes.Where(x => x.isSelected).Select(x => x.NoteSetTypeId).ToList(),
+                ArchiveYear = archiveYear,
+                isDeadATMExcluded = configuration.GetValue<bool>("isDeadATMExcluded"),
+                UserId = userId
+            };
+
+        logger.LogWarning($"[OutOfCashReportPage:FilterSubmit] going in GetOutOfCashReport ");
+        var data = await service.GetOutOfCashReport(filter);
+        logger.LogWarning($"[OutOfCashReportPage:FilterSubmit] returning from GetOutOfCashReport ");
+
+        logger.LogWarning("[OutOfCashReportPage:FilterSubmit] Start Serializing Datatable ");
+        string serializedDatatable = JsonConvert.SerializeObject(data);
+        logger.LogWarning("[OutOfCashReportPage:FilterSubmit] End Serializing Datatable ");
+
+        logger.LogWarning("[OutOfCashReportPage:FilterSubmit] Start convering serialized Datatable into bytes ");
+        byte[] bytes = Encoding.ASCII.GetBytes(serializedDatatable);
+        logger.LogWarning("[OutOfCashReportPage:FilterSubmit] End convering serialized Datatable into bytes ");
+
+        string redisKey = $"OutOfCashReport_{filter.UserId}";
+        _distributedCache.Set(redisKey, bytes);
+
+        var reports = new ReportsRequestModel()
+            {
+                redisKey = $"{redisKey}",
+            };
+
+        if (data.Rows.Count > 0)
+        {
+            string url = $"{apiUrl.Value.ReportingProjectUrl}ReportPopup.aspx?Report=LowBalanceReport.rpt&ReportTitle=Out%20Of%20Cash%20Report&FromDate={filteredFromDate.Date.ToString("MM/dd/yyyy")}&ToDate={filteredToDate.Date.ToString("MM/dd/yyyy")}&GeneratedBy={userLogin}";
+            await jsRuntime.InvokeVoidAsync("openWindowWithPost", url, reports);
+        }
+
+        showSpinner = IsDisabled = false;
+        await this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private void ResetFilter()
+    {
+        currentTime = DateTime.Now;
+
+        if (isArchive)
+        {
+            archiveYear = archiveYears.FirstOrDefault();
+            filteredFromDate = new DateTime(archiveYear, currentTime.Month, currentTime.Day, 0, 0, 0);
+            filteredToDate = new DateTime(archiveYear, currentTime.Month, currentTime.Day, 23, 59, 0);
+        }
+        else
+        {
+            filteredFromDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0);
+            filteredToDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 0);
+            archiveYear = 0;
+        }
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private Task OnarchiveYearChange(int selectedYear)
+    {
+        archiveYear = selectedYear;
+        filteredFromDate = new DateTime(archiveYear, currentTime.Month, currentTime.Day, 0, 0, 0);
+        filteredToDate = new DateTime(archiveYear, currentTime.Month, currentTime.Day, 23, 59, 0);
+        this.InvokeAsync(() => this.StateHasChanged());
+        return Task.CompletedTask;
+    }
+
+    private Task ChangeToarchiveYear()
+    {
+        if (isArchive)
+        {
+            if (filteredFromDate != null && filteredFromDate.Year != archiveYear)
+                filteredFromDate = new DateTime(archiveYear, filteredFromDate.Month, filteredFromDate.Day, filteredFromDate.Hour, filteredFromDate.Month, filteredFromDate.Second);
+
+            if (filteredToDate != null && filteredToDate.Year != archiveYear)
+                filteredToDate = new DateTime(archiveYear, filteredToDate.Month, filteredToDate.Day, filteredToDate.Hour, filteredToDate.Month, filteredToDate.Second);
+        }
+        return Task.CompletedTask;
+    }
+
+    private Task OnCheckboxChanged(bool value)
+    {
+        DisableDate = false;
+        if (value)
+        {
+            DisableDate = true;
+        }
+        filteredIsCurrent = value;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+}

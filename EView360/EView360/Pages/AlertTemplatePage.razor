@@ -1,0 +1,298 @@
+﻿@page "/AlertTemplate"
+@using EView360.Services;
+@using EView360Models.ViewModels;
+@using Newtonsoft.Json;
+@using static EView360.Data.Enumerations;
+@inject AlertTemplateService service
+@inject ILogger<AlertTemplatePage> logger
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+<div class="row content">
+    <div class="col-sm-12 text-left" style="margin-top:1%">
+        <div class="form-group">
+            <h2>Alert Template</h2>
+        </div>
+        @if (showSpinner)
+        {
+            <div class="spinner" style="z-index:4"></div>
+        }
+
+        @if (showGrid)
+        {
+            <DataGrid @ref="@dataGridRef"
+                  TItem="AlertTypeViewModel"
+                  Data="@alertTypes"
+                  Editable
+                  Responsive="true"
+                  ShowPager
+                  Bordered
+                  PageSize="50"
+                  FixedHeader
+                  FixedHeaderDataGridHeight="570px"
+                  FixedHeaderDataGridMaxHeight="570px"
+                  Narrow="true"
+                  Sortable  SortMode="DataGridSortMode.Single"
+                  HeaderThemeContrast="@ThemeContrast.Light">
+
+
+                <DataGridColumn Field="@nameof(AlertTypeViewModel.AlertTypeName)" Caption="Alert Type" />
+                <DataGridColumn Field="@nameof(AlertTypeViewModel.AlertAdditionalText)" Caption="Alert Additional Text" />
+                <DataGridCheckColumn Field="@nameof(AlertTypeViewModel.SendEmailNotification)" Caption="Email Notification" />
+                @*<DataGridCheckColumn Field="@nameof(AlertTypeViewModel.OpenTicketInGasper)" Caption="Open Ticket In Gasper" />
+                <DataGridColumn Field="@nameof(AlertTypeViewModel.TpaCode)" Caption="TPA Code" />
+                <DataGridColumn Field="@nameof(AlertTypeViewModel.TpaValue)" Caption="TPA Value" />*@
+
+                <DataGridCommandColumn ClearFilterCommandAllowed="false" DeleteCommandAllowed="false" NewCommandAllowed="false">
+                    <EditCommandTemplate>
+                        <Button Clicked="@(()=>OnCustomEditCommand(context))" title="Edit"><Icon Name="IconName.Edit" TextColor="TextColor.Success" /></Button>
+                    </EditCommandTemplate>
+                </DataGridCommandColumn>
+            </DataGrid>
+        }
+
+
+        @if (showModal)
+        {
+            <div id="modalDialog" class="modal" tabindex="-1" role="dialog" style="display:block">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header" style="background-color:green;color:white;">
+                            <h5 class="modal-title">Edit Alert Template</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="@CloseEditForm">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <EditForm id="EditGroups" EditContext="editContext" OnValidSubmit=@SubmitHandler Context="parentContext">
+                                <DataAnnotationsValidator />
+                                <Microsoft.AspNetCore.Components.Forms.ValidationSummary />
+                                <div class="form-group">
+                                    <label for="exampleFormControlTextarea1">Default Notification Text:</label>
+                                    <InputTextArea @bind-Value="alertType.AlertDefaultText" class="form-control" disabled="true" rows="3"></InputTextArea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleFormControlTextarea1">Additional Notification Text:</label>
+                                    <InputTextArea @bind-Value="alertType.AlertAdditionalText" class="form-control" rows="3"></InputTextArea>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="Comm" class="col-sm-3 col-form-label col-form-label">Send Email Notification</label>
+                                    <div class="col-sm-4">
+                                        <Check TValue="bool?" @bind-Checked="alertType.SendEmailNotification" class="form-check-input" />
+                                    </div>
+                                </div>
+                                @*<div class="form-group row">
+                                    <label for="Comm" class="col-sm-3 col-form-label col-form-label">Open Ticket In Gasper</label>
+                                    <div class="col-sm-4">
+                                        <Check TValue="bool?" @bind-Checked="alertType.OpenTicketInGasper" class="form-check-input" />
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="setTypeName" class="col-sm-3 col-form-label">TPA Code:</label>
+                                    <div class="col-sm-4">
+                                        <InputText class="form-control" @bind-Value="alertType.TpaCode" />
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="setTypeName" class="col-sm-3 col-form-label">TPA Value:</label>
+                                    <div class="col-sm-4">
+                                        <InputText class="form-control" @bind-Value="alertType.TpaValue" />
+                                    </div>
+                                </div>*@
+                            </EditForm>
+                        </div>
+                        <div class="modal-footer">
+                            @if (CheckPermission((int)Permissions.ModifyAlertTemplate))
+                            {
+                                <input type="submit" form="EditGroups" class="btn btn-success" value="Save" />
+                            }
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="@CloseEditForm">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+
+<style>
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        margin-top: 20px;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        width: 170px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+</style>
+
+
+
+@code {
+
+    public List<AlertTypeViewModel> alertTypes = new();
+    private bool showSpinner = true;
+    private bool showGrid = false;
+    private bool showModal = false;
+    private DataGrid<AlertTypeViewModel>? dataGridRef;
+    private EditContext? editContext;
+    private AlertTypeViewModel alertType = new();
+    private long userId;
+
+    [Inject] INotificationService NotificationService { get; set; }
+    [Inject] IMessageService MessageService { get; set; }
+    [Inject] AuditLogService auditService { get; set; }
+    Dictionary<int, string> userRights;
+
+    protected async override void OnInitialized()
+    {
+        userRights = await localStorage.GetItemAsync<Dictionary<int, string>>("userRights");
+        userId = (await localStorage.GetItemAsync<EView360Models.Core.AppUser>("AppUser")).UserId;
+        editContext = new(alertType);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                await LoadData();
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at AlertTemplate Page, OnAfterRenderAsync as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    private bool CheckPermission(int right)
+    {
+        try
+        {
+            if (userRights is not null)
+                return userRights.ContainsKey(right);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at AlertTemplatePage, CheckPermission as: {ex.Message}");
+
+            NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+        return false;
+    }
+
+    private async Task LoadData()
+    {
+        alertTypes = await service.GetAlertTypesAsync();
+        showSpinner = false;
+        showGrid = true;
+        this.InvokeAsync(() => this.StateHasChanged());
+
+        if (alertTypes is null || alertTypes.Count == 0)
+        {
+            await NotificationService.Error("No record found or check logs for error", "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    async Task OnCustomEditCommand(EditCommandContext<AlertTypeViewModel> context)
+    {
+        string jsonContent = JsonConvert.SerializeObject(context.Item);
+        alertType = JsonConvert.DeserializeObject<AlertTypeViewModel>(jsonContent)!;
+        editContext = new(alertType);
+        showModal = true;
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    public async Task RenderErrorBox(string title, string message)
+    {
+        await NotificationService.Error(message, title, (options) =>
+        {
+            options.IntervalBeforeClose = 4000;
+        });
+    }
+
+    private void HideModal()
+    {
+        showModal = false;
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private async Task SubmitHandler()
+    {
+        try
+        {
+            showSpinner = true;
+            showGrid = false;
+            string response = string.Empty;
+            HideModal();
+
+            response = await service.UpdateAlertType(alertType);
+            if (response == "error")
+            {
+                await NotificationService.Error("An error occured while updating alert type, check logs..", "Error", (options) =>
+                {
+                    options.IntervalBeforeClose = 4000;
+                });
+            }
+
+            if (response != "error")
+            {
+                await NotificationService.Success("Changes completed successfully.", "Success", (options) =>
+                {
+                    options.IntervalBeforeClose = 4000;
+                });
+                await auditService.InsertAuditLogEntry($"{alertType.AlertTypeName} alert updated.", userId, (long)Permissions.EditAlertTemplate);
+            }
+            await Task.Delay(300);
+            await LoadData();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at AlertTemplate Page, SubmitHandler as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+    private void CloseEditForm()
+    {
+        showModal = false;
+        this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+}

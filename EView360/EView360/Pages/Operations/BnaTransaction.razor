@@ -1,0 +1,200 @@
+﻿@page "/BnaTransaction"
+@page "/BnaTransaction/{mode}"
+
+@using EView360.Common;
+@using EView360Models.Core;
+@using EView360.Services.Operations;
+@using EView360.Services;
+@using EView360Models.RequestModel;
+@using EView360Models.ViewModels;
+@using static EView360.Data.Enumerations;
+@inject BnaTranactionsService service
+@inject AtmTaskService taskService
+@inject ATMTreeViewRepository treeService
+@inject NoteSetTypeService noteSetTypeService
+@inject ILogger<BnaTransaction> logger
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject ATMTreeViewRepository atmRepository 
+ @inject NotifyService notifyService
+@inject YearService yearService
+@inject CommonServices common
+@implements IDisposable
+@inject IJSRuntime jsRuntime
+
+<div class="row content">
+    @if (showSpinner)
+    {
+        <div class="spinner" style="z-index:4"></div>
+    }
+    <div class="col-sm-2 filter_bar border-right-2">
+        <form style="margin-top: 20px;">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <h5>Filters: </h5>
+                </div>
+            </div>
+            @if (@mode is not null && mode.Equals("Archive"))
+            {
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label>Archive Year: </label>
+                        <Select TValue="int" SelectedValue="@ArchiveYear" class="form-control" SelectedValueChanged="@DateChanged">
+                            @foreach (int year in archiveYears)
+                            {
+                                <SelectItem Value=year>@year</SelectItem>
+                            }
+                        </Select>
+                    </div>
+                </div>
+            }
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label>From Date: </label>
+                    @if (@mode is not null && mode.Equals("Archive"))
+                    {
+
+                        <DatePicker TValue="DateTime?" @ref="@dateRef" DisplayFormat="dd/MM H:m" InputMode="DateInputMode.DateTime" TimeAs24hr="true" Placeholder="Select Date" @bind-Date="@fromDate"></DatePicker>
+                    }
+                    else
+                    {
+                        <DatePicker TValue="DateTime?" @ref="@dateRef" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" TimeAs24hr="true" Placeholder="Select Date" @bind-Date="@fromDate"></DatePicker>
+                    }
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label>To Date: </label>
+                    @if (@mode is not null && mode.Equals("Archive"))
+                    {
+
+                        <DatePicker TValue="DateTime?" @ref="@dateRef" DisplayFormat="dd/MM H:m" InputMode="DateInputMode.DateTime" TimeAs24hr="true" Placeholder="Select Date" @bind-Date="@toDate"></DatePicker>
+                    }
+                    else
+                    {
+                        <DatePicker TValue="DateTime?" @ref="@dateRef" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" TimeAs24hr="true" Placeholder="Select Date" @bind-Date="@toDate"></DatePicker>
+                    }
+                </div>
+            </div>
+
+
+            <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@FilterSubmit" value="Search">
+            <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@ResetFilter" value="Reset">
+        </form>
+    </div>
+
+
+    <div class="col-sm-10 text-left" style="margin-top:1%">
+        <div class="form-group">
+
+            @if (@mode is not null && mode.Equals("Archive"))
+            {
+                <b><h2 style="font-family:montserrat; font-weight:bold">BNA Transaction (History) - Archive</h2></b>
+            }
+            else
+            {
+                <b><h2 style="font-family:montserrat; font-weight:bold">BNA Transaction (History)</h2></b>
+            }
+        </div>
+
+
+
+        @if (showGrid)
+        {
+            <DataGrid @ref="@dataGridRef"
+                  TItem="BnaTransactionViewModel"
+                  Data="@filteredBnaTransaction"
+                            Editable
+                  Responsive="true"
+                  ShowPager="false"
+                            Bordered
+                  PageSize="50"
+                            FixedHeader
+                  FixedHeaderDataGridHeight="500px"
+                  FixedHeaderDataGridMaxHeight="500px"
+                  Narrow="true"
+                            Sortable  SortMode="DataGridSortMode.Single"
+                       SortChanged="SortData"
+                  HeaderThemeContrast="@ThemeContrast.Light">
+
+
+            <DataGridColumn Field="@nameof(BnaTransactionViewModel.ATM)" Caption="ATM" />
+            <DataGridColumn Field="@nameof(BnaTransactionViewModel.Location)" Caption="Location" />
+            <DataGridColumn Field="@nameof(BnaTransactionViewModel.IP)" Caption="IP" />
+            <DataGridColumn Field="@nameof(BnaTransactionViewModel.LastBNADeposit)" Caption="DateTime" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" />
+            <DataGridColumn Field="@nameof(BnaTransactionViewModel.Cassette1)" Caption="Cassette1" />
+            <DataGridColumn Field="@nameof(BnaTransactionViewModel.Cassette2)" Caption="Cassette2" />
+            <DataGridColumn Field="@nameof(BnaTransactionViewModel.Cassette3)" Caption="Cassette3" />
+            <DataGridColumn Field="@nameof(BnaTransactionViewModel.Cassette4)" Caption="Cassette4" />
+            <DataGridColumn Field="@nameof(BnaTransactionViewModel.Cassette5)" Caption="Cassette5" />
+            <DataGridColumn Field="@nameof(BnaTransactionViewModel.Total)" Caption="Total" />
+            </DataGrid>
+            <EView360.Pages.Pagination pageNo="pageNo" maxPageNo="maxPageNo" totalRecords="totalRecords" OnSubmitCallback="GetDataByPageNo" />
+
+        }
+
+    </div>
+</div>
+
+@if (@mode is not null)
+{
+    <style>
+        .flatpickr-prev-month, .flatpickr-month .numInputWrapper, .flatpickr-next-month {
+            visibility: hidden;
+        }
+
+        .flatpickr-month {
+            font-size: large;
+        }
+    </style>
+}
+
+<style>
+
+    form {
+        max-width: 100%;
+    }
+
+    .table-primary .showAnimation {
+        animation: spin 1200ms linear infinite;
+    }
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        margin-top: 20px;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        width: 170px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    .modal-body {
+        height: 70vh;
+        overflow-y: auto;
+    }
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+</style>
+
+
+

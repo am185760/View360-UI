@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="05/01/2023 22:46:40" ReportInfo.Modified="05/08/2023 14:01:35" ReportInfo.CreatorVersion="2023.2.10.0">
+  <Dictionary>
+    <BusinessObjectDataSource Name="TaskStatusReportViewModel" ReferenceName="TaskStatusReportViewModelRef" DataType="System.Int32" Enabled="true">
+      <Column Name="AtmTittle" DataType="System.String"/>
+      <Column Name="ATMLocation" DataType="System.String"/>
+      <Column Name="CreationTime" DataType="System.String"/>
+      <Column Name="EndTime" DataType="System.String"/>
+      <Column Name="LastInvoked" DataType="System.String"/>
+      <Column Name="Status" DataType="System.String"/>
+      <Column Name="TaskType" DataType="System.String"/>
+      <Column Name="FailureReason" DataType="System.String"/>
+    </BusinessObjectDataSource>
+    <Parameter Name="FromDate" DataType="System.String" AsString=""/>
+    <Parameter Name="ToDate" DataType="System.String" AsString=""/>
+  </Dictionary>
+  <ReportPage Name="Page1" Watermark.Font="Arial, 60pt">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="103.95">
+      <TextObject Name="Text1" Top="9.45" Width="718.2" Height="18.9" Text="Task Status Report" HorzAlign="Center" Font="Arial, 12pt, style=Bold, Underline"/>
+      <TextObject Name="Text2" Left="9.45" Top="47.25" Width="85.05" Height="18.9" Text="From Date :&#13;&#10;" Font="Arial, 10pt"/>
+      <TextObject Name="Text3" Left="9.45" Top="75.6" Width="85.05" Height="18.9" Text="To Date :" Font="Arial, 10pt"/>
+      <TextObject Name="Text19" Left="103.95" Top="47.25" Width="94.5" Height="18.9" Text="[FromDate]" Font="Arial, 10pt"/>
+      <TextObject Name="Text20" Left="103.95" Top="75.6" Width="94.5" Height="18.9" Text="[ToDate]" Font="Arial, 10pt"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="107.15" Width="718.2" Height="28.35">
+      <TextObject Name="Text4" Width="94.5" Height="18.9" Text="AtmTittle" Font="Arial, 10pt"/>
+      <TextObject Name="Text5" Left="75.6" Width="94.5" Height="18.9" Text="ATM Location" Font="Arial, 10pt"/>
+      <TextObject Name="Text6" Left="179.55" Width="94.5" Height="18.9" Text="Creation Time" Font="Arial, 10pt"/>
+      <TextObject Name="Text7" Left="283.5" Width="75.6" Height="18.9" Text="End Time" Font="Arial, 10pt"/>
+      <TextObject Name="Text8" Left="368.55" Width="94.5" Height="18.9" Text="Last Invoked" Font="Arial, 10pt"/>
+      <TextObject Name="Text9" Left="472.5" Width="56.7" Height="18.9" Text="Status" Font="Arial, 10pt"/>
+      <TextObject Name="Text10" Left="538.65" Width="94.5" Height="18.9" Text="Task Type" Font="Arial, 10pt"/>
+      <TextObject Name="Text11" Left="642.6" Width="94.5" Height="18.9" Text="Failure Reason" Font="Arial, 10pt"/>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="138.7" Width="718.2" Height="66.15" DataSource="TaskStatusReportViewModel">
+      <TextObject Name="Text21" Width="66.15" Height="18.9" Text="[TaskStatusReportViewModel.AtmTittle]" Font="Arial, 10pt"/>
+      <TextObject Name="Text22" Left="75.6" Width="75.6" Height="18.9" Text="[TaskStatusReportViewModel.ATMLocation]" Font="Arial, 10pt"/>
+      <TextObject Name="Text23" Left="179.55" Width="94.5" Height="18.9" Text="[TaskStatusReportViewModel.CreationTime]" Font="Arial, 10pt"/>
+      <TextObject Name="Text24" Left="283.5" Width="75.6" Height="18.9" Text="[TaskStatusReportViewModel.EndTime]" Font="Arial, 10pt"/>
+      <TextObject Name="Text25" Left="368.55" Width="94.5" Height="18.9" Text="[TaskStatusReportViewModel.LastInvoked]" Font="Arial, 10pt"/>
+      <TextObject Name="Text26" Left="472.5" Width="56.7" Height="18.9" Text="[TaskStatusReportViewModel.Status]" Font="Arial, 10pt"/>
+      <TextObject Name="Text27" Left="538.65" Width="94.5" Height="18.9" Text="[TaskStatusReportViewModel.TaskType]" Font="Arial, 10pt"/>
+      <TextObject Name="Text28" Left="642.6" Width="94.5" Height="18.9" Text="[TaskStatusReportViewModel.FailureReason]" Font="Arial, 10pt"/>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="208.05" Width="718.2" Height="18.9">
+      <TextObject Name="Text29" Left="661.5" Width="94.5" Height="18.9" Text="[PageN]" Font="Arial, 10pt"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

@@ -1,0 +1,213 @@
+﻿@page "/ReportTask"
+@using EView360.Services.Operations;
+@using EView360Models.Core;
+@using EView360Models.ViewModels;
+@using static EView360.Data.Enumerations;
+@inject ReportTaskService service
+@inject ILogger<ReportTask> logger
+@inject IJSRuntime jsRuntime
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+
+
+<div class="row content">
+    @if (showSpinner)
+    {
+        <div class="spinner" style="z-index:4"></div>
+    }
+    <div class="col-sm-2 filter_bar border-right-2">
+        <form style="margin-top: 20px;">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <h5>Filters: </h5>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label>From Date: </label>
+                    <DatePicker TValue="DateTime" @ref="@dateRef" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" TimeAs24hr="true" Placeholder="Selete Date" @bind-Date="@fromDate"></DatePicker>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label>To Date: </label>
+                    <DatePicker TValue="DateTime" @ref="@dateRef" DisplayFormat="dd/MM/yyyy H:m" InputMode="DateInputMode.DateTime" TimeAs24hr="true" Placeholder="Selete Date" @bind-Date="@toDate"></DatePicker>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label class="float-left" for="CreatedByName">Task Status :</label>
+                    <select @bind="filterTaskStatus" class="form-control">
+                        <option value="*">All</option>
+                        <option value="Processed">Processed</option>
+                        <option value="Sent">Sent</option>
+                        <option value="Scheduled">Scheduled</option>
+                        <option value="Retries Exhausted">Retries Exhausted</option>
+                    </select>
+                </div>
+            </div>
+
+            <input class="btn btn-success" type="button" onclick="@FilterSubmit" value="Search">
+            <input class="btn btn-success" type="button" onclick="@ResetFilter" value="Reset">
+        </form>
+    </div>
+
+
+    <div class="col-sm-10 text-left" style="margin-top:1%">
+        <div class="form-group">
+            <b><h2 style="font-family:montserrat; font-weight:bold">Report Task ( History )</h2></b>
+        </div>
+
+
+
+        @if (showGrid)
+        {
+            <DataGrid @ref="@dataGridRef"
+                  TItem="ReportTaskViewModel"
+                  Data="@reportTaskViews"
+                  Editable
+                  Responsive="true"
+                  ShowPager
+                  Bordered
+                  PageSize="50"
+                  FixedHeader
+                  FixedHeaderDataGridHeight="570px"
+                  FixedHeaderDataGridMaxHeight="570px"
+                  Narrow="true"
+                  Sortable  SortMode="DataGridSortMode.Single"
+                  HeaderThemeContrast="@ThemeContrast.Light">
+                <DataGridColumn Field="@nameof(ReportTaskViewModel.CreationTime)" Caption="Creation Time" DisplayFormat="{0:dd/MM/yyyy HH:mm:ss}" />
+                <DataGridColumn Field="@nameof(ReportTaskViewModel.ReportName)" Caption="Report Name"/>
+                <DataGridColumn Field="@nameof(ReportTaskViewModel.RetryCount)" Caption="Retry Count" />
+                <DataGridColumn Field="@nameof(ReportTaskViewModel.Status)" Caption="Status" />
+                <DataGridColumn Field="@nameof(ReportTaskViewModel.FailureReason)" Caption="Failure Reason" />
+            </DataGrid>
+        }
+
+    </div>
+</div>
+
+
+<style>
+
+    form {
+        max-width: 100%;
+    }
+
+    .table-primary .showAnimation {
+        animation: spin 1200ms linear infinite;
+    }
+
+    .table-responsive {
+        border: 1px solid #dee2e6 !important;
+        margin-top: 20px;
+        width: 100%;
+        background-color: white;
+    }
+
+    .all_headers {
+        width: 170px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .btn-danger {
+        margin-left: 5px;
+    }
+
+    .modal-body {
+        height: 70vh;
+        overflow-y: auto;
+    }
+
+    tr:nth-child(even) {
+        background-color: #e9ecef;
+    }
+
+    .all_headers_form {
+        margin-left: 12px;
+        padding: 5px;
+    }
+
+    .filter_bar {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        background-color: white;
+    }
+
+</style>
+
+@code {
+    private bool showSpinner = false;
+    private bool showGrid = false;
+    static DateTime currentTime = DateTime.Now;
+    DateTime fromDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0);
+    DateTime toDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 0);
+    DatePicker<DateTime>? dateRef;
+    public List<ReportTaskViewModel> reportTaskViews = new();
+    private DataGrid<ReportTaskViewModel>? dataGridRef;
+    private string? filterTaskStatus = "*";
+    [Inject] INotificationService NotificationService { get; set; }
+    [Inject] IMessageService MessageService { get; set; }
+    private DotNetObjectReference<ReportTask>? objRef;
+
+    protected override async Task OnInitializedAsync()
+    {
+        objRef = DotNetObjectReference.Create(this);
+        AppUser appUser = await localStorage.GetItemAsync<AppUser>("AppUser");
+        if (appUser is not null)
+        {
+            service.UserId = appUser.UserId;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender && (reportTaskViews is null || reportTaskViews.Count == 0))
+            {
+                await jsRuntime.InvokeVoidAsync("handleDatePicker", objRef);
+                await LoadData();
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at Report Task, OnAfterRenderAsync as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    private async Task LoadData()
+    {
+        showSpinner = true;
+        showGrid = false;
+        await this.InvokeAsync(() => this.StateHasChanged());
+        reportTaskViews = await service.GetReports(fromDate, toDate, filterTaskStatus == "*" ? null : filterTaskStatus);
+        showSpinner = false;
+        showGrid = true;
+        await this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+
+    private async void FilterSubmit()
+    {
+
+        await LoadData();
+        await this.InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private async void ResetFilter()
+    {
+        filterTaskStatus = "*";
+        fromDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 0, 0, 0);
+        toDate = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, 23, 59, 0);
+        await LoadData();
+        await this.InvokeAsync(() => this.StateHasChanged());
+    }
+}
+

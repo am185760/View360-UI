@@ -1,0 +1,222 @@
+﻿@using EView360.Services.Summary;
+@using EView360.Services;
+@using EView360Models.Core;
+@using EView360Models.ViewModels;
+@using static EView360.Data.Enumerations;
+@inject RemDenQtyService service
+@inject ILogger<RemDenQty> logger
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject ATMTreeViewRepository atmRepository
+
+@if (showChart)
+{
+    <div class="form-group row">
+        <label for="inputEmail3" class="col-sm-2 col-form-label">Note Set Type:</label>
+        <div class="col-sm-2">
+            <select value="@filterNoteSetTypeName" @onchange="HandleNoteSetType" class="form-control">
+                <option value="Select">Select</option>
+                @foreach (string name in noteSetTypes.Select(x => x.NoteSetTypeName).ToList().Distinct())
+                {
+                    <option value="@name">@name</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="mb-2">
+        <Chart @ref="pieChart" Type="ChartType.Bar" TItem="double" Options="@chartOptions" />
+    </div>
+}
+else
+{
+    <div class="spinner" style="z-index:4;margin-top:10%;"></div>
+}
+
+
+@code {
+
+    public List<AtmAlertViewModel> atmAlerts = new();
+    [Inject] INotificationService NotificationService { get; set; }
+    bool showChart = true;
+    private Chart<double>? pieChart;
+    ChartOptions chartOptions = new()
+        {
+            AspectRatio = 1,
+            Plugins = new ChartPlugins
+            {
+                Legend = new ChartLegend
+                {
+                    Display = false
+                }
+            },
+            MaintainAspectRatio = false
+            
+        };
+    private string[] Labels = { labelNoteSetType1, labelNoteSetType2, labelNoteSetType3, labelNoteSetType4 };
+    private List<string> backgroundColors = new() { ChartColor.FromRgba(255, 99, 132, 0.2f), ChartColor.FromRgba(54, 162, 235, 0.2f), ChartColor.FromRgba(255, 206, 86, 0.2f), ChartColor.FromRgba(75, 192, 192, 0.2f) };
+    private List<string> borderColors = new() { ChartColor.FromRgba(255, 99, 132, 1f), ChartColor.FromRgba(54, 162, 235, 1f), ChartColor.FromRgba(255, 206, 86, 1f), ChartColor.FromRgba(75, 192, 192, 1f) };
+    double cassette1_Sum = 0;
+    double cassette2_Sum = 0;
+    double cassette3_Sum = 0;
+    double cassette4_Sum = 0;
+    public static string? labelNoteSetType1 = string.Empty;
+    public static string? labelNoteSetType2 = string.Empty;
+    public static string? labelNoteSetType3 = string.Empty;
+    public static string? labelNoteSetType4 = string.Empty;
+    public List<NoteSetTypeViewModel>? noteSetTypes = new();
+    private long? noteSetTypeId;
+    public string filterNoteSetTypeName;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        AppUser appUser = await localStorage.GetItemAsync<AppUser>("AppUser");
+        if (appUser is not null)
+        {
+            service.UserId = appUser.UserId;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                noteSetTypes = await service.GetNoteSetTypeAsync();
+                if (noteSetTypes is null || !noteSetTypes.Any())
+                {
+                    await RenderInfoBox("Information", "Note set types not found");
+                }
+                filterNoteSetTypeName = "Select";
+                await this.InvokeAsync(() => this.StateHasChanged());
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at RemDenQty, OnAfterRenderAsync as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+    }
+
+    private async Task HandleNoteSetType(ChangeEventArgs e)
+    {
+        try
+        {
+            filterNoteSetTypeName = e.Value.ToString();
+            noteSetTypeId = filterNoteSetTypeName == "Select" ? null : noteSetTypes.Where(x => x.NoteSetTypeName == filterNoteSetTypeName).First().NoteSetTypeId;
+
+            cassette1_Sum = 0;
+            cassette2_Sum = 0;
+            cassette3_Sum = 0;
+            cassette4_Sum = 0;
+
+            if (filterNoteSetTypeName != "Select")
+            {
+                await LoadData();
+            }
+            else
+            {
+                showChart = true;
+                this.InvokeAsync(() => this.StateHasChanged());
+                await HandleRedraw(pieChart, GetChartLabel(), GetPieChartDataset());
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Exception at RemDenQty, HandleNoteSetType as: {ex.Message}");
+
+            await NotificationService.Error(ex.Message, "Error", (options) =>
+            {
+                options.IntervalBeforeClose = 4000;
+            });
+        }
+
+    }
+
+    public async Task LoadData()
+    {
+        showChart = false;
+        cassette1_Sum = 0;
+        cassette2_Sum = 0;
+        cassette3_Sum = 0;
+        cassette4_Sum = 0;
+
+        labelNoteSetType1 = string.Empty;
+        labelNoteSetType2 = string.Empty;
+        labelNoteSetType3 = string.Empty;
+        labelNoteSetType4 = string.Empty;
+
+        this.InvokeAsync(() => this.StateHasChanged());
+
+        await Task.Delay(5);
+
+        if (filterNoteSetTypeName != "Select")
+        {
+            var response = await service.GetRemainingNotes(noteSetTypeId);
+            if (response.isSucess && response.cassette_Sum?.Count > 0)
+            {
+                cassette1_Sum = double.Parse(!string.IsNullOrEmpty(response.cassette_Sum[0]) ? response.cassette_Sum[0] : "0");
+                cassette2_Sum = double.Parse(!string.IsNullOrEmpty(response.cassette_Sum[1]) ? response.cassette_Sum[1] : "0");
+                cassette3_Sum = double.Parse(!string.IsNullOrEmpty(response.cassette_Sum[2]) ? response.cassette_Sum[2] : "0");
+                cassette4_Sum = double.Parse(!string.IsNullOrEmpty(response.cassette_Sum[3]) ? response.cassette_Sum[3] : "0");
+            }
+        }
+
+
+        showChart = true;
+        this.InvokeAsync(() => this.StateHasChanged());
+
+        await HandleRedraw(pieChart, GetChartLabel(), GetPieChartDataset());
+
+    }
+
+    async Task HandleRedraw(Chart<double>? pieChart, List<string> labels, BarChartDataset<double> chartData)
+    {
+        if (pieChart != null)
+        {
+            await pieChart.Clear();
+            await pieChart.AddLabelsDatasetsAndUpdate(labels, GetPieChartDataset());
+        }
+    }
+
+
+    public List<string> GetChartLabel()
+    {
+        List<string> Labels = new();
+        if (noteSetTypeId != null)
+        {
+            labelNoteSetType1 = noteSetTypes.Where(x => x.NoteSetTypeId == noteSetTypeId).First()?.DenominationType1Title;
+            labelNoteSetType2 = noteSetTypes.Where(x => x.NoteSetTypeId == noteSetTypeId).First()?.DenominationType2Title;
+            labelNoteSetType3 = noteSetTypes.Where(x => x.NoteSetTypeId == noteSetTypeId).First()?.DenominationType3Title;
+            labelNoteSetType4 = noteSetTypes.Where(x => x.NoteSetTypeId == noteSetTypeId).First()?.DenominationType4Title;
+            Labels.Add(labelNoteSetType1); Labels.Add(labelNoteSetType2); Labels.Add(labelNoteSetType3); Labels.Add(labelNoteSetType4);
+        }
+
+        return Labels;
+    }
+
+
+    private BarChartDataset<double> GetPieChartDataset()
+    {
+        return new()
+            {
+                Data = new() { cassette1_Sum, cassette2_Sum, cassette3_Sum, cassette4_Sum },
+                BackgroundColor = backgroundColors,
+                BorderColor = borderColors,
+                BorderWidth = 1
+            };
+    }
+
+    async Task RenderInfoBox(string title, string message)
+    {
+        await NotificationService.Info(message, title, (options) =>
+        {
+            options.IntervalBeforeClose = 3000;
+        });
+        await Task.CompletedTask;
+    }
+}
