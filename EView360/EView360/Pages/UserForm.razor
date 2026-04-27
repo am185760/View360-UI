@@ -1,4 +1,4 @@
-﻿@page "/UserForm"
+@page "/UserForm"
 @using EView360.Data;
 @using EView360.Services;
 @using EView360Models.ViewModels;
@@ -34,23 +34,23 @@
                                     </tr>*@
                                     <tr>
                                         <td><i class="fa fa-asterisk" aria-hidden="true" style="font-size:xx-small;vertical-align:top; color:red"></i> Login ID</td>
-                                        <td <InputText class="form-control" @bind-Value="thisUser.User.UserLogin"/></td>
+                                        <td><InputText class="form-control" disabled="true" @bind-Value="thisUser.User.UserLogin"/></td>
                                     </tr>
-                                    <tr>
+                                    @*<tr>
                                         <td><i class="fa fa-asterisk" aria-hidden="true" style="font-size:xx-small;vertical-align:top; color:red"></i> Password</td>
-                                        <td <InputText type="password" class="form-control" @bind-Value="userPassword"/></td>
+                                        <td><InputText type="password" class="form-control" @bind-Value="userPassword"/></td>
                                     </tr>
                                     <tr>
                                         <td>Confirm Password</td>
-                                        <td <InputText type="password" class="form-control" @bind-Value="confirmPassword"/></td>
-                                    </tr>
+                                        <td><InputText type="password" class="form-control" @bind-Value="confirmPassword"/></td>
+                                    </tr>*@
                                     <tr>
                                         <td><i class="fa fa-asterisk" aria-hidden="true" style="font-size:xx-small;vertical-align:top; color:red"></i> Full Name</td>
-                                        <td <InputText class="form-control" @bind-Value="thisUser.User.UserFullName"/></td>
+                                        <td><InputText class="form-control" disabled="true" @bind-Value="thisUser.User.UserFullName"/></td>
                                     </tr>
                                     <tr>
                                         <td>Email</td>
-                                        <td <InputText class="form-control" @bind-Value="thisUser.User.UserEmail"/></td>
+                                        <td><InputText class="form-control" disabled="true" @bind-Value="thisUser.User.UserEmail"/></td>
                                     </tr>
                                     @*<tr>
                                     <td>Mobile</td>
@@ -223,34 +223,25 @@
     private void CustomValidations(object? sender, ValidationRequestedEventArgs args)
     {
         messageStore?.Clear();
-        List<UserViewModel> users = new();
 
-        if (userPassword.Equals(confirmPassword))
+        if (!isEdit)
         {
-            if (!oldPassword.Equals(confirmPassword))
-                thisUser.User.UserPassword = Encryption.Cryptic.EncryptString(confirmPassword, Helper.ConstractKey(false));
-        }
-        else
-            messageStore?.Add(() => thisUser.User.UserPassword, "Password do not match, please enter a valid password");
-
-        if (isEdit)
+            List<UserViewModel> users = new();
             users = appUsers.Where(x => x.User.UserLogin != thisUser.User.UserLogin).ToList();
 
-        if (thisUser.User.UserLogin == null)
-            messageStore?.Add(() => thisUser.User.UserLogin, "Please enter a Login ID");
+            if (string.IsNullOrEmpty(thisUser.User.UserLogin))
+                messageStore?.Add(() => thisUser.User.UserLogin, "Please enter a Login ID");
 
-        if (thisUser.User.UserPassword == null)
-            messageStore?.Add(() => thisUser.User.UserPassword, "Please enter a valid password");
+            if (string.IsNullOrEmpty(thisUser.User.UserFullName))
+                messageStore?.Add(() => thisUser.User.UserFullName, "Please enter the user full name");
 
-        if (thisUser.User.UserFullName == null)
-            messageStore?.Add(() => thisUser.User.UserFullName, "Please enter the user full name");
-
-        foreach (var user in users)
-        {
-            if (user.User.UserLogin.Equals(thisUser.User.UserLogin))
+            foreach (var user in users)
             {
-                messageStore?.Add(() => thisUser.User.UserLogin, "User Name already exists, please provide a unique name");
-                break;
+                if (user.User.UserLogin.Equals(thisUser.User.UserLogin))
+                {
+                    messageStore?.Add(() => thisUser.User.UserLogin, "User Name already exists, please provide a unique name");
+                    break;
+                }
             }
         }
     }

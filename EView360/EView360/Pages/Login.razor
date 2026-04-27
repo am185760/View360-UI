@@ -1,4 +1,4 @@
-﻿@page "/Login"
+@page "/Login"
 @using System.Security.Claims
 @using ClientsideEncryption;
 @using EView360.Data;
@@ -15,6 +15,7 @@
 @inject LdapService ldapService
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject IJSRuntime jsRuntime
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
 
 @if (showLogin)
 
@@ -49,7 +50,7 @@
 
                         <div class="mb-3">
 
-                            <EditForm Model="@user" OnValidSubmit="@ValidateUser">
+                            <EditForm Model="@user" OnValidSubmit="HandleLoginSubmit">
                                 @if (showProgress)
                                 {
                                     <div class="spinner" style="z-index:4; margin-left: -8%"></div>
@@ -62,7 +63,7 @@
                                 </div>
 
                                 <input class="btn btn-lg btn-success btn-block" type="submit" value="Login">
-                                <input class="btn btn-lg btn-outline-primary btn-block" type="button" value="Reset" onclick="@ResetFilter">
+                                <!-- <input class="btn btn-lg btn-outline-primary btn-block" type="button" value="Reset" onclick="@ResetFilter"> -->
 
                             </EditForm>
                         </div>
@@ -112,32 +113,87 @@
     }
 
 
+    private async Task<bool> HandleLoginSubmit()
+    {
+        bool disableLdap = Configuration.GetValue<bool>("DisableLdap", false);
+        if (disableLdap)
+        {
+            return await ValidateUser();
+        }
+        else
+        {
+            return await ValidateUserLdap();
+        }
+    }
+
     private async Task<bool> ValidateUserLdap()
     {
         showProgress = true;
         await this.InvokeAsync(() => this.StateHasChanged());
+        await Task.Yield();
+        bool isValid = false;
+        try
+        {
+            if (string.IsNullOrEmpty(user.UserLogin) || string.IsNullOrEmpty(user.Password))
+            {
+                if (string.IsNullOrEmpty(user.UserLogin) && string.IsNullOrEmpty(user.Password))
+                {
+                    LoginMesssage = "Username and Password are required";
+                    await jsRuntime.InvokeVoidAsync("setFocusToUsername", objRef);
+                }
 
-        bool isValid = ldapService.ValidateCredentials(user.UserLogin, user.Password);
+                else if (string.IsNullOrEmpty(user.UserLogin))
+                {
+                    LoginMesssage = "Username is required";
+                    await jsRuntime.InvokeVoidAsync("setFocusToUsername", objRef);
+                }
+
+                else if (string.IsNullOrEmpty(user.Password))
+                {
+                    LoginMesssage = "Password is required";
+                    await jsRuntime.InvokeVoidAsync("setFocusToPassword", objRef);
+                }
+
+                showProgress = false;
+                await this.InvokeAsync(() => this.StateHasChanged());
+                return false;
+            }
+
+            isValid = await Task.Run(() => ldapService.ValidateCredentials(user.UserLogin, user.Password));
+        }
+        catch (Exception ex)
+        {
+            LoginMesssage = "LDAP Authentication Failed: " + ex.Message;
+            showProgress = false;
+            await this.InvokeAsync(() => this.StateHasChanged());
+            return false;
+        }
 
         if (!isValid)
         {
             LoginMesssage = "Invalid User Id or Password";
+            await jsRuntime.InvokeVoidAsync("setFocusToUsername", objRef);
+            showProgress = false;
+            await this.InvokeAsync(() => this.StateHasChanged());
             return false;
         }
 
         AppUser returnedUser = await userService.GetUserFromDbAsync(user);
-        if (returnedUser == null)
+        
+        if (returnedUser == null || returnedUser.UserId == -1)
         {
-            await NotificationService.Info("Credentials verified, Please wait, so get user information", "Login Success", (options) =>
-            {
-                options.IntervalBeforeClose = 4000;
-            });
+            LoginMesssage = "Credentials verified, but user details not Sync in our system";
+            showProgress = false;
+            await this.InvokeAsync(() => this.StateHasChanged());
+            return false;
+        }
 
-            bool status = ldapService.HandleNewUser(user.UserLogin);
-            if (!status)
+        if (returnedUser != null && returnedUser.UserId != -1)
+        {
+            if (!returnedUser.UserIsActive)
             {
-                LoginMesssage = "Credentials are verified, but unable to login right now due to some Internal Error / API Connectivity";
-                return false;
+                LoginMesssage = "Your account is inactive. Please contact administrator";
+                await jsRuntime.InvokeVoidAsync("setFocusToUsername", objRef);
             }
             else
             {
@@ -146,13 +202,18 @@
                 await this.InvokeAsync(() => this.StateHasChanged());
                 await auditService.InsertAuditLogEntry("User successfully logged in", returnedUser.UserId, userRights.FirstOrDefault(x => x.Value == "Login").Key);
 
-
                 await localStorage.SetItemAsync("AppUser", returnedUser);
                 await localStorage.SetItemAsync("userRights", userRights);
                 await ((CustomAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(user);
             }
         }
+        else
+        {
+            LoginMesssage = "User is not registered in the system.";
+        }
 
+        showProgress = false;
+        await this.InvokeAsync(() => this.StateHasChanged());
         return true;
     }
 

@@ -138,11 +138,13 @@ namespace EView360.Services
         {
             try
             {
-                auditData = new AuditLogViewModel() { UserId = userId, RightId = (int)Permissions.ModifyUser, Message = $"{user.User.UserFullName} user updated." };
+                //  auditData = new AuditLogViewModel() { UserId = userId, RightId = (int)Permissions.ModifyUser, Message = $"{user.User.UserFullName} user updated." };
 
-                PostContentViewModel postContent = new PostContentViewModel() { AuditData = auditData, PostObj = user };
+                //PostContentViewModel postContent = new PostContentViewModel() { AuditData = auditData, PostObj = user };
 
-                var jsonContent = JsonConvert.SerializeObject(postContent);
+                var jsonContent = JsonConvert.SerializeObject(user);
+
+                //var jsonContent = JsonConvert.SerializeObject(postContent);
                 HttpContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
                 HttpResponseMessage result = await client.PutAsync($"{BaseUrl}UpdateUser/{user}", content);
                 var responseBody = await result.Content.ReadAsStringAsync();

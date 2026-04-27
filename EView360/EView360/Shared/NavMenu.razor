@@ -1,4 +1,4 @@
-﻿﻿@using EView360.Data;
+@using EView360.Data;
 @using EView360.Services;
 @using EView360Models.Core;
 @using static EView360.Data.Enumerations;
@@ -503,9 +503,12 @@
                 <div class="logut-class" style="margin-right: 5%;">
                     <ul class="navbar-nav ml-5">
                         <li class="nav-link" style="cursor: default !important">
+
                             <strong>
-                                Last Logged In:@appUser?.UserLastLoginTime.Value.ToString("dd-MMM-yy HH:mm:ss")
+                                Last Logged In:
+                                @(appUser?.UserLastLoginTime != null ? appUser.UserLastLoginTime.Value.ToString("dd-MMM-yy HH:mm:ss"): "N/A")
                             </strong>
+
                         </li>
                         <li class="nav-item dropdown Logout_DropDown">
                             <a class="nav-link" href="">
@@ -513,7 +516,7 @@
                                 <i class="fas fa-chevron-circle-down fa-lg"></i>
                             </a>
                             <ul class="dropdown-menu Logout-Content">
-                                <li><a class="dropdown-item" href="ChangePassword">Change Password</a></li>
+                                <!-- <li><a class="dropdown-item" href="ChangePassword">Change Password</a></li> -->
                                 <li><a class="dropdown-item" @onclick="(() => Logout())">Logout</a></li>
                             </ul>
                         </li>

@@ -1,4 +1,4 @@
-﻿@page "/UserManagement"
+@page "/UserManagement"
 @using EView360.Data;
 @using EView360.Services;
 @using EView360Models.Core;
@@ -33,10 +33,10 @@
                 </div>
                 <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@FilterSubmit" value="Search">
                 <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@ResetFilter" value="Reset">
-                @if (CheckPermission((int)Permissions.CreateUser))
+                @* @if (CheckPermission((int)Permissions.CreateUser))
                 {
                     <input class="btn btn-success" disabled="@IsDisabled" type="button" onclick="@Add" value="Add" style="margin-left: 3px;">
-                }
+                } *@
             </form>
 
         </div>
@@ -102,10 +102,10 @@
                         }
                     </EditCommandTemplate>
                     <DeleteCommandTemplate>
-                        @if (context.Item.User.UserId != service.userId && CheckPermission((int)Permissions.DeleteUser))
+                        @* @if (context.Item.User.UserId != service.userId && CheckPermission((int)Permissions.DeleteUser))
                         {
                             <Button Clicked="@context.Clicked" title="Delete"><Icon Name="IconName.Delete" TextColor="TextColor.Danger" IconSize=IconSize.Small /></Button>
-                        }
+                        } *@
                     </DeleteCommandTemplate>
                     <CancelCommandTemplate>
                         <Button Color="Color.Secondary" Clicked="@context.Clicked">Cancel</Button>

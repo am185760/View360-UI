@@ -1,4 +1,4 @@
-﻿@page "/GroupManagement"
+@page "/GroupManagement"
 @using EView360.Services;
 @using EView360Models.ViewModels;
 @using EView360Models.Core;
@@ -24,10 +24,10 @@
             </div>
             <input class="btn btn-success" type="button" onclick="@FilterSubmit" value="Search">
             <input class="btn btn-success" type="button" onclick="@ResetFilter" value="Reset">
-            @if (CheckPermission((int)Permissions.CreateGroup))
+            @* @if (CheckPermission((int)Permissions.CreateGroup))
             {
                 <input class="btn btn-success" style="margin-left: 3px;" type="button" onclick="@Add" value="Add">
-            }
+            } *@
         </form>
     </div>
 
@@ -94,10 +94,10 @@
                         }
                     </EditCommandTemplate>
                     <DeleteCommandTemplate>
-                        @if (CheckPermission((int)Permissions.DeleteGroup))
+                        @* @if (CheckPermission((int)Permissions.DeleteGroup))
                         {
                             <Button Class="DeleteBtn" Clicked="@context.Clicked" title="Delete"><Icon Name="IconName.Delete" TextColor="TextColor.Danger" /></Button>
-                        }
+                        } *@
                     </DeleteCommandTemplate>
                 </DataGridCommandColumn>
             </DataGrid>
@@ -160,16 +160,19 @@
                         </div>
                         <div class="modal-body">
                             <EditForm id="EditGroups" EditContext="editContext" OnValidSubmit=@SubmitHandler Context="parentContext">
-                                <DataAnnotationsValidator />
-                                <Microsoft.AspNetCore.Components.Forms.ValidationSummary />
+                                @if (!isEdit)
+                                {
+                                    <DataAnnotationsValidator />
+                                    <Microsoft.AspNetCore.Components.Forms.ValidationSummary />
+                                }
                                 <div class="form-row">
                                     <div class="form-group col-md-6">
                                         <label for="setTypeName" class="col-sm-6 col-form-label">Group Name</label>
-                                        <InputText class="form-control" id="setTypeName" @bind-Value="group.GroupName" />
+                                        <InputText class="form-control" id="setTypeName" disabled="true" @bind-Value="group.GroupName" />
                                     </div>
                                     <div class="form-group col-md-6">
                                         <label for="setTypeName" class="col-sm-6 col-form-label">Description</label>
-                                        <InputText class="form-control" id="setTypeName" @bind-Value="group.Description" />
+                                        <InputText class="form-control" id="setTypeName" disabled="true" @bind-Value="group.Description" />
                                     </div>
                                 </div>
 
