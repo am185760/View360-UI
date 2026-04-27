@@ -605,6 +605,7 @@
     {
         try
         {
+            if (userRight is null) return false;
             foreach (int id in userRight.Keys)
             {
                 if (rights.AdminRights.Contains(id))
@@ -627,6 +628,7 @@
     {
         try
         {
+            if (userRight is null) return false;
             foreach (int id in userRight.Keys)
             {
                 if (rights.OperationRights.Contains(id))
@@ -649,6 +651,7 @@
     {
         try
         {
+            if (userRight is null) return false;
             foreach (int id in userRight.Keys)
             {
                 if (rights.ReportRights.Contains(id))
@@ -671,6 +674,7 @@
     {
         try
         {
+            if (userRight is null) return false;
             foreach (int id in userRight.Keys)
             {
                 if (rights.ArchiveRights.Contains(id))
@@ -714,9 +718,14 @@
             filter = "(" + string.Join(",", regionIDs) + ")";
             baseurl += $"/true/{filter}";
         }
-        else
+        else if (atmIDs?.Count > 0)
         {
             filter = "(" + string.Join(",", atmIDs) + ")";
+            baseurl += $"/false/{filter}";
+        }
+        else
+        {
+            filter = "()";
             baseurl += $"/false/{filter}";
         }
         await jsRuntime.InvokeVoidAsync("open", baseurl, "_blank", "location=yes,height=1000,width=5000,scrollbars=yes,status=yes");

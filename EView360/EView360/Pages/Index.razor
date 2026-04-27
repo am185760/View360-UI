@@ -1,4 +1,4 @@
-﻿@page "/"
+@page "/"
 
 @using EView360.Services;
 @using EView360Models.Core;
@@ -370,6 +370,7 @@
     {
         try
         {
+            if (userRight is null) return false;
             foreach (int id in userRight.Keys)
             {
                 if (rights.AdminRights.Contains(id))
@@ -392,6 +393,7 @@
     {
         try
         {
+            if (userRight is null) return false;
             foreach (int id in userRight.Keys)
             {
                 if (rights.OperationRights.Contains(id))
@@ -414,6 +416,7 @@
     {
         try
         {
+            if (userRight is null) return false;
             foreach (int id in userRight.Keys)
             {
                 if (rights.ReportRights.Contains(id))
@@ -436,6 +439,7 @@
     {
         try
         {
+            if (userRight is null) return false;
             foreach (int id in userRight.Keys)
             {
                 if (rights.ArchiveRights.Contains(id))

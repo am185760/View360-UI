@@ -71,7 +71,7 @@
                                                       MaxHeight="400px"
                                                       Style="margin-top: 2%">
                                                 <ItemTemplate>
-                                                    <Check TValue="bool" @bind-Checked="context.Item.isSelected">@context.Text</Check>
+                                                    <Check TValue="bool" Disabled="true" @bind-Checked="context.Item.isSelected">@context.Text</Check>
                                                 </ItemTemplate>
                                             </ListView>
                                         </td>
