@@ -182,7 +182,7 @@
         
         if (returnedUser == null || returnedUser.UserId == -1)
         {
-            LoginMesssage = "Credentials verified, but user details not Sync in our system";
+            LoginMesssage = "Credentials verified, but user details not sync in our system";
             showProgress = false;
             await this.InvokeAsync(() => this.StateHasChanged());
             return false;

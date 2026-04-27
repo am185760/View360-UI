@@ -54,7 +54,7 @@ namespace EView360.Services
                 {
                     appUser = JsonConvert.DeserializeObject<AppUser>(responseBody);
                 }
-                else
+                else if (!string.IsNullOrEmpty(responseBody))
                 {
                     _logger.LogError($"API error at Login, GetUserFromDbAsync: {responseBody}");
                     await RenderErrorBox("Error", responseBody);
