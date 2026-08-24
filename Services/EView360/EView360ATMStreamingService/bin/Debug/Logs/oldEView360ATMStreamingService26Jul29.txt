@@ -1,0 +1,96 @@
+29/07/2026 20:17:12 Info      File path D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\\Logs\EView360ATMStreamingService26Jul29.txt
+29/07/2026 20:17:12:63 Info      EView360ATMStreaming.DoInit                  Version : EView360ATMStreamingService Version 1.0.0.0, Build Date 11-Feb-2023
+29/07/2026 20:17:12:63 Info      EView360ATMStreaming.DoInit                  Worker Threads begin execution after 15 seconds.
+29/07/2026 20:17:12:63 Info      EView360ATMStreaming.DoInit                  hostname:,logFilePath:D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\\Logs,TransportQueuePath:D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\\TransportQueue,uploadRefreshInterval:5,cutOverIntervalDays:40, heartBeatRefreshInterval:600
+29/07/2026 20:17:28:71 Info      EView360ATMStreaming.FileProcessor           Entered
+29/07/2026 20:17:37:56 Info      EView360ATMStreaming.ReadCounterFile         Processed file for the first time: C:\program files\ncr aptra\advance NDC\CCMSAgent\Counter1.dll.
+29/07/2026 20:17:38:55 Info      Communicator.Connect                         Connecting to WIN-7QMNL13:16328
+29/07/2026 20:17:38:64 Info      Communicator.Connect                         Connection established
+29/07/2026 20:17:38:65 Info      Communicator.Upload                          going to upload file D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\Processor\Counters_29072026201737_23164_2_1_438_23
+29/07/2026 20:17:38:65 Info      Communicator.Upload                          waiting for server response
+29/07/2026 20:17:38:66 Info      Communicator.Upload                          server replied:OK
+29/07/2026 20:17:38:71 Info      Communicator.Upload                          going to upload file D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\Processor\Counters_29072026201737_23164_2_2_406_23
+29/07/2026 20:17:38:71 Info      Communicator.Upload                          waiting for server response
+29/07/2026 20:17:38:71 Info      Communicator.Upload                          server replied:OK
+29/07/2026 20:17:38:72 Info      Communicator.Upload                          going to upload file D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\Processor\Counters_29072026201737_23164_2_3_303_23
+29/07/2026 20:17:38:72 Info      Communicator.Upload                          waiting for server response
+29/07/2026 20:17:38:72 Info      Communicator.Upload                          server replied:OK
+29/07/2026 20:17:38:74 Info      Communicator.Upload                          going to upload file D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\Processor\Counters_29072026201737_23164_2_4_247_23
+29/07/2026 20:17:38:74 Info      Communicator.Upload                          waiting for server response
+29/07/2026 20:17:38:74 Info      Communicator.Upload                          server replied:OK
+29/07/2026 20:17:38:75 Info      Communicator.Upload                          going to upload file D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\Processor\Counters_29072026201737_23164_2_5_300_23
+29/07/2026 20:17:38:75 Info      Communicator.Upload                          waiting for server response
+29/07/2026 20:17:38:75 Info      Communicator.Upload                          server replied:OK
+29/07/2026 20:17:38:76 Info      Communicator.Upload                          going to upload file D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\Processor\Counters_29072026201737_23164_2_6_230_23
+29/07/2026 20:17:38:76 Info      Communicator.Upload                          waiting for server response
+29/07/2026 20:17:38:76 Info      Communicator.Upload                          server replied:OK
+29/07/2026 20:17:38:77 Info      Communicator.Upload                          going to upload file D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\Processor\Counters_29072026201737_23164_2_7_242_23
+29/07/2026 20:17:38:78 Info      Communicator.Upload                          waiting for server response
+29/07/2026 20:17:38:78 Info      Communicator.Upload                          server replied:OK
+29/07/2026 20:17:38:78 Info      Communicator.Upload                          going to upload file D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\Processor\Counters_29072026201737_23164_2_8_284_23
+29/07/2026 20:17:38:78 Info      Communicator.Upload                          waiting for server response
+29/07/2026 20:17:38:78 Info      Communicator.Upload                          server replied:OK
+29/07/2026 20:17:38:80 Info      Communicator.Upload                          going to upload file D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\Processor\Counters_29072026201737_23164_2_9_353_23
+29/07/2026 20:17:38:80 Info      Communicator.Upload                          waiting for server response
+29/07/2026 20:17:38:80 Info      Communicator.Upload                          server replied:OK
+29/07/2026 20:17:38:81 Info      Communicator.Upload                          going to upload file D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\Processor\Counters_29072026201737_23164_2_10_372_23
+29/07/2026 20:17:38:81 Info      Communicator.Upload                          waiting for server response
+29/07/2026 20:17:38:81 Info      Communicator.Upload                          server replied:OK
+29/07/2026 20:17:38:83 Info      Communicator.Upload                          going to upload file D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\Processor\Counters_29072026201737_23164_2_11_389_23
+29/07/2026 20:17:38:83 Info      Communicator.Upload                          waiting for server response
+29/07/2026 20:17:38:83 Info      Communicator.Upload                          server replied:OK
+29/07/2026 20:17:38:84 Info      Communicator.Upload                          going to upload file D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\Processor\Counters_29072026201737_23164_2_12_373_23
+29/07/2026 20:17:38:84 Info      Communicator.Upload                          waiting for server response
+29/07/2026 20:17:38:84 Info      Communicator.Upload                          server replied:OK
+29/07/2026 20:17:38:85 Info      Communicator.Upload                          going to upload file D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\Processor\Counters_29072026201737_23164_2_13_359_23
+29/07/2026 20:17:38:85 Info      Communicator.Upload                          waiting for server response
+29/07/2026 20:17:38:85 Info      Communicator.Upload                          server replied:OK
+29/07/2026 20:17:38:87 Info      Communicator.Upload                          going to upload file D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\Processor\Counters_29072026201737_23164_2_14_320_23
+29/07/2026 20:17:38:87 Info      Communicator.Upload                          waiting for server response
+29/07/2026 20:17:38:87 Info      Communicator.Upload                          server replied:OK
+29/07/2026 20:17:38:87 Info      Communicator.Upload                          going to upload file D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\Processor\Counters_29072026201737_23164_2_15_324_23
+29/07/2026 20:17:38:88 Info      Communicator.Upload                          waiting for server response
+29/07/2026 20:17:38:88 Info      Communicator.Upload                          server replied:OK
+29/07/2026 20:17:38:89 Info      Communicator.Upload                          going to upload file D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\Processor\Counters_29072026201737_23164_2_16_476_23
+29/07/2026 20:17:38:89 Info      Communicator.Upload                          waiting for server response
+29/07/2026 20:17:38:89 Info      Communicator.Upload                          server replied:OK
+29/07/2026 20:17:38:91 Info      Communicator.Upload                          going to upload file D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\Processor\Counters_29072026201737_23164_2_17_410_23
+29/07/2026 20:17:38:91 Info      Communicator.Upload                          waiting for server response
+29/07/2026 20:17:38:91 Info      Communicator.Upload                          server replied:OK
+29/07/2026 20:17:38:93 Info      Communicator.Upload                          going to upload file D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\Processor\Counters_29072026201737_23164_2_18_365_23
+29/07/2026 20:17:38:93 Info      Communicator.Upload                          waiting for server response
+29/07/2026 20:17:38:93 Info      Communicator.Upload                          server replied:OK
+29/07/2026 20:17:38:94 Info      Communicator.Upload                          going to upload file D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\Processor\Counters_29072026201737_23164_2_19_270_23
+29/07/2026 20:17:38:94 Info      Communicator.Upload                          waiting for server response
+29/07/2026 20:17:38:94 Info      Communicator.Upload                          server replied:OK
+29/07/2026 20:17:38:95 Info      Communicator.Upload                          going to upload file D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\Processor\Counters_29072026201737_23164_2_20_278_23
+29/07/2026 20:17:38:95 Info      Communicator.Upload                          waiting for server response
+29/07/2026 20:17:38:95 Info      Communicator.Upload                          server replied:OK
+29/07/2026 20:17:38:97 Info      Communicator.Upload                          going to upload file D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\Processor\Counters_29072026201737_23164_2_21_479_23
+29/07/2026 20:17:38:97 Info      Communicator.Upload                          waiting for server response
+29/07/2026 20:17:38:97 Info      Communicator.Upload                          server replied:OK
+29/07/2026 20:17:38:98 Info      Communicator.Upload                          going to upload file D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\Processor\Counters_29072026201737_23164_2_22_327_23
+29/07/2026 20:17:38:98 Info      Communicator.Upload                          waiting for server response
+29/07/2026 20:17:38:98 Info      Communicator.Upload                          server replied:OK
+29/07/2026 20:17:38:99 Info      Communicator.Upload                          going to upload file D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\Processor\Counters_29072026201737_23164_2_23_334_23
+29/07/2026 20:17:38:99 Info      Communicator.Upload                          waiting for server response
+29/07/2026 20:17:38:99 Info      Communicator.Upload                          server replied:OK
+29/07/2026 20:17:39:04 Info      EView360ATMStreaming.CreateZipFile           going to create Zipped file
+29/07/2026 20:17:39:18 Info      EView360ATMStreaming.CreateZipFile           Zipped Created Successufully.
+29/07/2026 20:17:41:19 Info      EView360ATMStreaming.ReadCounterFile         File does not exists
+29/07/2026 20:17:43:20 Info      EView360ATMStreaming.ReadCounterFile         File does not exists
+29/07/2026 20:17:45:20 Info      EView360ATMStreaming.ReadCounterFile         File does not exists
+29/07/2026 20:17:47:21 Info      EView360ATMStreaming.ReadCounterFile         File does not exists
+29/07/2026 20:17:49:22 Info      EView360ATMStreaming.ReadCounterFile         File does not exists
+29/07/2026 20:17:52:71 Info      Communicator.SendHeartBeat                   Sending heartbeat to WIN-7QMNL13:16329
+29/07/2026 20:17:52:71 Info      EView360ATMStreaming.DoCutOver               Going to sleep for 40 days
+29/07/2026 20:18:00:92 Error     Communicator.SendHeartBeat                   
+No connection could be made because the target machine actively refused it 192.168.255.1:16329
+
+   at System.Net.Sockets.Socket.Connect(IPAddress[] addresses, Int32 port)
+   at System.Net.Sockets.Socket.Connect(String host, Int32 port)
+   at ATM360.Communicator.SendHeartBeat(String ip, Int32 port) in D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\Communicator.cs:line 279
+29/07/2026 20:18:28:73 Info      EView360ATMStreaming.FileProcessor           Entered
+29/07/2026 20:19:28:74 Info      EView360ATMStreaming.FileProcessor           Entered
+29/07/2026 20:20:28:76 Info      EView360ATMStreaming.FileProcessor           Entered
+29/07/2026 20:20:53:98 Warning   EView360ATMStreaming.OnStop                  Service Stopped

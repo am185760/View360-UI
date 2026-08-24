@@ -1,0 +1,51 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CashDAL", "..\..\..\EView360DAL\CashDAL\CashDAL.csproj", "{DBEC3F98-A542-42B8-A311-4495065526E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EView360ATMStreamingService", "..\EView360ATMStreamingService\EView360ATMStreamingService.csproj", "{B8E93ABE-3D01-413D-821D-FCC775B2DCE0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|Mixed Platforms = Release|Mixed Platforms
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DBEC3F98-A542-42B8-A311-4495065526E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBEC3F98-A542-42B8-A311-4495065526E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBEC3F98-A542-42B8-A311-4495065526E8}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{DBEC3F98-A542-42B8-A311-4495065526E8}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{DBEC3F98-A542-42B8-A311-4495065526E8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DBEC3F98-A542-42B8-A311-4495065526E8}.Debug|x86.Build.0 = Debug|Any CPU
+		{DBEC3F98-A542-42B8-A311-4495065526E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBEC3F98-A542-42B8-A311-4495065526E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBEC3F98-A542-42B8-A311-4495065526E8}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{DBEC3F98-A542-42B8-A311-4495065526E8}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{DBEC3F98-A542-42B8-A311-4495065526E8}.Release|x86.ActiveCfg = Release|Any CPU
+		{DBEC3F98-A542-42B8-A311-4495065526E8}.Release|x86.Build.0 = Release|Any CPU
+		{B8E93ABE-3D01-413D-821D-FCC775B2DCE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8E93ABE-3D01-413D-821D-FCC775B2DCE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8E93ABE-3D01-413D-821D-FCC775B2DCE0}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{B8E93ABE-3D01-413D-821D-FCC775B2DCE0}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{B8E93ABE-3D01-413D-821D-FCC775B2DCE0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B8E93ABE-3D01-413D-821D-FCC775B2DCE0}.Debug|x86.Build.0 = Debug|Any CPU
+		{B8E93ABE-3D01-413D-821D-FCC775B2DCE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8E93ABE-3D01-413D-821D-FCC775B2DCE0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8E93ABE-3D01-413D-821D-FCC775B2DCE0}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{B8E93ABE-3D01-413D-821D-FCC775B2DCE0}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{B8E93ABE-3D01-413D-821D-FCC775B2DCE0}.Release|x86.ActiveCfg = Release|Any CPU
+		{B8E93ABE-3D01-413D-821D-FCC775B2DCE0}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7D9709BA-9F1B-4724-9062-892E2CFAFC03}
+	EndGlobalSection
+EndGlobal

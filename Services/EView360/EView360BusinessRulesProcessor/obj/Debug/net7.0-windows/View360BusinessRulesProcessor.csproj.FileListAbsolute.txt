@@ -1,0 +1,151 @@
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\obj\Debug\net7.0-windows\View360BusinessRulesProcessor.csproj.AssemblyReference.cache
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\obj\Debug\net7.0-windows\View360BusinessRulesProcessor.GeneratedMSBuildEditorConfig.editorconfig
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\obj\Debug\net7.0-windows\View360BusinessRulesProcessor.AssemblyInfoInputs.cache
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\obj\Debug\net7.0-windows\View360BusinessRulesProcessor.AssemblyInfo.cs
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\obj\Debug\net7.0-windows\View360BusinessRulesProcessor.csproj.CoreCompileInputs.cache
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\app.config
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\View360BusinessRulesProcessor.exe
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\View360BusinessRulesProcessor.dll.config
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\View360BusinessRulesProcessor.deps.json
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\View360BusinessRulesProcessor.runtimeconfig.json
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\View360BusinessRulesProcessor.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\View360BusinessRulesProcessor.pdb
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Configuration.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Configuration.Abstractions.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Configuration.Binder.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Configuration.CommandLine.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Configuration.EnvironmentVariables.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Configuration.FileExtensions.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Configuration.Json.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Configuration.UserSecrets.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.DependencyInjection.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.FileProviders.Abstractions.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.FileProviders.Physical.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.FileSystemGlobbing.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Hosting.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Hosting.Abstractions.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Hosting.WindowsServices.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Logging.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Logging.Configuration.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Logging.Console.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Logging.Debug.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Logging.EventLog.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Logging.EventSource.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Options.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Options.ConfigurationExtensions.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Primitives.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Win32.SystemEvents.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\System.Configuration.ConfigurationManager.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\System.Data.SqlClient.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\System.Diagnostics.EventLog.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\System.Drawing.Common.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\System.Security.Cryptography.ProtectedData.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\System.Security.Permissions.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\System.ServiceProcess.ServiceController.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\System.Windows.Extensions.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\runtimes\win\lib\net7.0\Microsoft.Win32.SystemEvents.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\runtimes\win-arm64\native\sni.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\runtimes\win-x64\native\sni.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\runtimes\win-x86\native\sni.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\runtimes\unix\lib\netcoreapp2.1\System.Data.SqlClient.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\runtimes\win\lib\net7.0\System.Diagnostics.EventLog.Messages.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\runtimes\win\lib\net7.0\System.Diagnostics.EventLog.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\runtimes\win\lib\net7.0\System.Drawing.Common.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\runtimes\win\lib\net7.0\System.Security.Cryptography.ProtectedData.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\runtimes\win\lib\net7.0\System.ServiceProcess.ServiceController.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\runtimes\win\lib\net7.0\System.Windows.Extensions.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Encryption.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\ServicesDAL.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\ICSharpCode.SharpZipLib.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Encryption.pdb
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\ServicesDAL.pdb
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\ICSharpCode.SharpZipLib.pdb
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\ICSharpCode.SharpZipLib.xml
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\obj\Debug\net7.0-windows\View360BusinessRulesProcessor.csproj.CopyComplete
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\obj\Debug\net7.0-windows\View360BusinessRulesProcessor.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\obj\Debug\net7.0-windows\refint\View360BusinessRulesProcessor.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\obj\Debug\net7.0-windows\View360BusinessRulesProcessor.pdb
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\obj\Debug\net7.0-windows\View360BusinessRulesProcessor.genruntimeconfig.cache
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\obj\Debug\net7.0-windows\ref\View360BusinessRulesProcessor.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\MSMQ.Messaging.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\System.DirectoryServices.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\runtimes\win\lib\netcoreapp2.0\System.DirectoryServices.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\app.config
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\View360BusinessRulesProcessor.exe
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\View360BusinessRulesProcessor.dll.config
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\View360BusinessRulesProcessor.deps.json
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\View360BusinessRulesProcessor.runtimeconfig.json
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\View360BusinessRulesProcessor.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\View360BusinessRulesProcessor.pdb
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Configuration.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Configuration.Abstractions.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Configuration.Binder.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Configuration.CommandLine.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Configuration.EnvironmentVariables.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Configuration.FileExtensions.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Configuration.Json.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Configuration.UserSecrets.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.DependencyInjection.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.FileProviders.Abstractions.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.FileProviders.Physical.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.FileSystemGlobbing.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Hosting.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Hosting.Abstractions.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Hosting.WindowsServices.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Logging.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Logging.Abstractions.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Logging.Configuration.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Logging.Console.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Logging.Debug.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Logging.EventLog.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Logging.EventSource.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Options.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Options.ConfigurationExtensions.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Extensions.Primitives.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Microsoft.Win32.SystemEvents.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\MSMQ.Messaging.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\System.Configuration.ConfigurationManager.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\System.Data.SqlClient.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\System.Diagnostics.EventLog.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\System.DirectoryServices.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\System.Drawing.Common.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\System.Security.Cryptography.ProtectedData.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\System.Security.Permissions.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\System.ServiceProcess.ServiceController.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\System.Windows.Extensions.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\runtimes\win\lib\net7.0\Microsoft.Win32.SystemEvents.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\runtimes\win-arm64\native\sni.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\runtimes\win-x64\native\sni.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\runtimes\win-x86\native\sni.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\runtimes\unix\lib\netcoreapp2.1\System.Data.SqlClient.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\runtimes\win\lib\net7.0\System.Diagnostics.EventLog.Messages.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\runtimes\win\lib\net7.0\System.Diagnostics.EventLog.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\runtimes\win\lib\netcoreapp2.0\System.DirectoryServices.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\runtimes\win\lib\net7.0\System.Drawing.Common.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\runtimes\win\lib\net7.0\System.Security.Cryptography.ProtectedData.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\runtimes\win\lib\net7.0\System.ServiceProcess.ServiceController.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\runtimes\win\lib\net7.0\System.Windows.Extensions.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Encryption.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\ServicesDAL.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\ICSharpCode.SharpZipLib.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\Encryption.pdb
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\ServicesDAL.pdb
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\ICSharpCode.SharpZipLib.pdb
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\bin\Debug\net7.0-windows\ICSharpCode.SharpZipLib.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\obj\Debug\net7.0-windows\View360BusinessRulesProcessor.csproj.AssemblyReference.cache
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\obj\Debug\net7.0-windows\View360BusinessRulesProcessor.GeneratedMSBuildEditorConfig.editorconfig
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\obj\Debug\net7.0-windows\View360BusinessRulesProcessor.AssemblyInfoInputs.cache
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\obj\Debug\net7.0-windows\View360BusinessRulesProcessor.AssemblyInfo.cs
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\obj\Debug\net7.0-windows\View360BusinessRulesProcessor.csproj.CoreCompileInputs.cache
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\obj\Debug\net7.0-windows\View360BusinessRulesProcessor.sourcelink.json
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\obj\Debug\net7.0-windows\View360B.AB1D0698.Up2Date
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\obj\Debug\net7.0-windows\View360BusinessRulesProcessor.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\obj\Debug\net7.0-windows\refint\View360BusinessRulesProcessor.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\obj\Debug\net7.0-windows\View360BusinessRulesProcessor.pdb
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\obj\Debug\net7.0-windows\View360BusinessRulesProcessor.genruntimeconfig.cache
+D:\View360\Repository - View360 Depart\Services\EView360\EView360BusinessRulesProcessor\obj\Debug\net7.0-windows\ref\View360BusinessRulesProcessor.dll

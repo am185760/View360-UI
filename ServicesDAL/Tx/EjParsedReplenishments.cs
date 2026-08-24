@@ -24,7 +24,7 @@ namespace ServicesDAL
             this.rep_datetime = rep_datetime;
             this.rep_datetimeChanged = true;
         }
-        public EjParsedReplenishments(long? atm_id, int? notes_added_type1, int? notes_added_type2, int? notes_added_type3, int? notes_added_type4, DateTime rep_datetime, long? task_id, DateTime? processing_datetime, int? start_index, int? end_index, int? last_tsn, int? notes_Added_type5, int? notes_Added_type6, int? notes_Added_type7)
+        public EjParsedReplenishments(long? atm_id, int? notes_added_type1, int? notes_added_type2, int? notes_added_type3, int? notes_added_type4, DateTime rep_datetime, long? task_id, DateTime? processing_datetime, int? start_index, int? end_index, int? last_tsn, int? notes_Added_type5, int? notes_Added_type6, int? notes_Added_type7, bool? is_bill_dispenser)
         {
             this.atm_id = atm_id;
             this.atm_idChanged = true;
@@ -54,8 +54,10 @@ namespace ServicesDAL
             this.notes_Added_type6Changed = true;
             this.notes_Added_type7 = notes_Added_type7;
             this.notes_Added_type7Changed = true;
+            this.is_bill_dispenser = is_bill_dispenser;
+            this.is_bill_dispenserChanged = true;
         }
-        private EjParsedReplenishments(long ej_parsed_replenishments_id, long? atm_id, int? notes_added_type1, int? notes_added_type2, int? notes_added_type3, int? notes_added_type4, DateTime rep_datetime, long? task_id, DateTime? processing_datetime, int? start_index, int? end_index, int? last_tsn, int? notes_Added_type5, int? notes_Added_type6, int? notes_Added_type7)
+        private EjParsedReplenishments(long ej_parsed_replenishments_id, long? atm_id, int? notes_added_type1, int? notes_added_type2, int? notes_added_type3, int? notes_added_type4, DateTime rep_datetime, long? task_id, DateTime? processing_datetime, int? start_index, int? end_index, int? last_tsn, int? notes_Added_type5, int? notes_Added_type6, int? notes_Added_type7, bool? is_bill_dispenser)
         {
             this.ej_parsed_replenishments_id = ej_parsed_replenishments_id;
             this.ej_parsed_replenishments_idChanged = true;
@@ -87,6 +89,8 @@ namespace ServicesDAL
             this.notes_Added_type6Changed = true;
             this.notes_Added_type7 = notes_Added_type7;
             this.notes_Added_type7Changed = true;
+            this.is_bill_dispenser = is_bill_dispenser;
+            this.is_bill_dispenserChanged = true;
         }
 
         #region members and properties for columns
@@ -410,7 +414,6 @@ namespace ServicesDAL
         #region NotesAddedType7
         private bool notes_Added_type7Changed = false;
         private int? notes_Added_type7;
-        public bool IsBillDispenser;
         public int? NotesAddedType7
         {
             get { return notes_Added_type7; }
@@ -426,6 +429,29 @@ namespace ServicesDAL
             {
                 if (this.notes_Added_type7.HasValue)
                     return notes_Added_type7.ToString();
+                else
+                    return "null";
+            }
+        }
+        #endregion
+        #region IsBillDispenser
+        private bool is_bill_dispenserChanged = false;
+        private bool? is_bill_dispenser;
+        public bool? IsBillDispenser
+        {
+            get { return is_bill_dispenser; }
+            set
+            {
+                is_bill_dispenser = value;
+                is_bill_dispenserChanged = true;
+            }
+        }
+        private string is_bill_dispenserDbString
+        {
+            get
+            {
+                if (this.is_bill_dispenser.HasValue)
+                    return this.is_bill_dispenser.Value ? "1" : "0";
                 else
                     return "null";
             }
@@ -528,6 +554,8 @@ namespace ServicesDAL
                             currentEjParsedReplenishments.notes_Added_type6 = (int?)reader["notes_Added_type6"];
                         if ((columns & Columns.notes_Added_type7) == Columns.notes_Added_type7 && reader["notes_Added_type7"] != DBNull.Value)
                             currentEjParsedReplenishments.notes_Added_type7 = (int?)reader["notes_Added_type7"];
+                        if ((columns & Columns.is_bill_dispenser) == Columns.is_bill_dispenser && reader["is_bill_dispenser"] != DBNull.Value)
+                            currentEjParsedReplenishments.is_bill_dispenser = (bool?)reader["is_bill_dispenser"];
 
                     }
                     else
@@ -562,6 +590,8 @@ namespace ServicesDAL
                             currentEjParsedReplenishments.notes_Added_type6 = (int?)reader["notes_Added_type6"];
                         if (reader["notes_Added_type7"] != DBNull.Value)
                             currentEjParsedReplenishments.notes_Added_type7 = (int?)reader["notes_Added_type7"];
+                        if (reader["is_bill_dispenser"] != DBNull.Value)
+                            currentEjParsedReplenishments.is_bill_dispenser = (bool?)reader["is_bill_dispenser"];
                     }
 
                     currentEjParsedReplenishments.isNewEntity = false;
@@ -638,6 +668,8 @@ namespace ServicesDAL
                 qry.Append("notes_Added_type6,");
             if (Columns.notes_Added_type7 == (Columns.notes_Added_type7 & columns))
                 qry.Append("notes_Added_type7,");
+            if (Columns.is_bill_dispenser == (Columns.is_bill_dispenser & columns))
+                qry.Append("is_bill_dispenser,");
             qry.Replace(',', ' ', qry.Length - 1, 1);
             qry.Append("from Ej_parsed_replenishments ");
 
@@ -674,7 +706,7 @@ namespace ServicesDAL
             IDbCommand cmd = conn.CreateCommand();
             cmd.CommandText = "SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED";
             cmd.ExecuteNonQuery();
-            cmd.CommandText = "Selectej_parsed_replenishments_id,atm_id,notes_added_type1,notes_added_type2,notes_added_type3,notes_added_type4,rep_datetime,task_id,processing_datetime,start_index,end_index,last_tsn,notes_Added_type5,notes_Added_type6,notes_Added_type7from Ej_parsed_replenishments ";
+            cmd.CommandText = "select ej_parsed_replenishments_id,atm_id,notes_added_type1,notes_added_type2,notes_added_type3,notes_added_type4,rep_datetime,task_id,processing_datetime,start_index,end_index,last_tsn,notes_Added_type5,notes_Added_type6,notes_Added_type7,is_bill_dispenser from Ej_parsed_replenishments ";
             if (where != null && where.Trim().Length > 0)
                 cmd.CommandText = string.Format("{0} where {1}", cmd.CommandText, where);
 
@@ -718,7 +750,7 @@ namespace ServicesDAL
 
         public void Save()
         {
-            if (ej_parsed_replenishments_idChanged || atm_idChanged || notes_added_type1Changed || notes_added_type2Changed || notes_added_type3Changed || notes_added_type4Changed || rep_datetimeChanged || task_idChanged || processing_datetimeChanged || start_indexChanged || end_indexChanged || last_tsnChanged || notes_Added_type5Changed || notes_Added_type6Changed || notes_Added_type7Changed)
+            if (ej_parsed_replenishments_idChanged || atm_idChanged || notes_added_type1Changed || notes_added_type2Changed || notes_added_type3Changed || notes_added_type4Changed || rep_datetimeChanged || task_idChanged || processing_datetimeChanged || start_indexChanged || end_indexChanged || last_tsnChanged || notes_Added_type5Changed || notes_Added_type6Changed || notes_Added_type7Changed || is_bill_dispenserChanged)
                 ExcuteSave(ConnectionFactory.GetNewConnection(DatabaseName.Tx).CreateCommand());
         }
 
@@ -738,13 +770,13 @@ namespace ServicesDAL
         /// an opened connection
         private void ExcuteSave(IDbCommand cmd)
         {
-            if (ej_parsed_replenishments_idChanged || atm_idChanged || notes_added_type1Changed || notes_added_type2Changed || notes_added_type3Changed || notes_added_type4Changed || rep_datetimeChanged || task_idChanged || processing_datetimeChanged || start_indexChanged || end_indexChanged || last_tsnChanged || notes_Added_type5Changed || notes_Added_type6Changed || notes_Added_type7Changed)
+            if (ej_parsed_replenishments_idChanged || atm_idChanged || notes_added_type1Changed || notes_added_type2Changed || notes_added_type3Changed || notes_added_type4Changed || rep_datetimeChanged || task_idChanged || processing_datetimeChanged || start_indexChanged || end_indexChanged || last_tsnChanged || notes_Added_type5Changed || notes_Added_type6Changed || notes_Added_type7Changed || is_bill_dispenserChanged)
             {
                 StringBuilder qry = new StringBuilder(500);
 
                 if (this.isNewEntity)
                 {
-                    qry.Append(@"insert into Ej_parsed_replenishments(ej_parsed_replenishments_id,atm_id,notes_added_type1,notes_added_type2,notes_added_type3,notes_added_type4,rep_datetime,task_id,processing_datetime,start_index,end_index,last_tsn,notes_Added_type5,notes_Added_type6,notes_Added_type7) values(");
+                    qry.Append(@"insert into Ej_parsed_replenishments(ej_parsed_replenishments_id,atm_id,notes_added_type1,notes_added_type2,notes_added_type3,notes_added_type4,rep_datetime,task_id,processing_datetime,start_index,end_index,last_tsn,notes_Added_type5,notes_Added_type6,notes_Added_type7,is_bill_dispenser) values(");
                     lock (ConnectionFactory.connectionStringCore)
                     {
                         this.ej_parsed_replenishments_id = ConnectionFactory.GetNextId(DatabaseName.Tx);
@@ -764,13 +796,14 @@ namespace ServicesDAL
                     qry.Append(last_tsnDbString + ",");
                     qry.Append(notes_Added_type5DbString + ",");
                     qry.Append(notes_Added_type6DbString + ",");
-                    qry.Append(notes_Added_type7DbString);
+                    qry.Append(notes_Added_type7DbString + ",");
+                    qry.Append(is_bill_dispenserDbString);
                     qry.Append(");");
 
                 }
                 else
                 {
-                    if (!(ej_parsed_replenishments_idChanged || atm_idChanged || notes_added_type1Changed || notes_added_type2Changed || notes_added_type3Changed || notes_added_type4Changed || rep_datetimeChanged || task_idChanged || processing_datetimeChanged || start_indexChanged || end_indexChanged || last_tsnChanged || notes_Added_type5Changed || notes_Added_type6Changed || notes_Added_type7Changed))
+                    if (!(ej_parsed_replenishments_idChanged || atm_idChanged || notes_added_type1Changed || notes_added_type2Changed || notes_added_type3Changed || notes_added_type4Changed || rep_datetimeChanged || task_idChanged || processing_datetimeChanged || start_indexChanged || end_indexChanged || last_tsnChanged || notes_Added_type5Changed || notes_Added_type6Changed || notes_Added_type7Changed || is_bill_dispenserChanged))
                         return;
                     qry.Append("UPDATE Ej_parsed_replenishments set "); if (atm_idChanged)
                     {
@@ -850,6 +883,12 @@ namespace ServicesDAL
                         qry.Append(",");
                     }
 
+                    if (is_bill_dispenserChanged)
+                    {
+                        qry.Append("is_bill_dispenser =" + is_bill_dispenserDbString);
+                        qry.Append(",");
+                    }
+
 
                     qry.Replace(',', ' ', qry.Length - 1, 1);
                     qry.Append(" where ");
@@ -885,7 +924,7 @@ namespace ServicesDAL
         public void Delete(IDbConnection conn)
         {
             IDbCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "DELETE Ej_parsed_replenishments whereej_parsed_replenishments_id= " + ej_parsed_replenishments_id + " and rep_datetime= " + rep_datetime;
+            cmd.CommandText = "DELETE Ej_parsed_replenishments where ej_parsed_replenishments_id= " + ej_parsed_replenishments_id + " and rep_datetime= " + rep_datetime;
             if (conn.State == ConnectionState.Closed)
             {
                 cmd.Connection.Open();
@@ -919,7 +958,8 @@ namespace ServicesDAL
             last_tsn = 11,
             notes_Added_type5 = 12,
             notes_Added_type6 = 13,
-            notes_Added_type7 = 14
+            notes_Added_type7 = 14,
+            is_bill_dispenser = 15
         }
         #endregion
         public DataTable BulkSave(List<EjParsedReplenishments> dataArray, SqlTransaction dbTrx)
@@ -960,6 +1000,7 @@ namespace ServicesDAL
                 Row["notes_Added_type5"] = tran.NotesAddedType5;
                 Row["notes_Added_type6"] = tran.NotesAddedType6;
                 Row["notes_Added_type7"] = tran.NotesAddedType7;
+                Row["is_bill_dispenser"] = tran.IsBillDispenser;
                 dt.Rows.Add(Row);
             }
         }

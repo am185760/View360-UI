@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.136
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "View360SecuredTransportLayer", "View360SecuredTransportLayer.csproj", "{B8E93ABE-3D01-413D-821D-FCC775B2DCE0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B8E93ABE-3D01-413D-821D-FCC775B2DCE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8E93ABE-3D01-413D-821D-FCC775B2DCE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8E93ABE-3D01-413D-821D-FCC775B2DCE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8E93ABE-3D01-413D-821D-FCC775B2DCE0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7350AE95-8343-4A24-87FB-48265365822E}
+	EndGlobalSection
+EndGlobal

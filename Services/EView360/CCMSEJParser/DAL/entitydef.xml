@@ -1,0 +1,21 @@
+<?xml-stylesheet type="text/xsl" href="EntityGenerator.xslt"?>
+<Database namespace="Avanza.CCMS.DAL" DBType="iSuite">
+  <Table name="Ej_parsed_replenishments" className="EjParsedReplenishments">
+    <Column name="ej_parsed_replenishments_id" dataType="int" propertyName="EjParsedReplenishmentsId" primaryKey="true" autoNumber="true" charType="false" isNullable="false" columnId="1" index="0" NullableType="int" columnName="ej_parsed_replenishments_id" />
+    <Column name="atm_id" dataType="int" propertyName="AtmId" primaryKey="false" autoNumber="false" charType="false" isNullable="true" columnId="2" index="1" NullableType="int?" columnName="atm_id" />
+    <Column name="notes_added_type1" dataType="int" propertyName="NotesAddedType1" primaryKey="false" autoNumber="false" charType="false" isNullable="true" columnId="4" index="2" NullableType="int?" columnName="notes_added_type1" />
+    <Column name="notes_added_type2" dataType="int" propertyName="NotesAddedType2" primaryKey="false" autoNumber="false" charType="false" isNullable="true" columnId="8" index="3" NullableType="int?" columnName="notes_added_type2" />
+    <Column name="notes_added_type3" dataType="int" propertyName="NotesAddedType3" primaryKey="false" autoNumber="false" charType="false" isNullable="true" columnId="16" index="4" NullableType="int?" columnName="notes_added_type3" />
+    <Column name="notes_added_type4" dataType="int" propertyName="NotesAddedType4" primaryKey="false" autoNumber="false" charType="false" isNullable="true" columnId="32" index="5" NullableType="int?" columnName="notes_added_type4" />
+    <Column name="rep_datetime" dataType="DateTime" propertyName="RepDatetime" primaryKey="false" autoNumber="false" charType="true" isNullable="true" columnId="64" index="6" NullableType="DateTime?" columnName="rep_datetime" />
+    <Column name="task_id" dataType="int" propertyName="TaskId" primaryKey="false" autoNumber="false" charType="false" isNullable="true" columnId="128" index="7" NullableType="int?" columnName="task_id" />
+    <Column name="processing_datetime" dataType="DateTime" propertyName="ProcessingDatetime" primaryKey="false" autoNumber="false" charType="true" isNullable="true" columnId="256" index="8" NullableType="DateTime?" columnName="processing_datetime" />
+    <Column name="start_index" dataType="int" propertyName="StartIndex" primaryKey="false" autoNumber="false" charType="false" isNullable="true" columnId="512" index="9" NullableType="int?" columnName="start_index" />
+    <Column name="end_index" dataType="int" propertyName="EndIndex" primaryKey="false" autoNumber="false" charType="false" isNullable="true" columnId="1024" index="10" NullableType="int?" columnName="end_index" />
+    <Column name="last_tsn" dataType="int" propertyName="LastTsn" primaryKey="false" autoNumber="false" charType="false" isNullable="true" columnId="2048" index="11" NullableType="int?" columnName="last_tsn" />
+    <Column name="notes_Added_type5" dataType="int" propertyName="NotesAddedType5" primaryKey="false" autoNumber="false" charType="false" isNullable="true" columnId="4096" index="12" NullableType="int?" columnName="notes_Added_type5" />
+    <Column name="notes_Added_type6" dataType="int" propertyName="NotesAddedType6" primaryKey="false" autoNumber="false" charType="false" isNullable="true" columnId="8192" index="13" NullableType="int?" columnName="notes_Added_type6" />
+    <Column name="notes_Added_type7" dataType="int" propertyName="NotesAddedType7" primaryKey="false" autoNumber="false" charType="false" isNullable="true" columnId="16384" index="14" NullableType="int?" columnName="notes_Added_type7" />
+    <Column name="is_bill_dispenser" dataType="bool" propertyName="IsBillDispenser" primaryKey="false" autoNumber="false" charType="false" isNullable="true" columnId="32768" index="15" NullableType="bool?" columnName="is_bill_dispenser" />
+  </Table>
+</Database>

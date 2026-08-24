@@ -1,0 +1,13 @@
+﻿Installing assembly 'C:\Jabbar\Git Repository\Services\EView360\EView360ATMStreamingService\bin\Debug\EView360ATMStreamingService.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Jabbar\Git Repository\Services\EView360\EView360ATMStreamingService\bin\Debug\EView360ATMStreamingService.InstallLog
+   assemblypath = C:\Jabbar\Git Repository\Services\EView360\EView360ATMStreamingService\bin\Debug\EView360ATMStreamingService.exe
+Installing service EView360ATMStreamingService...
+Service EView360ATMStreamingService has been successfully installed.
+Creating EventLog source EView360ATMStreamingService in log Application...
+Committing assembly 'C:\Jabbar\Git Repository\Services\EView360\EView360ATMStreamingService\bin\Debug\EView360ATMStreamingService.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Jabbar\Git Repository\Services\EView360\EView360ATMStreamingService\bin\Debug\EView360ATMStreamingService.InstallLog
+   assemblypath = C:\Jabbar\Git Repository\Services\EView360\EView360ATMStreamingService\bin\Debug\EView360ATMStreamingService.exe

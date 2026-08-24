@@ -904,6 +904,8 @@ namespace EView360.Pages.Operations
                 else if (dataFileResponse.isSucess && !string.IsNullOrEmpty(dataFileResponse.DataFile))
                 {
                     dataFile = dataFileResponse.DataFile;
+                    //if (model.FileTypeId == 1)
+                        dataFile = await FormatCashFile(dataFileResponse.DataFile.Replace("\0", ""));
                     await File.WriteAllLinesAsync(@$"{tempFolder}\CashDataFile_{DateTime.Now.ToString("MM_dd_yyyy_H_mm")}.txt", new List<string> { dataFile });
                     await jsRuntime.InvokeVoidAsync("downloadFile", dataFile, @$"CashDataFile2_{DateTime.Now.ToString("MM_dd_yyyy_H_mm")}.txt");
                     await RenderSuccessBox("Download success", $"File downloaded at {tempFolder}");

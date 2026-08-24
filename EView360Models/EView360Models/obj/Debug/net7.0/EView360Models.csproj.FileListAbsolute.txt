@@ -79,3 +79,4 @@ D:\View360\View360-UI\EView360Models\EView360Models\obj\Debug\net7.0\refint\EVie
 D:\View360\View360-UI\EView360Models\EView360Models\obj\Debug\net7.0\EView360Models.pdb
 D:\View360\View360-UI\EView360Models\EView360Models\obj\Debug\net7.0\EView360Models.genruntimeconfig.cache
 D:\View360\View360-UI\EView360Models\EView360Models\obj\Debug\net7.0\ref\EView360Models.dll
+D:\View360\View360-UI\EView360Models\EView360Models\obj\Debug\net7.0\EView360Models.sourcelink.json

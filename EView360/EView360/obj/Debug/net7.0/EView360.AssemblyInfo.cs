@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("EView360")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c53948b1a8848951b038eede57e6540ac3df687a")]
 [assembly: System.Reflection.AssemblyProductAttribute("EView360")]
 [assembly: System.Reflection.AssemblyTitleAttribute("EView360")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

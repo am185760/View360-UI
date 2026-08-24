@@ -657,10 +657,11 @@ D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\staticwebassets.build.j
 D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\staticwebassets.build.json.cache
 D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\staticwebassets.development.json
 D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\staticwebassets.build.endpoints.json
-D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\staticwebassets.upToDateCheck.txt
 D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\EView360.csproj.Up2Date
 D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\EView360.dll
 D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\refint\EView360.dll
 D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\EView360.pdb
 D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\EView360.genruntimeconfig.cache
 D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\ref\EView360.dll
+D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\EView360.sourcelink.json
+D:\View360\View360-UI\EView360\EView360\obj\Debug\net7.0\staticwebassets.upToDateCheck.txt

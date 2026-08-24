@@ -1,0 +1,8 @@
+D:\View360\Repository - View360 Depart\Services\EView360\Parser net-4.8\Parser\Parser\bin\Debug\Parser.dll
+D:\View360\Repository - View360 Depart\Services\EView360\Parser net-4.8\Parser\Parser\bin\Debug\Parser.pdb
+D:\View360\Repository - View360 Depart\Services\EView360\Parser net-4.8\Parser\Parser\bin\Debug\ServicesDAL.dll
+D:\View360\Repository - View360 Depart\Services\EView360\Parser net-4.8\Parser\Parser\bin\Debug\ServicesDAL.pdb
+D:\View360\Repository - View360 Depart\Services\EView360\Parser net-4.8\Parser\Parser\obj\Debug\Parser.csproj.CoreCompileInputs.cache
+D:\View360\Repository - View360 Depart\Services\EView360\Parser net-4.8\Parser\Parser\obj\Debug\Parser.csproj.CopyComplete
+D:\View360\Repository - View360 Depart\Services\EView360\Parser net-4.8\Parser\Parser\obj\Debug\Parser.dll
+D:\View360\Repository - View360 Depart\Services\EView360\Parser net-4.8\Parser\Parser\obj\Debug\Parser.pdb

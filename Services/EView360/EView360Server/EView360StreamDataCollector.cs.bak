@@ -1,0 +1,1765 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.ServiceProcess;
+using System.Threading;
+using Avanza.CCMS.DAL;
+using System.Reflection;
+using System.Net.Sockets;
+using System.Data.SqlClient;
+using Microsoft.Win32;
+using System.IO;
+using Avanza.iSuite.DAL;
+using System.Configuration;
+using System.Net;
+using Encryption;
+using System.Net.Mail;
+using System.Management;
+using System.Text;
+
+namespace Avanza.CCMS
+{
+    public partial class CurrencyMngServer : ServiceBase
+    {
+        #region declarations
+
+        public static string CurrentEJStore = "";
+        public static DateTime serviceStartedAt = DateTime.Now;
+        public static DateTime appSettingLastLoadedAt = DateTime.Now;
+        static int maxLicensedATMId = 0;
+        public static Timer timerNotifier;
+        Timer timerFetchCashOrders;
+        Timer timerExecCashOrderOrConfigTask;
+        Timer timerSaveCashOrders;
+        Timer timerListener;
+        Timer timerEmailSender;
+        Timer timerLicenseThreshold;
+        Timer timerHardDiskSpaceThreshold;
+        Timer timerCashDataDownloader;
+        Timer timerScheduleThreadForExecution;
+        public static AppSetting appSettings;
+        public static List<Downloader> ActiveDownloads = new List<Downloader>(50);
+        string scheduleTerminalIP;
+        int processorCount = Environment.ProcessorCount;
+        public static List<ATMStatus> listAtmStatus = new List<ATMStatus>();
+
+        #endregion
+
+        public CurrencyMngServer()
+        {
+            InitializeComponent();
+
+
+
+        }
+
+        void ScheduleThreadForExecution(object state)
+        {
+            try
+            {
+
+                string connectionStr = (string)Registry.LocalMachine.OpenSubKey("SOFTWARE\\NCR\\CCMS").GetValue("ConnectionString", "");
+                connectionStr = Encryption.Cryptic.DecryptString(connectionStr);
+                ConnectionFactory.Initialize(connectionStr, true);
+                appSettings = AppSetting.LoadAppSetting("1=1");
+                appSettingLastLoadedAt = DateTime.Now;
+                XmlLogWriter.InitXmlLogWriter(String.Format("{0}\\CurrencyManagement_{1:yyMMMdd}.txt", appSettings.LogFilePath, DateTime.Now));
+                maxLicensedATMId = LicenseManager.MaxLicensedATMID();
+                LogableTask.LogMonoActivityTask("DisplayVersion", System.Reflection.MethodBase.GetCurrentMethod(), TraceLevel.Info, "Version : Currency Management Server 1.0.0.4, Modified Date 17-Sep-2011");
+                LogableTask.LogMonoActivityTask("Schedular", System.Reflection.MethodBase.GetCurrentMethod(), TraceLevel.Info, "Worker Threads begin execution after 15 seconds.");
+
+                timerFetchCashOrders = new Timer(FetchCashOrders, null, new TimeSpan(0, 0, 15), new TimeSpan(0, 0, 0, 0, -1));
+                timerExecCashOrderOrConfigTask = new Timer(ExecCashOrderOrConfigTask, null, new TimeSpan(0, 0, 15), new TimeSpan(0, 0, 0, 0, -1));
+                timerSaveCashOrders = new Timer(SaveCashOrders, null, new TimeSpan(0, 0, 15), new TimeSpan(0, 0, 0, 0, -1));
+                timerCashDataDownloader = new Timer(DoWork, null, new TimeSpan(0, 0, 15), new TimeSpan(0, 0, 0, 0, -1));
+                timerNotifier = new Timer(Notifier.DoWork, null, new TimeSpan(0, 0, 15), new TimeSpan(0, 0, 0, 0, -1));
+                timerListener = new Timer(Listener, null, new TimeSpan(0, 0, 15), new TimeSpan(0, 0, 0, 0, -1));
+                timerEmailSender = new Timer(EmailSender, null, new TimeSpan(0, 0, 15), new TimeSpan(0, 0, 0, 0, -1));
+                timerLicenseThreshold = new Timer(AlertGenerationOnLicenseThreshold, null, new TimeSpan(0, 0, 15), new TimeSpan(0, 0, 0, 0, -1));
+                timerHardDiskSpaceThreshold = new Timer(AlertGenerationOnHardDiskSpaceThreshold, null, new TimeSpan(0, 0, 15), new TimeSpan(0, 0, 0, 0, -1));
+                EventLog.WriteEntry("CurrencyMngServer", "Service Started Successfully", EventLogEntryType.Information);
+
+            }
+            catch (Exception ex)
+            {
+                //trying to log error in event log if its not full.
+                try
+                {
+                    EventLog.WriteEntry("CurrencyMngServer", ex.Message + " " + ex.StackTrace, EventLogEntryType.Error);
+                    //EventLog.WriteEntry("CurrencyMngServer", "Service is idle", EventLogEntryType.Warning);
+                    timerScheduleThreadForExecution.Change(new TimeSpan(0, appSettings.RefreshInterval, 0), new TimeSpan(0, 0, 0, 0, -1));
+                }
+                catch (Exception innerException)
+                {
+                }
+            }
+        }
+        protected override void OnStart(string[] args)
+        {
+            timerScheduleThreadForExecution = new Timer(ScheduleThreadForExecution, null, new TimeSpan(0, 0, 25), new TimeSpan(0, 0, 0, 0, -1));
+            EventLog.WriteEntry("CurrencyMngServer", "Thread schedular sent startup request", EventLogEntryType.Information);
+        }
+
+        protected override void OnStop()
+        {
+            try
+            {
+                timerFetchCashOrders.Dispose();
+                timerExecCashOrderOrConfigTask.Dispose();
+                timerSaveCashOrders.Dispose();
+                timerListener.Dispose();
+                timerNotifier.Dispose();
+                timerCashDataDownloader.Dispose();
+                timerScheduleThreadForExecution.Dispose();
+                LogableTask task = LogableTask.NewTask("Service Stopped");
+                task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Warning, "Stopping");
+                task.EndTask();
+            }
+            catch (Exception ex)
+            {
+                EventLog.WriteEntry("CurrencyMngServer", "Error in OnStop(). detail: " + ex.Message + ex.StackTrace, EventLogEntryType.Error);
+            }
+        }
+
+        void FetchCashOrders(object state)
+        {
+            timerFetchCashOrders.Change(-1, -1);
+            LogableTask task = LogableTask.NewTask("FetchingCashOrders");
+
+            try
+            {
+                Region.RegionReader regionReader = Region.ExecuteReader("is_organization = 1 and region_id > 1 and is_active = 1");
+                while (regionReader.Read())
+                {
+                    try
+                    {
+                        FTP ftp = new FTP(regionReader.CurrentRegion.CashOrderFtpUsername, Cryptic.DecryptString(regionReader.CurrentRegion.CashOrderFtpPassword), regionReader.CurrentRegion.CashOrderFtpUri);
+                        string filenames = ftp.GetCashOrderFilenameList();
+                        if (filenames.Length > 0)
+                        {
+                            foreach (string filename in filenames.Split('\n'))
+                            {
+                                task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, "file name : " + filename);
+                                FtpFileInfo ftpFileInfo = new FtpFileInfo();
+                                if (filename.Contains("/"))
+                                    ftpFileInfo.FtpFilename = filename.Split('/')[1]; //regionReader.CurrentRegion.CashOrderFolderName.ToString()+"//"+
+                                else
+                                    ftpFileInfo.FtpFilename = filename;
+
+
+                                ftpFileInfo.CreationTime = DateTime.Now;
+                                ftpFileInfo.RegionId = regionReader.CurrentRegion.RegionId;
+                                ftpFileInfo.Status = FTPDownloadStatus.scheduled.ToString();
+                                ftpFileInfo.RetryCount = (int)CurrencyMngServer.appSettings.MaxTries;
+                                ftpFileInfo.TaskTypeId = (int)EnumTaskType.CashOrderDownload;
+                                ftpFileInfo.Save();
+                            }
+                        }
+                        else
+                            task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, "No cash orders to import for organization " + regionReader.CurrentRegion.RegionName);
+
+                        FtpFileInfo.FtpFileInfoReader reader = FtpFileInfo.ExecuteReader("status = '" + FTPDownloadStatus.scheduled.ToString() + "' and retry_count > 0 and task_type_id =3");
+                        while (reader.Read())
+                        {
+                            reader.CurrentFtpFileInfo.RetryCount--;
+                            reader.CurrentFtpFileInfo.LastInvokedAt = DateTime.Now;
+                            reader.CurrentFtpFileInfo.Save();
+
+                            ftp.DownloadCashOrders(reader.CurrentFtpFileInfo, regionReader.CurrentRegion.CashOrderDownloadedFilePath, regionReader.CurrentRegion.CashOrderArchiveUrl);
+                            //string CashOrderStoreName = "CashOrderStore_" + reader.CurrentFtpFileInfo.CreationTime.Year.ToString();
+                            //VerifyCashDataStore(CashOrderStoreName.ToLower());
+
+                            //SqlCommand cmd = ConnectionFactory.GetNewCommand(false);
+                            //cmd.Connection.Open();
+                            //cmd.Connection.ChangeDatabase(CashOrderStoreName);
+
+                            //cmd.CommandText = "insert into CashOrderFiles (ftp_file_info_id, cash_order_file) values(" + reader.CurrentFtpFileInfo.RegionId + ",@ej_file)";
+                            //cmd.Parameters.Add("@cash_order_file", System.Data.SqlDbType.Binary);
+                            //cmd.Parameters[0].Value = File.ReadAllBytes(reader.CurrentFtpFileInfo.FtpFilename);
+                            //cmd.ExecuteNonQuery();
+                            //cmd.Connection.Close();
+
+
+
+
+
+                        }
+
+                        if (reader != null)
+                            reader.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Error, ex);
+
+                    }
+
+                }
+                if (regionReader != null)
+                    regionReader.Close();
+            }
+            catch (Exception ex)
+            {
+                task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Error, ex);
+            }
+            finally
+            {
+                timerFetchCashOrders.Change(new TimeSpan(0, appSettings.RefreshInterval, 0), new TimeSpan(0, 0, 0, 0, -1));
+                task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, "Wake up after " + appSettings.RefreshInterval + " min");
+                task.EndTask();
+            }
+        }
+
+        public void ExecCashOrderOrConfigTask(object state)
+        {
+            timerExecCashOrderOrConfigTask.Change(-1, -1);
+            LogableTask task = LogableTask.NewTask("ExecuteTasks");
+            Task uploadingTask = null;
+            SqlConnection conn = null;
+            SqlDataReader reader = null;
+            try
+            {
+                //commented on 22 october bcoz cash order execution time is set by system current date at the time of installation.
+
+                //if (appSettings.CashOrderExecutionTime == null)
+                //    throw new Exception("Cash Order Execution Time is not defined in application configuration.");
+
+                //if (appSettings.CashOrderExecutionTime.Value.Date != DateTime.Now.Date)
+                //{
+                //    appSettings.CashOrderExecutionTime = appSettings.CashOrderExecutionTime.Value.AddDays(1);
+                //    appSettings.Save();
+                //}
+
+
+                conn = ConnectionFactory.GetNewConnection();
+                conn.Open();
+                SqlCommand cmd = conn.CreateCommand();
+                cmd.CommandText = @"select task_id 
+                                    from task inner join atm 
+                                    on task.atm_id = atm.atm_id 
+                                    where atm.is_active = 1
+                                    and task_type_id in (" + (int)EnumTaskType.CashOrderUpload + "," + (int)EnumTaskType.Configuration + ") and atm.atm_id <= " + CurrencyMngServer.maxLicensedATMId
+                                   + " and status in ('uploadingDisconnected','scheduled') " +
+                                   " or (status in ('initiating','uploading','resumedUploading') " +
+                                   " and last_invoked < dateadd(hh,-5,getdate())) and retry_remaining > 0";
+
+                reader = cmd.ExecuteReader();
+                //reader = Task.ExecuteReader(String.Format(@");
+                CashOrders cashOrders = null;
+                while (reader.Read())
+                {
+                    uploadingTask = Task.LoadTaskByPk(reader.GetInt32(0));
+                    if (uploadingTask.TaskTypeId == (int)EnumTaskType.CashOrderUpload)
+                    {
+
+
+                        cashOrders = CashOrders.LoadCashOrdersByPk(uploadingTask.CashOrderId.Value);
+
+                        if (cashOrders == null)
+                        {
+                            task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Warning, "cash order deleted from the database " + uploadingTask.CashOrderId.Value);
+                            uploadingTask.FailureReason = "Cash Order deleted from database";
+                            uploadingTask.RetryRemaining = 0;
+                            uploadingTask.LastInvoked = DateTime.Now;
+
+                            uploadingTask.Status = UploadStates.failed.ToString();
+                            uploadingTask.Save();
+                            continue;
+                        }
+
+                        if (cashOrders.DispatchTime >= DateTime.Now)
+                        {
+                            task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Warning, "Cash Order Execution time did not reach " + cashOrders.DispatchTime.ToString() + " for terminal " + uploadingTask.ATMId + " for the task " + uploadingTask.TaskId);
+                            uploadingTask.FailureReason = "Cash Order Execution time did not reach " + cashOrders.DispatchTime.ToString();
+                            uploadingTask.LastInvoked = DateTime.Now;
+                            uploadingTask.Save();
+
+                            continue;
+                        }
+
+
+
+
+                        //Check For Suspension First.
+                        Atm atm = Atm.LoadAtmByPk(uploadingTask.ATMId);
+                        if (atm != null)
+                        {
+                            if (atm.SuspendCashOrder)
+                            {
+                                task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Warning, "Cash Order Suspended " + uploadingTask.ATMId);
+                                uploadingTask.Status = UploadStates.cashOrderSuspended.ToString();
+                                uploadingTask.LastInvoked = DateTime.Now;
+                                uploadingTask.Save();
+                                continue;
+                            }
+                        }
+                        else
+                            throw new Exception("Atm does not exists");
+
+
+                        if (cashOrders.CashOrderDatetime < DateTime.Now.Date)
+                        {
+                            task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Warning, "Cash Order Expired " + uploadingTask.ATMId);
+                            uploadingTask.Status = UploadStates.cancelledOrderExpired.ToString();
+                            uploadingTask.LastInvoked = DateTime.Now;
+                            uploadingTask.Save();
+
+                            continue;
+                        }
+                        else if (cashOrders.CashOrderDatetime > DateTime.Now.Date)
+                        {
+                            task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, "Cash Order For future date found for atm:" + uploadingTask.ATMId);
+                            uploadingTask.FailureReason = "Cash order for future date found.";
+                            uploadingTask.LastInvoked = DateTime.Now;
+                            uploadingTask.Save();
+                            continue;
+                        }
+                    }
+
+                    Uploader uploader = new Uploader(uploadingTask, cashOrders);
+                    uploader.Start();
+                }
+            }
+            catch (Exception ex)
+            {
+                task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Error, ex);
+            }
+            finally
+            {
+                if (reader != null)
+                    reader.Close();
+
+                timerExecCashOrderOrConfigTask.Change(new TimeSpan(0, CurrencyMngServer.appSettings.RefreshInterval, 0), new TimeSpan(0, 1, 0));
+                task.EndTask();
+                if (conn != null)
+                    if (conn.State == System.Data.ConnectionState.Open)
+                        conn.Close();
+            }
+        }
+
+        void SaveCashOrders(object state)
+        {
+            timerSaveCashOrders.Change(-1, -1);
+            FtpFileInfo.FtpFileInfoReader reader = null;
+            int[] denominations = new int[7];
+            int uploadTask = 0;
+            string currentFile = null;
+            LogableTask task = LogableTask.NewTask("SaveCashOrders");
+            bool skipCurrentATM = false;
+            decimal remainingAmount = 0;
+            Atm atm = null;
+            bool readerHasRows = false;
+            SqlConnection conn = null;
+            SqlTransaction trxn = null;
+            int totalCashOrdersInFile = 0;
+            StringBuilder builder = null;
+            string msg = null;
+
+            try
+            {
+                reader = FtpFileInfo.ExecuteReader("status = '" + FTPDownloadStatus.downloaded.ToString() + "' and retry_count > 0");
+
+                while (reader.Read())
+                {
+                    try
+                    {
+                        totalCashOrdersInFile = 0;
+                        readerHasRows = true;
+                        reader.CurrentFtpFileInfo.RetryCount--;
+                        reader.CurrentFtpFileInfo.Save();
+                        Region region = Region.LoadRegionByPk(reader.CurrentFtpFileInfo.RegionId);
+                        currentFile = region.CashOrderDownloadedFilePath + "\\" + reader.CurrentFtpFileInfo.FtpFilename;
+
+                        if (!File.Exists(currentFile))
+                        {
+                            task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, "File does not exists " + currentFile);
+                            //update task status....
+
+                            //reader.CurrentFtpFileInfo.FailureReason = "File does not exists " + currentFile;
+                            //reader.CurrentFtpFileInfo.Save();
+                            continue;
+                        }
+
+                        string[] CashOrders = File.ReadAllLines(currentFile);
+                        task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, "Processing " + currentFile);
+
+                        if (conn == null)
+                        {
+                            conn = ConnectionFactory.GetNewConnection();
+                            conn.Open();
+                        }
+                        trxn = conn.BeginTransaction();
+                        builder = new StringBuilder();
+
+                        foreach (string CashOrderString in CashOrders)
+                        {
+                            totalCashOrdersInFile++;
+                            remainingAmount = 0;
+                            skipCurrentATM = false;
+                            CashOrders cashOrder = new CashOrders();
+                            string[] parameters = CashOrderString.Split(',');
+                            atm = Atm.LoadAtm("title='" + parameters[6] + "' and is_active = 1");
+                            if (atm == null)
+                            {
+                                msg = string.Format("ATM Friendly Name: {0} Does Not Exists In The Database Or the terminal is inactive.", parameters[6]);
+                                builder.Append(CashOrderString + "\r\n" + msg + "\r\n");
+                                AlertManager.GenerateGeneralAlert((int)EnumAlertType.ATMFriendlyNameMissing, msg, trxn);
+                                AlertManager.GenerateCCMSEvent(EventType.ATMNotFound.ToString(),
+                                    EventType.ATMNotFound.ToString(), Event_Type.Warning.ToString(), parameters[0] + "-" + parameters[6] + "-" + DateTime.ParseExact(parameters[4].Substring(2), "MMddyyyy", null).ToString("ddMMyy"),
+                                    EntityType.Order.ToString(), Actors.OPTICash.ToString(),
+                                    Actors.CCMS.ToString(), trxn);
+
+                                task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, msg);
+
+
+
+                                continue;
+                            }
+
+                            if (atm.ATMId > CurrencyMngServer.maxLicensedATMId)
+                            {
+                                msg = string.Format("Terminal IP : {0} Is Not Licensed.", atm.IP);
+                                builder.Append(CashOrderString + "\r\n" + msg + "\r\n");
+                                AlertManager.GenerateTerminalAlert(atm.ATMId, (int)EnumAlertType.TerminalNotLicensed, msg, trxn);
+                                task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, msg);
+                                continue;
+                            }
+
+                            if (parameters[19].Length == 0)
+                            {
+                                msg = string.Format("Ignoring Order {0} Because Field 20 Is Empty", CashOrderString);
+                                builder.Append(CashOrderString + "\r\n" + "Ignoring Order Because Field 20 Is empty " + "\r\n");
+                                AlertManager.GenerateTerminalAlert(atm.ATMId, (int)EnumAlertType.CashOrderField20Missing, msg, trxn);
+                                task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, msg);
+                                continue;
+                            }
+
+                            cashOrder.AtmId = atm.ATMId;
+                            cashOrder.CashOrderType = parameters[0];
+                            cashOrder.OrderNumber = parameters[0] + "-" + parameters[6] + "-" + DateTime.ParseExact(parameters[4].Substring(2), "MMddyyyy", null).ToString("ddMMyy");
+                            cashOrder.Cassette1Denomination = cashOrder.Cassette1RemainingNotes = cashOrder.Cassette1SuggestedNotes = 0;
+                            cashOrder.Cassette2Denomination = cashOrder.Cassette2RemainingNotes = cashOrder.Cassette2SuggestedNotes = 0;
+                            cashOrder.Cassette3Denomination = cashOrder.Cassette3RemainingNotes = cashOrder.Cassette3SuggestedNotes = 0;
+                            cashOrder.Cassette4Denomination = cashOrder.Cassette4RemainingNotes = cashOrder.Cassette4SuggestedNotes = 0;
+                            cashOrder.Cassette5Denomination = cashOrder.Cassette5RemainingNotes = cashOrder.Cassette5SuggestedNotes = 0;
+                            cashOrder.Cassette6Denomination = cashOrder.Cassette6RemainingNotes = cashOrder.Cassette6SuggestedNotes = 0;
+                            cashOrder.Cassette7Denomination = cashOrder.Cassette7RemainingNotes = cashOrder.Cassette7SuggestedNotes = 0;
+
+                            task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, "Load note set type");
+
+                            NoteSetType noteSetType = NoteSetType.LoadNoteSetTypeByPk(atm.NoteSetTypeId);
+                            if (noteSetType == null)
+                                throw new Exception("Note Set Type does not exists");
+
+
+                            denominations[0] = noteSetType.DenominationType1.Value;
+                            denominations[1] = noteSetType.DenominationType2.Value;
+                            denominations[2] = noteSetType.DenominationType3.Value;
+                            denominations[3] = noteSetType.DenominationType4.Value;
+                            denominations[4] = noteSetType.DenominationType5.Value;
+                            denominations[5] = noteSetType.DenominationType6.Value;
+                            denominations[6] = noteSetType.DenominationType7.Value;
+
+
+                            skipCurrentATM = false;
+                            cashOrder.CashOrderDatetime = DateTime.ParseExact(parameters[14], "MMddyyyy", null);
+                            int count = 19;
+                            task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, "Saving Cash Orders");
+
+
+
+
+                            int i = 0;
+                            for (i = count + 1; i < parameters.Length; i = i + 2)
+                            {
+                                int denominationIndex = Array.IndexOf(denominations, int.Parse(parameters[i].Substring(3)));
+                                if (denominationIndex < 0)
+                                {
+                                    task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, "Denomination " + parameters[i] + " missing for terminal " + atm.IP);
+                                    skipCurrentATM = true;
+                                    break;
+                                }
+
+                                if (denominationIndex == 0)
+                                {
+                                    cashOrder.Cassette1SuggestedNotes = cashOrder.Cassette1RemainingNotes = (int)(Decimal.Parse(parameters[i + 1]) / int.Parse(parameters[i].Substring(3)));
+                                    cashOrder.Cassette1Denomination = int.Parse(parameters[i].Substring(3));
+                                    remainingAmount += (decimal)(cashOrder.Cassette1SuggestedNotes * denominations[denominationIndex]);
+
+                                }
+                                else if (denominationIndex == 1)
+                                {
+                                    cashOrder.Cassette2SuggestedNotes = cashOrder.Cassette2RemainingNotes = (int)(Decimal.Parse(parameters[i + 1]) / int.Parse(parameters[i].Substring(3)));
+                                    cashOrder.Cassette2Denomination = int.Parse(parameters[i].Substring(3));
+                                    remainingAmount += (decimal)(cashOrder.Cassette2SuggestedNotes * denominations[denominationIndex]);
+                                }
+                                else if (denominationIndex == 2)
+                                {
+                                    cashOrder.Cassette3SuggestedNotes = cashOrder.Cassette3RemainingNotes = (int)(Decimal.Parse(parameters[i + 1]) / int.Parse(parameters[i].Substring(3)));
+                                    cashOrder.Cassette3Denomination = int.Parse(parameters[i].Substring(3));
+                                    remainingAmount += (decimal)(cashOrder.Cassette3SuggestedNotes * denominations[denominationIndex]);
+                                }
+                                else if (denominationIndex == 3)
+                                {
+                                    cashOrder.Cassette4SuggestedNotes = cashOrder.Cassette4RemainingNotes = (int)(Decimal.Parse(parameters[i + 1]) / int.Parse(parameters[i].Substring(3)));
+                                    cashOrder.Cassette4Denomination = int.Parse(parameters[i].Substring(3));
+                                    remainingAmount += (decimal)(cashOrder.Cassette4SuggestedNotes * denominations[denominationIndex]);
+                                }
+                                else if (denominationIndex == 4)
+                                {
+                                    cashOrder.Cassette5SuggestedNotes = cashOrder.Cassette5RemainingNotes = (int)(Decimal.Parse(parameters[i + 1]) / int.Parse(parameters[i].Substring(3)));
+                                    cashOrder.Cassette5Denomination = int.Parse(parameters[i].Substring(3));
+                                    remainingAmount += (decimal)(cashOrder.Cassette5SuggestedNotes * denominations[denominationIndex]);
+                                }
+                                else if (denominationIndex == 5)
+                                {
+                                    cashOrder.Cassette6SuggestedNotes = cashOrder.Cassette6RemainingNotes = (int)(Decimal.Parse(parameters[i + 1]) / int.Parse(parameters[i].Substring(3)));
+                                    cashOrder.Cassette6Denomination = int.Parse(parameters[i].Substring(3));
+                                    remainingAmount += (decimal)(cashOrder.Cassette6SuggestedNotes * denominations[denominationIndex]);
+                                }
+                                else if (denominationIndex == 6)
+                                {
+                                    cashOrder.Cassette7SuggestedNotes = cashOrder.Cassette7RemainingNotes = (int)(Decimal.Parse(parameters[i + 1]) / int.Parse(parameters[i].Substring(3)));
+                                    cashOrder.Cassette7Denomination = int.Parse(parameters[i].Substring(3));
+                                    remainingAmount += (decimal)(cashOrder.Cassette7SuggestedNotes * denominations[denominationIndex]);
+                                }
+                            }
+                            if (skipCurrentATM)
+                            {
+                                msg = string.Format("Denomination {0} Missing For Terminal IP {1} ", parameters[i], atm.IP);
+                                builder.Append(CashOrderString + "\r\n" + msg + "\r\n");
+                                AlertManager.GenerateTerminalAlert(atm.ATMId, (int)EnumAlertType.DenominationMissing, msg, trxn);
+
+                                AlertManager.GenerateCCMSEvent(
+                                EventType.InvalidOrderDenomination.ToString(),
+                                EventType.InvalidOrderDenomination.ToString(),
+                                Event_Type.Warning.ToString(),
+                                cashOrder.OrderNumber.ToString(),
+                                EntityType.Order.ToString(),
+                                Actors.OPTICash.ToString(),
+                                Actors.CCMS.ToString(),
+                                trxn);
+
+                                continue;
+                            }
+                            cashOrder.CreatedBy = 1; // System
+                            cashOrder.IsUploaded = false;
+                            cashOrder.FtpFileInfoId = reader.CurrentFtpFileInfo.FtpFileInfoId;
+                            cashOrder.DispatchTime = new DateTime(cashOrder.CashOrderDatetime.Year,
+                                                    cashOrder.CashOrderDatetime.Month, cashOrder.CashOrderDatetime.Day, appSettings.CashOrderExecutionTime.Hour,
+                                                    appSettings.CashOrderExecutionTime.Minute, appSettings.CashOrderExecutionTime.Second);
+
+                            cashOrder.Save(conn, trxn);
+
+                            //Task cashOrderUploadTask = new Task();
+                            //cashOrderUploadTask.ATMId = atm.ATMId;
+                            //cashOrderUploadTask.CreatedBy = 1;
+                            //cashOrderUploadTask.CreationTime = DateTime.Now;
+                            //cashOrderUploadTask.UploadTime = new DateTime(1900, 1, 1);
+                            //cashOrderUploadTask.Parsed = false;
+                            //cashOrderUploadTask.Status = DownloadStates.scheduled.ToString();
+                            //cashOrderUploadTask.CashOrderId = cashOrder.CashOrderId;
+                            //cashOrderUploadTask.BytesTransferred = 0;
+                            //cashOrderUploadTask.TaskTypeId = (int)EnumTaskType.CashOrderUpload;
+                            //cashOrderUploadTask.RetryRemaining = (byte)CurrencyMngServer.appSettings.MaxTries;
+                            //cashOrderUploadTask.Save(conn, trxn);
+                            uploadTask++;
+
+                            CashOrderMonitoring newCashOrderDetails = new CashOrderMonitoring();
+                            newCashOrderDetails.CashOrderDatetime = cashOrder.CashOrderDatetime;
+                            newCashOrderDetails.AtmId = atm.ATMId;
+                            newCashOrderDetails.CurrentOrderReceivedAt = reader.CurrentFtpFileInfo.EndTime.Value;
+                            newCashOrderDetails.CurrentOrderId = cashOrder.CashOrderId;
+                            newCashOrderDetails.CurrentOrderRemainingAmount = remainingAmount;
+                            newCashOrderDetails.CurrentOrderSuggestedAmount = remainingAmount;
+                            newCashOrderDetails.Save(conn, trxn);
+
+
+                            //for emitac...
+
+                            //SqlCommand cmd = conn.CreateCommand();
+                            //cmd.CommandText = "select id from ccms_organization where code='" + parameters[1] + "'";
+
+                            CcmsOrganization ccmsOrganization = CcmsOrganization.LoadCcmsOrganization("code='" + parameters[1] + "'");
+                            if (ccmsOrganization == null)
+                                throw new Exception("Organization Code does not exists : " + parameters[1]);
+                            CcmsOrgNoteSet ccmsOrgNoteSet = CcmsOrgNoteSet.LoadCcmsOrgNoteSet("organization_id=" + ccmsOrganization.Id + " and is_default=1");
+                            if (ccmsOrgNoteSet == null)
+                                throw new Exception(string.Format("Default note set type does not exists for organization {0} having code {1}", ccmsOrganization.Id, ccmsOrganization.Code));
+
+
+                            //Get Cit Id..Coded on 14-07-2011
+
+                            SqlCommand cmd = conn.CreateCommand();
+                            cmd.Transaction = trxn;
+                            cmd.CommandText = string.Format(@"select ccms_cit.id from ccms_cit
+                                                            inner join region_cit on region_cit.cit_id = ccms_cit.id
+                                                            inner join atm on atm.region_id = region_cit.region_id
+                                                            where atm.atm_id = {0}
+                                                            and ccms_cit.is_deleted = 0", atm.ATMId);
+                            object obj = cmd.ExecuteScalar();
+
+                            //
+                            CcmsOrder ccmsOrder = new CcmsOrder();
+                            ccmsOrder.AtmId = atm.ATMId;
+                            ccmsOrder.CreatedBy = 1;
+                            ccmsOrder.CreatedOn = DateTime.Now;
+                            ccmsOrder.IsDeleted = false;
+                            ccmsOrder.IsValidated = false;
+                            ccmsOrder.OrderDate = cashOrder.CashOrderDatetime;
+                            ccmsOrder.OrderNumber = cashOrder.OrderNumber;
+                            ccmsOrder.Status = "Pending";
+                            ccmsOrder.Source = "NCR";
+                            if (obj != null)
+                                ccmsOrder.CitId = int.Parse(obj.ToString());
+
+                            ccmsOrder.Save(conn, trxn);
+                            task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, "Order inserted in ccms_order table.");
+                            CcmsOrderDetail ccmsOrderDetail = null;
+                            for (i = 20; i < parameters.Length; i = i + 2)
+                            {
+                                ccmsOrderDetail = new CcmsOrderDetail();
+                                ccmsOrderDetail.DenominationName = parameters[i];
+                                ccmsOrderDetail.Quantity = decimal.Parse(parameters[i + 1]) / int.Parse(parameters[i].Substring(3));
+                                ccmsOrderDetail.OrderId = ccmsOrder.Id;
+                                CcmsOrgNoteSetItem ccmsOrgNoteSetItem = CcmsOrgNoteSetItem.LoadCcmsOrgNoteSetItem("denomination_name='" + parameters[i] + "' and org_note_set_id =" + ccmsOrgNoteSet.Id);
+                                if (ccmsOrgNoteSetItem == null)
+                                    throw new Exception(string.Format("Mote Set Type ID does not exists for organization {0} having code {1}", ccmsOrganization.Id, ccmsOrganization.Code));
+                                ccmsOrderDetail.NoteSetItemId = ccmsOrgNoteSetItem.Id;
+                                ccmsOrderDetail.Save(conn, trxn);
+                                task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, "Order detail inserted in ccms_order_table table.");
+                            }
+                            if (atm.MinAmountForNormalDelivery.HasValue)
+                            {
+                                if (newCashOrderDetails.CurrentOrderSuggestedAmount < atm.MinAmountForNormalDelivery.Value)
+                                {
+                                    AlertManager.GenerateCCMSEvent(
+                                    EventType.OrderBelowThreshold.ToString(),
+                                    EventType.OrderBelowThreshold.ToString(),
+                                    Event_Type.Warning.ToString(),
+                                    cashOrder.OrderNumber.ToString(),
+                                    EntityType.Order.ToString(),
+                                    Actors.OPTICash.ToString(),
+                                    Actors.CCMS.ToString(),
+                                    trxn);
+                                }
+                            }
+
+                        }
+
+                        if (uploadTask > 0 && totalCashOrdersInFile == uploadTask)
+                        {
+                            reader.CurrentFtpFileInfo.Status = FTPDownloadStatus.completed.ToString();
+                            reader.CurrentFtpFileInfo.FailureReason = "";
+                            reader.CurrentFtpFileInfo.Save(conn, trxn);
+                        }
+                        else if (uploadTask > 0 && totalCashOrdersInFile != uploadTask)
+                        {
+                            reader.CurrentFtpFileInfo.Status = FTPDownloadStatus.completedWithExceptions.ToString();
+                            reader.CurrentFtpFileInfo.FailureReason = "File Processed but some cash orders are not imported.";
+                            reader.CurrentFtpFileInfo.Save(conn, trxn);
+                            AlertManager.GenerateOrganizationAlert(reader.CurrentFtpFileInfo.FtpFileInfoId, (int)EnumAlertType.CashOrderImportCompletedWithExceptions, null, trxn);
+                        }
+                        else
+                        {
+                            reader.CurrentFtpFileInfo.Status = FTPDownloadStatus.failed.ToString();
+                            reader.CurrentFtpFileInfo.FailureReason = "File Processed but no cash order is imported.";
+                            reader.CurrentFtpFileInfo.Save(conn, trxn);
+                            AlertManager.GenerateOrganizationAlert(reader.CurrentFtpFileInfo.FtpFileInfoId, (int)EnumAlertType.CashOrderImportFailed, null, trxn);
+                        }
+
+                        task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, string.Format("{0} Cash Orders successfully saved in Database", uploadTask));
+                        uploadTask = 0;
+                        trxn.Commit();
+                        if (File.Exists(currentFile + "_unprocessed"))
+                            File.Delete(currentFile + "_unprocessed");
+                        File.WriteAllText(currentFile + "_unprocessed", builder.ToString());
+                    }
+
+                    catch (Exception ex)
+                    {
+
+                        try
+                        {
+                            if (ex.GetType().ToString().Contains("IndexOutOfRangeException"))
+                            {
+                                AlertManager.GenerateCCMSEvent(
+                                            EventType.CorruptOrderFile.ToString(),
+                                            EventType.CorruptOrderFile.ToString(),
+                                            Event_Type.Error.ToString(),
+                                            reader.CurrentFtpFileInfo.RegionId.ToString(),
+                                            EntityType.Organization.ToString(),
+                                            Actors.OPTICash.ToString(),
+                                            Actors.CCMS.ToString(),
+                                            null);
+                            }
+                            if (trxn != null)
+                                trxn.Rollback();
+
+                            task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Error, ex);
+
+                            if (ex.Message.Length > 256)
+                                reader.CurrentFtpFileInfo.FailureReason = ex.Message.Substring(0, 255).Replace("'", "''");
+                            else
+                                reader.CurrentFtpFileInfo.FailureReason = ex.Message.Replace("'", "''"); ;
+
+                            if (reader.CurrentFtpFileInfo.RetryCount == 0)
+                            {
+                                reader.CurrentFtpFileInfo.Status = FTPDownloadStatus.failed.ToString();
+                                AlertManager.GenerateOrganizationAlert(reader.CurrentFtpFileInfo.FtpFileInfoId, (int)EnumAlertType.CashOrderImportFailed, null);
+
+                            }
+                            reader.CurrentFtpFileInfo.Save();
+                        }
+                        catch (Exception innerEx)
+                        {
+                            task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Error, innerEx);
+                        }
+                    }
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Error, ex);
+            }
+
+            finally
+            {
+                if (reader != null)
+                    reader.Close();
+
+                if (!readerHasRows)
+                {
+                    task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, "No files entry found in ftp_file_info with unfinshed status");
+                }
+                if (conn != null)
+                    conn.Close();
+
+                timerSaveCashOrders.Change(new TimeSpan(0, appSettings.RefreshInterval, 0), new TimeSpan(0, 1, 0));
+                task.EndTask();
+            }
+        }
+
+        void DoWork(object state)
+        {
+            timerCashDataDownloader.Change(-1, -1);
+
+            try
+            {
+                XmlLogWriter.InitXmlLogWriter(String.Format("{0}\\CurrencyManagement_{1:yyMMMdd}.txt", appSettings.LogFilePath, DateTime.Now));
+                ThreadPool.SetMaxThreads(25, 25);
+
+                if (appSettings.RefreshInterval == 0)
+                    appSettings.RefreshInterval = 10;
+                else if (appSettings.RefreshInterval > 720)
+                    appSettings.RefreshInterval = 720;
+
+                try
+                {
+                    LogableTask.DefaultTraceLevel = (TraceLevel)Enum.Parse(typeof(TraceLevel), appSettings.ServiceLogLevel);
+                }
+                catch
+                {
+                    LogableTask.DefaultTraceLevel = TraceLevel.Info;
+                    LogableTask.LogMonoActivityTask("GetTraceLevel", MethodBase.GetCurrentMethod(), TraceLevel.Error, "Failed to extract trace level from database");
+                }
+
+                AddAutomaticDownloads(maxLicensedATMId);
+                PerformDownloads(maxLicensedATMId);
+            }
+            catch (Exception ex)
+            {
+                EventLog.WriteEntry("CurrencyMngServer", "Error in DoWork(). detail: " + ex.Message + ex.StackTrace, EventLogEntryType.Error);
+            }
+
+            int defaultInterval = 5; //minutes
+            try
+            {
+                if (appSettings == null)
+                    EventLog.WriteEntry("CurrencyMngServer", "Error in DoWork(). detail: AppSettings not loaded");
+                else
+                {
+                    defaultInterval = appSettings.RefreshInterval;
+                    LogableTask.LogMonoActivityTask("Dowork", MethodBase.GetCurrentMethod(), TraceLevel.Info, "Going to sleep for " + defaultInterval + " min");
+                }
+            }
+            catch (Exception ex)
+            {
+                LogableTask.LogMonoActivityTask("Dowork", MethodBase.GetCurrentMethod(), TraceLevel.Error, ex);
+            }
+            finally
+            {
+                timerCashDataDownloader.Change(new TimeSpan(0, defaultInterval, 0), new TimeSpan(0, 0, 0, 0, -1));
+            }
+        }
+
+        void Listener(object state)
+        {
+            LogableTask taskStartListnet = LogableTask.NewTask("StartListner");
+            Socket serverSoc = null;
+            DateTime atmPoolAt = DateTime.Now;
+            try
+            {
+                DoPreProcessingTask();
+                int port = (int)appSettings.ServerPort;
+                serverSoc = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                serverSoc.Bind(new IPEndPoint(IPAddress.Any, port));
+                serverSoc.Listen(10);
+                taskStartListnet.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, "Listener started at port = " + port);
+            }
+            catch (Exception ex)
+            {
+                taskStartListnet.Log(MethodBase.GetCurrentMethod(), TraceLevel.Error, ex);
+                return;
+            }
+            finally
+            {
+                try
+                {
+                    taskStartListnet.EndTask();
+                }
+                catch (Exception ex)
+                {
+                    EventLog.WriteEntry("CurrencyMngServer", ex.Message + ex.StackTrace, EventLogEntryType.Error);
+                }
+            }
+
+            while (true)
+            {
+                try
+                {
+                    LogableTask.LogMonoActivityTask("WaitingForIncomingRequest", MethodBase.GetCurrentMethod(), TraceLevel.Info, "Waiting....");
+                    Socket atmSocket = serverSoc.Accept();
+                    if (DateTime.Now >= atmPoolAt.AddMinutes(5))
+                    {
+                        DoPreProcessingTask();
+                        atmPoolAt = DateTime.Now;
+                        LogableTask.LogMonoActivityTask("Reload ATM from db", MethodBase.GetCurrentMethod(), TraceLevel.Info, "ATM list refreshed.Terminal count: " + listAtmStatus.Count);
+
+
+                    }
+                    else
+                        LogableTask.LogMonoActivityTask("Reload ATM from db", MethodBase.GetCurrentMethod(), TraceLevel.Info, "ATM list refreshed failed bcoz : " + DateTime.Now.ToString() + " " + atmPoolAt.ToString());
+
+                    LogableTask.LogMonoActivityTask("Terminal Notification Recieved", MethodBase.GetCurrentMethod(), TraceLevel.Info, "Processing : " + atmSocket.RemoteEndPoint.ToString());
+                    ATMRequestHandler atmHandler = new ATMRequestHandler(atmSocket);
+                    ThreadPool.QueueUserWorkItem(new WaitCallback(atmHandler.Talk));
+                    //Thread thread = new Thread(atmHandler.Talk);
+                    //thread.Start();
+                }
+                catch (Exception ex)
+                {
+                    EventLog.WriteEntry("CurrencyMngServer", String.Format("{0} {1}", ex.Message, ex.StackTrace), EventLogEntryType.Error);
+                }
+            }
+        }
+
+
+        private void SendOrganizationalMessages(SqlCommand cmd, SmtpClient client)
+        {
+            LogableTask task = LogableTask.NewTask("GenerateGeneralMessages");
+            int organizationAlertID = 0;
+            SqlDataReader reader = null;
+            SqlCommand helperCommand = null;
+            cmd.CommandText = @"select organization_alert_id,organization_alert.alert_type_id, alert_msg, generated_at,ftp_file_info_id
+                                from organization_alert, alert_type
+                                where organization_alert.alert_type_id = alert_type.alert_type_id 
+                                and retry_remaining  > 0
+                                and generate_notification_sent = 0";
+            try
+            {
+                reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    try
+                    {
+                        organizationAlertID = reader.GetInt32(0);
+                        AlertType alertType = AlertType.LoadAlertType(string.Format("alert_type_id = {0}", reader[1]));
+                        if (alertType == null)
+                            throw new Exception(string.Format("Alert type {0} does not exists in database ", reader[1]));
+
+                        helperCommand = ConnectionFactory.GetNewCommand(true);
+                        helperCommand.CommandText = string.Format(
+                                         @"update organization_alert 
+                                             set retry_remaining = retry_remaining - 1,
+                                             last_invoked_at = convert(datetime,'{0}',103) 
+                                             where organization_alert_id = {1}", DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"), reader.GetInt32(0));
+                        helperCommand.ExecuteNonQuery();
+
+                        MailMessage mailMsg = new MailMessage();
+                        mailMsg.From = new MailAddress(appSettings.SmtpUsername);
+                        int id = reader.GetInt32(4);
+                        FtpFileInfo ftpFileInfo = FtpFileInfo.LoadFtpFileInfoByPk(id);
+                        if (ftpFileInfo == null)
+                            throw new Exception("ftp_file_info does not have entry for id " + id);
+
+                        RegionReceipients.RegionReceipientsReader regionReceipientsReader = RegionReceipients.ExecuteReader("region_id=" + ftpFileInfo.RegionId);
+                        mailMsg.Subject = alertType.AlertTypeName + " failed for organization " + Region.LoadRegionByPk(ftpFileInfo.RegionId).RegionName;
+                        while (regionReceipientsReader.Read())
+                        {
+                            AppUser user = AppUser.LoadAppUserByPk(regionReceipientsReader.CurrentRegionReceipients.ReceipientsId);
+                            mailMsg.To.Add(new MailAddress(user.UserEmail));
+                        }
+                        mailMsg.Body = alertType.AlertDefaultText.Replace("[ALERT_ID]", reader.GetInt32(0).ToString()).Replace("[GENERATED_AT]", reader.GetDateTime(3).ToString("dd/MM/yyyy HH:mm:ss")) + alertType.AlertAdditionalText + "<br/>";
+                        mailMsg.Body += reader[2];
+                        mailMsg.IsBodyHtml = true;
+                        client.Send(mailMsg);
+                        helperCommand.CommandText = string.Format(
+                                         @"update organization_alert 
+                                             set generate_notification_sent = 1
+                                             where organization_alert_id = {0}", organizationAlertID);
+                        helperCommand.ExecuteNonQuery();
+
+
+                    }
+
+                    catch (Exception ex)
+                    {
+                        try
+                        {
+                            task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Error, ex);
+                            if (helperCommand == null)
+                                helperCommand = ConnectionFactory.GetNewCommand(true);
+                            string msg = null;
+                            if (ex.Message.Length > 512)
+                                msg = ex.Message.Substring(0, 511);
+                            else
+                                msg = ex.Message;
+                            if (organizationAlertID != 0)
+                            {
+                                helperCommand.CommandText = @"update organization_alert set failure_reason ='" + msg + "' where organization_alert_id = " + organizationAlertID;
+                                helperCommand.ExecuteNonQuery();
+                            }
+                        }
+                        catch (Exception innerException)
+                        {
+                            EventLog.WriteEntry("CurrencyMngServer", String.Format("{0} {1}", innerException.Message, innerException.StackTrace), EventLogEntryType.Error);
+                        }
+                        finally
+                        {
+                            if (helperCommand != null)
+                                if (helperCommand.Connection != null)
+                                    helperCommand.Connection.Close();
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                if (reader != null)
+                    reader.Close();
+                task.EndTask();
+            }
+
+        }
+
+        private void SendGeneralMessages(SqlCommand cmd, SmtpClient client)
+        {
+            LogableTask task = LogableTask.NewTask("GenerateGeneralMessages");
+            int generalAlertID = 0;
+            SqlDataReader reader = null;
+            SqlCommand helperCommand = null;
+            cmd.CommandText = @"select general_alert_id,general_alert.alert_type_id, alert_msg, generated_at
+                                from general_alert, alert_type
+                                where general_alert.alert_type_id = alert_type.alert_type_id 
+                                and retry_remaining  > 0
+                                and generate_notification_sent = 0";
+            try
+            {
+                reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    try
+                    {
+                        generalAlertID = reader.GetInt32(0);
+                        AlertType alertType = AlertType.LoadAlertType(string.Format("alert_type_id = {0}", reader[1]));
+                        if (alertType == null)
+                            throw new Exception(string.Format("Alert type {0} does not exists in database ", reader[1]));
+
+                        helperCommand = ConnectionFactory.GetNewCommand(true);
+                        helperCommand.CommandText = string.Format(
+                                         @"update general_alert 
+                                             set retry_remaining = retry_remaining - 1,
+                                             last_invoked_at = convert(datetime,'{0}',103) 
+                                             where general_alert_id = {1}", DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"), reader.GetInt32(0));
+                        helperCommand.ExecuteNonQuery();
+                        MailMessage mailMsg = new MailMessage();
+                        mailMsg.From = new MailAddress(appSettings.SmtpUsername);
+                        mailMsg.Subject = alertType.AlertTypeName;
+                        AppUser user = AppUser.LoadAppUserByPk(2);
+                        if (user.UserEmail.Length == 0)
+                            throw new Exception("admin email address is not defined");
+                        mailMsg.To.Add(new MailAddress(user.UserEmail));
+
+
+                        mailMsg.Body = alertType.AlertDefaultText.Replace("[ALERT_ID]", reader.GetInt32(0).ToString()).Replace("[GENERATED_AT]", reader.GetDateTime(3).ToString("dd/MM/yyyy HH:mm:ss")) + "<br/>" + alertType.AlertAdditionalText + "<br/>";
+                        mailMsg.Body += reader.GetString(2);
+                        mailMsg.IsBodyHtml = true;
+
+                        client.Send(mailMsg);
+                        helperCommand.CommandText = string.Format(
+                                         @"update general_alert 
+                                             set generate_notification_sent = 1
+                                             where general_alert_id = {0}", generalAlertID);
+                        helperCommand.ExecuteNonQuery();
+                    }
+
+                    catch (Exception ex)
+                    {
+                        try
+                        {
+                            task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Error, ex);
+                            if (helperCommand == null)
+                                helperCommand = ConnectionFactory.GetNewCommand(true);
+                            string msg = null;
+                            if (ex.Message.Length > 512)
+                                msg = ex.Message.Substring(0, 511);
+                            else
+                                msg = ex.Message;
+                            if (generalAlertID != 0)
+                            {
+                                helperCommand.CommandText = @"update general_alert set failure_reason ='" + msg + "' where general_alert_id = " + generalAlertID;
+                                helperCommand.ExecuteNonQuery();
+                            }
+                        }
+                        catch (Exception innerException)
+                        {
+                            EventLog.WriteEntry("CurrencyMngServer", String.Format("{0} {1}", innerException.Message, innerException.StackTrace), EventLogEntryType.Error);
+                        }
+                        finally
+                        {
+                            if (helperCommand != null)
+                                if (helperCommand.Connection != null)
+                                    helperCommand.Connection.Close();
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                if (reader != null)
+                    reader.Close();
+                task.EndTask();
+            }
+        }
+
+        private void SendTerminalMessages(SqlCommand cmd, SmtpClient client)
+        {
+            LogableTask task = LogableTask.NewTask("GenerateTerminalMessages");
+            int atmAlertID = 0;
+            SqlDataReader reader = null;
+            SqlCommand helperCommand = null;
+            string notificationSentSQL = null;
+            cmd.CommandText = @"select atm_alert_id,atm_alert.alert_type_id, atm_id,generated_at, resolve_at, alert_msg
+                                from atm_alert, alert_type
+                                where atm_alert.alert_type_id = alert_type.alert_type_id 
+                                and ((generate_at_retry_remaining > 0 and generate_notification_sent = 0  )
+                                or ( resolve_at_retry_remaining > 0 and resolve_notification_sent =0 and resolve_at is not null ))";
+            try
+            {
+                reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    try
+                    {
+                        atmAlertID = reader.GetInt32(0);
+                        helperCommand = ConnectionFactory.GetNewCommand(true);
+                        AlertType alertType = AlertType.LoadAlertType(string.Format("alert_type_id = {0}", reader[1]));
+                        if (alertType == null)
+                            throw new Exception(string.Format("Alert type {0} does not exists in database ", reader[1]));
+
+
+                        if (alertType.AlertTypeId == (int)EnumAlertType.TCPConnectionDown
+                     || alertType.AlertTypeId == (int)EnumAlertType.CashOrderField20Missing
+                     || alertType.AlertTypeId == (int)EnumAlertType.ConfigurationMismatch
+                     || alertType.AlertTypeId == (int)EnumAlertType.ConfigurationUploadFailed
+                     || alertType.AlertTypeId == (int)EnumAlertType.DenominationMissing
+                     || alertType.AlertTypeId == (int)EnumAlertType.TerminalNotLicensed
+                     || alertType.AlertTypeId == (int)EnumAlertType.ATMCashLevelFileDownloadFailed
+                     || alertType.AlertTypeId == (int)EnumAlertType.CashOrderUploadFailed)
+                        {
+                            helperCommand.CommandText = string.Format(
+                                             @"update atm_alert 
+                                             set generate_at_retry_remaining = generate_at_retry_remaining - 1,
+                                             last_invoked_at = convert(datetime,'{0}',103) 
+                                             where atm_alert_id = {1}", DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"), reader.GetInt32(0));
+
+                            notificationSentSQL = string.Format(
+                                             @"update atm_alert 
+                                             set generate_notification_sent = 1
+                                             where atm_alert_id = {0}", reader.GetInt32(0));
+                        }
+
+                        else
+                        {
+                            bool skip = false;
+                            if (alertType.AlertTypeId == (int)EnumAlertType.TCPConnectionUp)
+                            {
+                                AtmAlert atmAlert = AtmAlert.LoadAtmAlertByPk(reader.GetInt32(0));
+                                if (!atmAlert.GenerateNotificationSent)
+                                {
+                                    helperCommand.CommandText = string.Format(
+                                                     @"update atm_alert 
+                                             set generate_at_retry_remaining = generate_at_retry_remaining - 1,
+                                             last_invoked_at = convert(datetime,'{0}',103) 
+                                             where atm_alert_id = {1}", DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"), reader.GetInt32(0));
+
+                                    notificationSentSQL = string.Format(
+                                                     @"update atm_alert 
+                                             set generate_notification_sent = 1
+                                             where atm_alert_id = {0}", reader.GetInt32(0));
+                                    alertType = AlertType.LoadAlertType(string.Format("alert_type_id = {0}", (int)EnumAlertType.TCPConnectionDown));
+                                    if (alertType == null)
+                                        throw new Exception(string.Format("Alert type {0} does not exists in database ", EnumAlertType.TCPConnectionDown.ToString()));
+                                    skip = true;
+
+                                }
+                            }
+
+                            if (skip == false)
+                            {
+                                helperCommand.CommandText = string.Format(
+                                                @"update atm_alert 
+                                             set resolve_at_retry_remaining = resolve_at_retry_remaining - 1,
+                                             last_invoked_at = convert(datetime,'{0}',103) 
+                                             where atm_alert_id = {1}", DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"), reader.GetInt32(0));
+                                notificationSentSQL = string.Format(
+                                                 @"update atm_alert 
+                                             set resolve_notification_sent = 1
+                                             where atm_alert_id = {0}", reader.GetInt32(0));
+                            }
+
+                        }
+
+                        helperCommand.ExecuteNonQuery();
+                        MailMessage mailMsg = new MailMessage();
+                        mailMsg.From = new MailAddress(appSettings.SmtpUsername);
+
+                        Atm atm = Atm.LoadAtmByPk(reader.GetInt32(2));
+                        if (atm == null)
+                            throw new Exception("atm does not exists " + atm.Title);
+                        //Subject.
+                        mailMsg.Subject = alertType.AlertTypeName + " - ATM:" + atm.Title;
+                        //Receipients.
+                        McnAtms mcnATMs = McnAtms.LoadMcnAtms(string.Format("atm_id={0}", atm.ATMId));
+                        if (mcnATMs == null)
+                            throw new Exception("mcn_atms does not have entry for atm:" + atm.ATMId);
+                        int region_id = mcnATMs.RegionId;
+                        RegionReceipients.RegionReceipientsReader regionReceipientsReader = RegionReceipients.ExecuteReader(string.Format("region_id={0}", region_id));
+                        while (regionReceipientsReader.Read())
+                        {
+                            AppUser user = AppUser.LoadAppUserByPk(regionReceipientsReader.CurrentRegionReceipients.ReceipientsId);
+                            mailMsg.To.Add(new MailAddress(user.UserEmail));
+                        }
+                        //Body
+                        if (alertType.AlertTypeId == (int)EnumAlertType.TCPConnectionUp)
+                            mailMsg.Body = alertType.AlertDefaultText.Replace("[ALERT_ID]", reader.GetInt32(0).ToString()).Replace("[GENERATED_AT]", reader.GetDateTime(3).ToString("dd/MM/yyyy HH:mm:ss")).Replace("[RESOLVE_AT]", reader.GetDateTime(4).ToString("dd/MM/yyyy HH:mm:ss")) + "<br/>" + alertType.AlertAdditionalText + "<br/>";
+                        else
+                            mailMsg.Body = alertType.AlertDefaultText.Replace("[ALERT_ID]", reader.GetInt32(0).ToString()).Replace("[GENERATED_AT]", reader.GetDateTime(3).ToString("dd/MM/yyyy HH:mm:ss")) + "<br/>" + alertType.AlertAdditionalText + "<br/>";
+                        mailMsg.Body += reader[5];
+                        mailMsg.IsBodyHtml = true;
+
+                        client.Send(mailMsg);
+                        helperCommand.CommandText = notificationSentSQL;
+                        helperCommand.ExecuteNonQuery();
+                    }
+
+                    catch (Exception ex)
+                    {
+                        try
+                        {
+                            task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Error, ex);
+                            if (helperCommand == null)
+                                helperCommand = ConnectionFactory.GetNewCommand(true);
+                            string msg = null;
+                            if (ex.Message.Length > 512)
+                                msg = ex.Message.Substring(0, 511);
+                            else
+                                msg = ex.Message;
+
+                            msg = msg.Replace("'", "''");
+                            if (atmAlertID != 0)
+                            {
+                                helperCommand.CommandText = @"update atm_alert set failure_reason ='" + msg + "' where atm_alert_id = " + atmAlertID;
+                                helperCommand.ExecuteNonQuery();
+                            }
+                        }
+                        catch (Exception innerException)
+                        {
+                            EventLog.WriteEntry("CurrencyMngServer", String.Format("{0} {1}", innerException.Message, innerException.StackTrace), EventLogEntryType.Error);
+                        }
+                        finally
+                        {
+                            if (helperCommand != null)
+                                if (helperCommand.Connection != null)
+                                    helperCommand.Connection.Close();
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                if (reader != null)
+                    reader.Close();
+
+                task.EndTask();
+            }
+
+
+        }
+        private void Send(SmtpClient client, List<MailMessage> list)
+        {
+            foreach (MailMessage msg in list)
+                client.Send(msg);
+        }
+
+        void EmailSender(object state)
+        {
+            timerEmailSender.Change(-1, -1);
+            LogableTask task = LogableTask.NewTask("EmailSender");
+            SqlCommand cmd = null;
+
+            try
+            {
+                if (appSettings.SmtpServer == null || appSettings.SmtpPort == null)
+                    throw new Exception("Configuration is missing for sending email");
+                SmtpClient client = new SmtpClient(appSettings.SmtpServer, (int)appSettings.SmtpPort);
+
+                cmd = ConnectionFactory.GetNewCommand(true);
+                task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, "Generating emails for terminal msgs");
+                SendTerminalMessages(cmd, client);
+                task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, "Generating emails for organizational msgs");
+                SendOrganizationalMessages(cmd, client);
+                task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, "Generating emails for general msgs");
+                SendGeneralMessages(cmd, client);
+
+
+
+
+                //cmd.CommandText = @"select notification_id, status, generated_at, resolve_at, atm_id, alert.alert_id, alert.alert_type_id, ftp_file_info_id, alert_data from alert, notification where alert.alert_id = notification.alert_id and retry_remaining > 0 and notification_sent = 0 and (atm_id is null or atm_id <= " + CurrencyMngServer.maxLicensedATMId + ")";
+                //reader = cmd.ExecuteReader();
+
+                //try
+                //{
+                //    while (reader.Read())
+                //    {
+                //        try
+                //        {
+                //            notificationId = reader.GetInt32(0);
+                //            helperCommand = ConnectionFactory.GetNewCommand(true);
+                //            helperCommand.CommandText = @"update notification set retry_remaining = retry_remaining - 1 , last_invoked_at = convert(datetime,'" + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "',103) where notification_id = " + notificationId;
+                //            helperCommand.ExecuteNonQuery();
+
+                //            MailMessage mailMsg = new MailMessage();
+                //            mailMsg.From = new MailAddress(appSettings.SmtpUsername);
+                //            //Can be one call by merging both tables...
+
+                //            AlertType alertType = AlertType.LoadAlertType("alert_type_id = " + reader[6]);
+                //            if (alertType == null)
+                //                throw new Exception("Alert type does not exists in database " + reader[6]);
+                //            string alertTypeName = alertType.AlertTypeName;
+
+                //            Avanza.CCMS.DAL.AlertTemplate alertTemplate = Avanza.CCMS.DAL.AlertTemplate.LoadAlertTemplate("alert_type_id = " + reader[6]);
+                //            if (alertTemplate == null)
+                //                throw new Exception("Alert template does not exists in database " + reader[6]);
+
+                //            string additionalText = alertTemplate.AlertTemplateText.ToString();
+
+                //            if ((int)reader[6] == (int)EnumAlertType.Licensing || (int)reader[6] == (int)EnumAlertType.HardDiskFreeSpace || (int)reader[6] == (int)EnumAlertType.ATMFriendlyNameMissing)
+                //            {
+                //                mailMsg.Subject = alertTypeName;
+                //                AppUser user = AppUser.LoadAppUserByPk(2);
+                //                if (user.UserEmail.Length == 0)
+                //                    throw new Exception("admin email address is not defined");
+                //                mailMsg.To.Add(new MailAddress(user.UserEmail));
+                //                if ((int)reader[6] == (int)EnumAlertType.ATMFriendlyNameMissing)
+                //                    mailMsg.Body += (string)reader[8] + "<br/>";
+                //                mailMsg.Body += alertTemplate.DefaultText.Replace("[ALERT_ID]", reader.GetInt32(5).ToString()).Replace("[GENERATED_AT]", reader.GetDateTime(2).ToString("dd/MM/yyyy HH:mm:ss")) + additionalText;
+                //            }
+                //            else if ((int)reader[6] == (int)EnumAlertType.CashOrderDownload || (int)reader[6] == (int)EnumAlertType.CashOrderImportFailed || (int)reader[6] == (int)EnumAlertType.CashOrderImportCompletedWithExceptions)
+                //            {
+                //                //SqlCommand command = ConnectionFactory.GetNewCommand(true);
+                //                int id = reader.GetInt32(7);
+                //                FtpFileInfo ftpFileInfo = FtpFileInfo.LoadFtpFileInfoByPk(id);
+                //                if (ftpFileInfo == null)
+                //                    throw new Exception("ftp_file_info does not have entry for id " + id);
+
+                //                RegionReceipients.RegionReceipientsReader regionReceipientsReader = RegionReceipients.ExecuteReader("region_id=" + ftpFileInfo.RegionId);
+                //                mailMsg.Subject = alertTypeName + " failed for organization " + Region.LoadRegionByPk(ftpFileInfo.RegionId).RegionName;
+                //                while (regionReceipientsReader.Read())
+                //                {
+                //                    AppUser user = AppUser.LoadAppUserByPk(regionReceipientsReader.CurrentRegionReceipients.ReceipientsId);
+                //                    mailMsg.To.Add(new MailAddress(user.UserEmail));
+                //                }
+                //                mailMsg.Body = alertTemplate.DefaultText.Replace("[ALERT_ID]", reader.GetInt32(5).ToString()).Replace("[GENERATED_AT]", reader.GetDateTime(2).ToString("dd/MM/yyyy HH:mm:ss")) + additionalText;
+                //            }
+                //            else if ((int)reader[6] == (int)EnumAlertType.TCPConnectionDown || (int)reader[6] == (int)EnumAlertType.TCPConnectionUp || (int)reader[6] == (int)EnumAlertType.CashOrderField20Missing || (int)reader[6] == (int)EnumAlertType.ConfigurationMismatch || (int)reader[6] == (int)EnumAlertType.ConfigurationUploadFailed || (int)reader[6] == (int)EnumAlertType.DenominationMissing || (int)reader[6] == (int)EnumAlertType.TerminalNotLicensed || (int)reader[6] == (int)EnumAlertType.ATMCashLevelFileDownloadFailed || (int)reader[6] == (int)EnumAlertType.CashOrderUploadFailed)
+                //            {
+                //                int alert_type_id = (int)reader[6];
+                //                if (!list.Contains(reader.GetInt32(5)))
+                //                    list.Add(reader.GetInt32(5));
+                //                else
+                //                {
+                //                    list.Remove(reader.GetInt32(5));
+                //                    //alertTypeName = EnumAlertType.TCPConnectionDown.ToString();
+                //                    alert_type_id = (int)EnumAlertType.TCPConnectionDown;
+
+                //                    alertType = AlertType.LoadAlertType("alert_type_id = " + alert_type_id);
+                //                    if (alertType == null)
+                //                        throw new Exception("Alert type does not exists in database " + alert_type_id);
+                //                    alertTypeName = alertType.AlertTypeName;
+
+                //                    alertTemplate = Avanza.CCMS.DAL.AlertTemplate.LoadAlertTemplate("alert_type_id = " + alert_type_id);
+                //                    if (alertTemplate == null)
+                //                        throw new Exception("Alert template does not exists in database " + reader[6]);
+
+                //                    additionalText = alertTemplate.AlertTemplateText.ToString();
+
+                //                }
+
+                //                //int atm_id = reader.GetInt32(4);
+                //                Atm atm = Atm.LoadAtmByPk(reader.GetInt32(4));
+
+
+
+                //                //if (lastAlertId != 0 && lastAlertId == reader.GetInt32(5))
+                //                //{
+                //                //    //Time to change alert type
+                //                //    alertTypeName = EnumAlertType.TCPConnectionDown.ToString();
+                //                //    alert_type_id = (int)EnumAlertType.TCPConnectionDown;
+                //                //}
+
+                //                if (atm == null)
+                //                    throw new Exception("atm does not exists " + atm.AtmFriendlyName);
+                //                mailMsg.Subject = alertTypeName + " - ATM:" + atm.Title;
+                //                McnAtms mcnATMs = McnAtms.LoadMcnAtms("atm_id=" + atm.ATMId);
+                //                if (mcnATMs == null)
+                //                    throw new Exception("mcn_atms does not have entry for atm:" + atm.ATMId);
+                //                int region_id = mcnATMs.RegionId;
+
+                //                RegionReceipients.RegionReceipientsReader regionReceipientsReader = RegionReceipients.ExecuteReader("region_id=" + region_id);
+                //                while (regionReceipientsReader.Read())
+                //                {
+                //                    AppUser user = AppUser.LoadAppUserByPk(regionReceipientsReader.CurrentRegionReceipients.ReceipientsId);
+                //                    mailMsg.To.Add(new MailAddress(user.UserEmail));
+                //                }
+
+                //                if (alert_type_id == (int)EnumAlertType.TCPConnectionUp)
+                //                    mailMsg.Body = alertTemplate.DefaultText.Replace("[ALERT_ID]", reader.GetInt32(5).ToString()).Replace("[GENERATED_AT]", reader.GetDateTime(2).ToString("dd/MM/yyyy HH:mm:ss")).Replace("[RESOLVE_AT]", reader.GetDateTime(3).ToString("dd/MM/yyyy HH:mm:ss")) + additionalText;
+                //                else
+                //                    mailMsg.Body = alertTemplate.DefaultText.Replace("[ALERT_ID]", reader.GetInt32(5).ToString()).Replace("[GENERATED_AT]", reader.GetDateTime(2).ToString("dd/MM/yyyy HH:mm:ss")) + additionalText;
+
+                //                //lastAlertId = reader.GetInt32(5);
+                //                //lastATMId = atm_id;
+
+
+                //            }
+                //            else if ((int)reader[6] == (int)EnumAlertType.DailyFeedUpload)
+                //            {
+                //                int ftpFileInfoId = reader.GetInt32(7);
+                //                FtpFileInfo ftpFileInfo = FtpFileInfo.LoadFtpFileInfoByPk(ftpFileInfoId);
+                //                if (ftpFileInfo == null)
+                //                    throw new Exception("ftp_file_info does not have entry for id" + ftpFileInfoId);
+
+                //                RegionReceipients.RegionReceipientsReader regionReceipientsReader = RegionReceipients.ExecuteReader("region_id=" + ftpFileInfo.RegionId);
+                //                mailMsg.Subject = alertTypeName + " failed for organization " + Region.LoadRegionByPk(ftpFileInfo.RegionId).RegionName;
+                //                while (regionReceipientsReader.Read())
+                //                {
+                //                    AppUser user = AppUser.LoadAppUserByPk(regionReceipientsReader.CurrentRegionReceipients.ReceipientsId);
+                //                    mailMsg.To.Add(new MailAddress(user.UserEmail));
+                //                }
+                //                mailMsg.Body = "Ticket ID: " + reader.GetInt32(5) + "<br/>Alert Generated On:" + reader.GetDateTime(2) + "<br/>" + additionalText;
+                //            }
+
+                //            mailMsg.IsBodyHtml = true;
+                //            client.Send(mailMsg);
+                //            //helperCommand = ConnectionFactory.GetNewCommand(true);
+                //            helperCommand.CommandText = @"update notification set notification_sent = 1 where notification_id = " + notificationId;
+                //            helperCommand.ExecuteNonQuery();
+
+                //            task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, "Email Sent Successfully for notification id " + notificationId);
+                //        }
+                //        catch (Exception ex)
+                //        {
+
+                //            task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Error, ex);
+                //            if (helperCommand == null)
+                //                helperCommand = ConnectionFactory.GetNewCommand(true);
+                //            string msg = null;
+                //            if (ex.Message.Length > 512)
+                //                msg = ex.Message.Substring(0, 511);
+                //            else
+                //                msg = ex.Message;
+                //            if (notificationId != 0)
+                //            {
+                //                helperCommand.CommandText = @"update notification set failure_reason ='" + msg + "' where notification_id = " + notificationId;
+                //                helperCommand.ExecuteNonQuery();
+                //            }
+
+
+                //        }
+                //        finally
+                //        {
+                //            if (helperCommand != null)
+                //                helperCommand.Connection.Close();
+
+                //        }
+                //    }
+                //}
+                //finally
+                //{
+                //    if (cmd != null)
+                //        cmd.Connection.Close();
+                //    //if (cmd1 != null)
+                //    //    cmd1.Connection.Close();
+                //    if (reader != null)
+                //        reader.Close();
+                //    //if (reader1 != null)
+                //    //    reader1.Close();
+                //}
+            }
+            catch (Exception ex)
+            {
+                task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Error, ex);
+            }
+            finally
+            {
+                timerEmailSender.Change(new TimeSpan(0, appSettings.RefreshInterval, 0), new TimeSpan(0, 1, 0));
+                if (cmd != null)
+                    cmd.Connection.Close();
+                task.EndTask();
+            }
+        }
+
+        void AlertGenerationOnLicenseThreshold(object state)
+        {
+            timerLicenseThreshold.Change(-1, -1);
+            LogableTask task = LogableTask.NewTask("LicenseThreshold");
+            SqlCommand cmd = null;
+            string msg = "License Threshold reached.";
+            try
+            {
+                cmd = ConnectionFactory.GetNewCommand(true);
+                cmd.CommandText = "select count(*) from atm where is_active=1";
+                int utilizedATMCount = Convert.ToInt32(cmd.ExecuteScalar());
+                if (100 - ((utilizedATMCount * 100) / LicenseManager.GetLicensedATMs()) <= int.Parse(ConfigurationManager.AppSettings["LicenseThreshold"]))
+                    AlertManager.GenerateConditionalGeneralAlert((int)EnumAlertType.Licensing, msg);
+            }
+            catch (Exception ex)
+            {
+                task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Error, ex);
+            }
+            finally
+            {
+                timerLicenseThreshold.Change(new TimeSpan(0, appSettings.RefreshInterval, 0), new TimeSpan(0, 0, 0, 0, -1));
+                task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, "Wake up after " + appSettings.RefreshInterval + " min");
+                task.EndTask();
+                if (cmd != null)
+                    if (cmd.Connection != null)
+                        cmd.Connection.Close();
+            }
+        }
+
+        void AlertGenerationOnHardDiskSpaceThreshold(object state)
+        {
+            timerHardDiskSpaceThreshold.Change(-1, -1);
+            LogableTask task = LogableTask.NewTask("HardDiskSpaceThreshold");
+            string msg = "Hard Disk Space Threshold reached.";
+            try
+            {
+                ManagementObject disk = new ManagementObject("win32_logicaldisk.deviceid='" + appSettings.LogFilePath.Split('\\')[0] + "'");
+                disk.Get();
+                if (100 - (Int64.Parse(disk["FreeSpace"].ToString()) * 100 / Int64.Parse(disk["Size"].ToString())) <= int.Parse(ConfigurationManager.AppSettings["HardDiskSpaceThreshold"]))
+                    AlertManager.GenerateConditionalGeneralAlert((int)EnumAlertType.HardDiskFreeSpace, msg);
+            }
+            catch (Exception ex)
+            {
+                task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Error, ex);
+            }
+            finally
+            {
+                timerHardDiskSpaceThreshold.Change(new TimeSpan(0, appSettings.RefreshInterval, 0), new TimeSpan(0, 0, 0, 0, -1));
+                task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, "Wake up after " + appSettings.RefreshInterval + " min");
+                task.EndTask();
+            }
+        }
+
+        int TraceOrganization(int region_id)
+        {
+            if (Region.LoadRegionByPk(region_id).IsOrganization == true)
+                return region_id;
+            else
+                return TraceOrganization(Region.LoadRegionByPk(region_id).ParentRegionId.Value);
+        }
+
+        void AddAutomaticDownloads(int maxLicensedATMId)
+        {
+            LogableTask task = LogableTask.NewTask("AddAutomaticDownloads");
+            SqlCommand cmd = null;
+            DownloadingSchedule.DownloadingScheduleReader schedulesReader = null;
+
+            try
+            {
+                bool HasRows = false;
+                bool scheduleFound = false;
+                schedulesReader = DownloadingSchedule.ExecuteReader("1=1");
+
+                while (schedulesReader.Read())
+                {
+                    HasRows = true;
+                    if (DateTime.Now < schedulesReader.CurrentDownloadingSchedule.NextDownloadAt)
+                    {
+                        task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Verbose, "Its not " + schedulesReader.CurrentDownloadingSchedule.NextDownloadAt.ToString()); //   schedulesExecuted++;
+                    }
+                    else
+                    {
+                        scheduleFound = true;
+                        break;
+                    }
+                }
+
+                if (!HasRows)
+                {
+                    task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Warning, "No schedules time defined");
+                    return;
+                }
+
+                if (!scheduleFound)
+                    return;
+
+                task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Verbose, "Its time to schedule download!" + schedulesReader.CurrentDownloadingSchedule.NextDownloadAt.ToString());
+
+                TimeSpan timeSpan = DateTime.Today - schedulesReader.CurrentDownloadingSchedule.NextDownloadAt.AddHours(-schedulesReader.CurrentDownloadingSchedule.NextDownloadAt.Hour)
+                    .AddMinutes(-schedulesReader.CurrentDownloadingSchedule.NextDownloadAt.Minute)
+                    .AddSeconds(-schedulesReader.CurrentDownloadingSchedule.NextDownloadAt.Second)
+                    .AddMilliseconds(-schedulesReader.CurrentDownloadingSchedule.NextDownloadAt.Millisecond);
+                schedulesReader.CurrentDownloadingSchedule.NextDownloadAt = schedulesReader.CurrentDownloadingSchedule.NextDownloadAt.AddDays(timeSpan.Days + 1);
+                schedulesReader.CurrentDownloadingSchedule.Save();
+
+
+                cmd = ConnectionFactory.GetNewCommand(true);
+                //correct the entires which might be due to killing of service while connecting to an ATM
+                cmd.CommandText = " update task set status = 'downloadingDisconnected' where  status = 'initiating' and last_invoked < dateadd(hh, -5, getdate()) and task_type_id = " + (int)EnumTaskType.CashDataDownload;
+                task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, cmd.ExecuteNonQuery() + " atms changed from initiating to downloadingDisconnected");
+
+                cmd.CommandText = @"select s.atm_id, s.file_type_id from atm inner join scheduled_downloads s on s.atm_id = atm.atm_id 
+                where atm.is_active = 1 and not exists (select atm_id, file_type_id from task where status in ('scheduled', 'downloadingDisconnected','initiating','downloading','nameReceived','sizeReceived') 
+                and atm_id = s.atm_id and file_type_id= s.file_type_id) and s.atm_id <= " + maxLicensedATMId;
+                SqlDataReader scheduleReader = cmd.ExecuteReader();
+                SqlConnection sqlConn = ConnectionFactory.GetNewConnection();
+                sqlConn.Open();
+                SqlTransaction sqlTrx = sqlConn.BeginTransaction();
+
+                try
+                {
+                    //appSettings.LastDownloadedAt = DateTime.Now;
+                    //appSettings.Save(sqlConn, sqlTrx);
+                    int count = 0;
+
+                    while (scheduleReader.Read())
+                    {
+                        Task CashDataDownloadTask = new Task();
+                        CashDataDownloadTask.ATMId = (int)scheduleReader["atm_id"];
+                        CashDataDownloadTask.BytesTransferred = 0;
+                        CashDataDownloadTask.CreationTime = DateTime.Now;
+                        CashDataDownloadTask.CreatedBy = 1;
+                        CashDataDownloadTask.DownloadTime = new DateTime(1900, 1, 1);
+                        CashDataDownloadTask.FileTypeId = (int)scheduleReader["file_type_id"];
+                        CashDataDownloadTask.Parsed = false;
+                        CashDataDownloadTask.RetryRemaining = (byte)appSettings.MaxTries;
+                        CashDataDownloadTask.Status = DownloadStates.scheduled.ToString();
+                        CashDataDownloadTask.TaskTypeId = (int)EnumTaskType.CashDataDownload;
+                        CashDataDownloadTask.DownloadingScheduleId = schedulesReader.CurrentDownloadingSchedule.DownloadingScheduleId;
+                        CashDataDownloadTask.Save(sqlConn, sqlTrx);
+                        count++;
+                    }
+                    scheduleReader.Close();
+                    sqlTrx.Commit();
+                    task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, count + " files scheduled for downloading");
+                }
+                catch (Exception ex)
+                {
+                    sqlTrx.Rollback();
+                    task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Error, ex);
+                }
+                finally
+                {
+                    sqlConn.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Error, ex);
+            }
+            finally
+            {
+                if (schedulesReader != null)
+                    schedulesReader.Close();
+                if (cmd != null)
+                    cmd.Connection.Close();
+                task.EndTask();
+            }
+        }
+
+        void PerformDownloads(int maxLicensedATMId)
+        {
+            LogableTask task = LogableTask.NewTask("PerformDownloads");
+            //int count = 0;
+            SqlConnection conn = null;
+
+            try
+            {
+
+                conn = ConnectionFactory.GetNewConnection();
+                conn.Open();
+                SqlCommand cmd = conn.CreateCommand();
+                cmd.CommandText = @"select task_id, ip, task.created_by 
+                                    from task inner join atm 
+                                    on task.atm_id = atm.atm_id 
+                                    and atm.is_active = 1 and atm.atm_id <=" + maxLicensedATMId +
+                                    " and task_type_id = " + (int)EnumTaskType.CashDataDownload +
+                                    " and status in ('downloadingDisconnected','scheduled','nameReceived','sizeReceived') " +
+                                     " or (status in ('downloading','resumedDownloading') " +
+                                     " and last_invoked < dateadd(hh,-5,getdate())) " +
+                                     " and retry_remaining >0 order by task.creation_time";
+
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                //Task.TaskReader taskReader = Task.ExecuteReader(" task_type_id = " + (int)EnumTaskType.CashDataDownload + " and status in ('downloadingDisconnected','scheduled','nameReceived','sizeReceived') or (status in ('downloading','resumedDownloading') and last_invoked < dateadd(hh,-5,getdate())) and retry_remaining >0 order by creation_time");
+                while (reader.Read())
+                {
+                    //      count++;
+                    if (ActiveDownloads.Count > (10 * processorCount))
+                    {
+                        task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, "taking a minute off");
+                        Thread.Sleep(60 * 1000);
+                    }
+                    Task downloadTask = Task.LoadTaskByPk(reader.GetInt32(0));
+
+                    //if (downloadTask.ATMId > maxLicensedATMId)
+                    //{
+                    //    task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Warning, "ATM id " + downloadTask.ATMId + " is not licensed");
+                    //    continue;
+                    //}
+
+                    scheduleTerminalIP = reader.GetString(1);
+
+                    if (!TerminalAlreadyConnected(scheduleTerminalIP))
+                    {
+                        Downloader downloader = new Downloader(downloadTask);
+                        downloader.requestInitiatedAT = DateTime.Now;
+                        lock (CurrencyMngServer.ActiveDownloads)
+                        {
+                            ActiveDownloads.Add(downloader);
+                        }
+                        if (downloader.Start())
+                            task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info,
+                            string.Format(" going to start download for {0} at {2}, {1} atms in queue ", downloader.ATMIP, ActiveDownloads.Count, downloader.requestInitiatedAT));
+                    }
+                    else
+                    {
+                        LogableTask.LogMonoActivityTask("ScheduleDownload", MethodBase.GetCurrentMethod(), TraceLevel.Info,
+                        string.Format(" Terminal {0} already connected,job id {1}, created by {2}", scheduleTerminalIP, reader.GetInt32(0), reader.GetInt32(2)));
+                    }
+
+                    if (ActiveDownloads.Count > 3)
+                        Thread.Sleep(3000); //to avoid boombardment of downloads
+                }
+                //    task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info,"Jobs found"+count);
+                reader.Close();
+            }
+            catch (Exception ex)
+            {
+                task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Error, ex);
+            }
+            finally
+            {
+                task.EndTask();
+                if (conn != null)
+                    if (conn.State == System.Data.ConnectionState.Open)
+                        conn.Close();
+
+            }
+        }
+
+        void DoPreProcessingTask()
+        {
+            
+            StringBuilder builder =null;
+            if (listAtmStatus.Count > 0)
+            {
+                builder = new StringBuilder();
+                foreach (ATMStatus atmStatus in listAtmStatus)
+                    builder.Append(atmStatus.atm_id + ",");
+
+            }
+            using (SqlCommand cmd = ConnectionFactory.GetNewCommand(true))
+            {
+                if (builder != null)
+                {
+                    cmd.CommandText = "select atm_id, ip from atm where is_active = 1 and atm_id <= " + LicenseManager.MaxLicensedATMID() + " and atm_id not in (" + builder.ToString() + "-1)";
+                    
+                }
+                else
+                {
+                    cmd.CommandText = "select atm_id, ip from atm where is_active = 1 and atm_id <= " + LicenseManager.MaxLicensedATMID();
+                    
+                }
+
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        ATMStatus atmStatus = new ATMStatus();
+                        atmStatus.atm_id = reader.GetInt32(0);
+                        atmStatus.ip = reader.GetString(1);
+                        atmStatus.lastNotificationAt = new DateTime(1900, 1, 1);
+                        lock (listAtmStatus)
+                        {
+                            listAtmStatus.Add(atmStatus);
+                        }
+                    }
+                }
+            }
+        }
+
+        bool TerminalAlreadyConnected(string scheduleTerminalIP)
+        {
+            for (int i = 0; i < ActiveDownloads.Count; i++)
+            {
+                if (ActiveDownloads[i].ATMIP == scheduleTerminalIP)
+                {
+                    if (ActiveDownloads[i].requestInitiatedAT < DateTime.Now.AddHours(-6))
+                    {
+                        try
+                        {
+                            if (ActiveDownloads[i].currentThread != null && ActiveDownloads[i].currentThread.IsAlive)
+                            {
+                                ActiveDownloads[i].currentThread.Abort();
+                                LogableTask.LogMonoActivityTask("Scheduling", System.Reflection.MethodBase.GetCurrentMethod(), TraceLevel.Verbose, string.Format("Thread aborted for terminal {0}", ActiveDownloads[i].ATMIP));
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            LogableTask.LogMonoActivityTask("Scheduling", System.Reflection.MethodBase.GetCurrentMethod(), TraceLevel.Verbose, string.Format("Exception occured while trying to kill thread for terminal {0}-{1}", ActiveDownloads[i].ATMIP, ex.Message));
+                        }
+
+                        lock (CurrencyMngServer.ActiveDownloads)
+                        {
+
+                            ActiveDownloads.RemoveAt(i);
+                            i--;
+                            LogableTask.LogMonoActivityTask("Scheduling", System.Reflection.MethodBase.GetCurrentMethod(), TraceLevel.Verbose, string.Format("Terminal {0} removed because 6 hrs have been elapsed", ActiveDownloads[i].ATMIP));
+                        }
+                        return false;
+                    }
+                    else
+                        return true;
+                }
+            }
+            return false;
+        }
+    }
+}

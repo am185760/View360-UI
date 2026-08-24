@@ -963,7 +963,7 @@ namespace ServicesDAL
         public void Delete(IDbConnection conn)
         {
             IDbCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "DELETE Atm_alert whereatm_alert_id= " + atm_alert_id;
+            cmd.CommandText = "DELETE Atm_alert where atm_alert_id= " + atm_alert_id;
             if (conn.State == ConnectionState.Closed)
             {
                 cmd.Connection.Open();

@@ -19,3 +19,24 @@ D:\View360\Repository - View360 Depart\EView360Models\EView360Models\obj\Release
 D:\View360\Repository - View360 Depart\EView360Models\EView360Models\obj\Release\net7.0\EView360Models.pdb
 D:\View360\Repository - View360 Depart\EView360Models\EView360Models\obj\Release\net7.0\EView360Models.genruntimeconfig.cache
 D:\View360\Repository - View360 Depart\EView360Models\EView360Models\obj\Release\net7.0\ref\EView360Models.dll
+D:\View360\View360-UI\EView360Models\EView360Models\bin\Release\net7.0\EView360Models.deps.json
+D:\View360\View360-UI\EView360Models\EView360Models\bin\Release\net7.0\EView360Models.runtimeconfig.json
+D:\View360\View360-UI\EView360Models\EView360Models\bin\Release\net7.0\EView360Models.dll
+D:\View360\View360-UI\EView360Models\EView360Models\bin\Release\net7.0\EView360Models.pdb
+D:\View360\View360-UI\EView360Models\EView360Models\bin\Release\net7.0\Encryption.dll
+D:\View360\View360-UI\EView360Models\EView360Models\bin\Release\net7.0\ICSharpCode.SharpZipLib.dll
+D:\View360\View360-UI\EView360Models\EView360Models\bin\Release\net7.0\Encryption.pdb
+D:\View360\View360-UI\EView360Models\EView360Models\bin\Release\net7.0\ICSharpCode.SharpZipLib.pdb
+D:\View360\View360-UI\EView360Models\EView360Models\bin\Release\net7.0\ICSharpCode.SharpZipLib.xml
+D:\View360\View360-UI\EView360Models\EView360Models\obj\Release\net7.0\EView360Models.csproj.AssemblyReference.cache
+D:\View360\View360-UI\EView360Models\EView360Models\obj\Release\net7.0\EView360Models.GeneratedMSBuildEditorConfig.editorconfig
+D:\View360\View360-UI\EView360Models\EView360Models\obj\Release\net7.0\EView360Models.AssemblyInfoInputs.cache
+D:\View360\View360-UI\EView360Models\EView360Models\obj\Release\net7.0\EView360Models.AssemblyInfo.cs
+D:\View360\View360-UI\EView360Models\EView360Models\obj\Release\net7.0\EView360Models.csproj.CoreCompileInputs.cache
+D:\View360\View360-UI\EView360Models\EView360Models\obj\Release\net7.0\EView360Models.sourcelink.json
+D:\View360\View360-UI\EView360Models\EView360Models\obj\Release\net7.0\EView360.E972C07E.Up2Date
+D:\View360\View360-UI\EView360Models\EView360Models\obj\Release\net7.0\EView360Models.dll
+D:\View360\View360-UI\EView360Models\EView360Models\obj\Release\net7.0\refint\EView360Models.dll
+D:\View360\View360-UI\EView360Models\EView360Models\obj\Release\net7.0\EView360Models.pdb
+D:\View360\View360-UI\EView360Models\EView360Models\obj\Release\net7.0\EView360Models.genruntimeconfig.cache
+D:\View360\View360-UI\EView360Models\EView360Models\obj\Release\net7.0\ref\EView360Models.dll

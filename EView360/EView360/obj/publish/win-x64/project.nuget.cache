@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "xQ+g79XoirE=",
+  "dgSpecHash": "x5Zbkr6iEAY=",
   "success": true,
-  "projectFilePath": "D:\\View360\\Repository - View360 Depart\\EView360\\EView360\\EView360.csproj",
+  "projectFilePath": "D:\\View360\\View360-UI\\EView360\\EView360\\EView360.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\am185760\\.nuget\\packages\\azure.core\\1.24.0\\azure.core.1.24.0.nupkg.sha512",
     "C:\\Users\\am185760\\.nuget\\packages\\azure.identity\\1.6.0\\azure.identity.1.6.0.nupkg.sha512",
@@ -244,9 +244,9 @@
       "code": "NU1903",
       "level": "Warning",
       "message": "Package 'System.Data.SqlClient' 4.8.5 has a known high severity vulnerability, https://github.com/advisories/GHSA-98g6-xh36-x2p7",
-      "projectPath": "D:\\View360\\Repository - View360 Depart\\EView360\\EView360\\EView360.csproj",
+      "projectPath": "D:\\View360\\View360-UI\\EView360\\EView360\\EView360.csproj",
       "warningLevel": 1,
-      "filePath": "D:\\View360\\Repository - View360 Depart\\EView360\\EView360\\EView360.csproj",
+      "filePath": "D:\\View360\\View360-UI\\EView360\\EView360\\EView360.csproj",
       "libraryId": "System.Data.SqlClient",
       "targetGraphs": [
         "net7.0",
@@ -257,9 +257,9 @@
       "code": "NU1701",
       "level": "Warning",
       "message": "Package 'BouncyCastle 1.8.9' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net7.0'. This package may not be fully compatible with your project.",
-      "projectPath": "D:\\View360\\Repository - View360 Depart\\EView360\\EView360\\EView360.csproj",
+      "projectPath": "D:\\View360\\View360-UI\\EView360\\EView360\\EView360.csproj",
       "warningLevel": 1,
-      "filePath": "D:\\View360\\Repository - View360 Depart\\EView360\\EView360\\EView360.csproj",
+      "filePath": "D:\\View360\\View360-UI\\EView360\\EView360\\EView360.csproj",
       "libraryId": "BouncyCastle",
       "targetGraphs": [
         "net7.0"
@@ -269,9 +269,9 @@
       "code": "NU1701",
       "level": "Warning",
       "message": "Package 'iTextSharp 5.5.13.3' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net7.0'. This package may not be fully compatible with your project.",
-      "projectPath": "D:\\View360\\Repository - View360 Depart\\EView360\\EView360\\EView360.csproj",
+      "projectPath": "D:\\View360\\View360-UI\\EView360\\EView360\\EView360.csproj",
       "warningLevel": 1,
-      "filePath": "D:\\View360\\Repository - View360 Depart\\EView360\\EView360\\EView360.csproj",
+      "filePath": "D:\\View360\\View360-UI\\EView360\\EView360\\EView360.csproj",
       "libraryId": "iTextSharp",
       "targetGraphs": [
         "net7.0"

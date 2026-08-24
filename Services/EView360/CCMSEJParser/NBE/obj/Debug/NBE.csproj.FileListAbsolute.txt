@@ -1,0 +1,22 @@
+C:\Jabbar\Git Repository\CCMSEJParser\NBE\bin\Debug\Parser.dll
+C:\Jabbar\Git Repository\CCMSEJParser\NBE\bin\Debug\Parser.pdb
+C:\Jabbar\Git Repository\CCMSEJParser\NBE\bin\Debug\EJToCounterMapper.dll
+C:\Jabbar\Git Repository\CCMSEJParser\NBE\bin\Debug\ServicesDAL.dll
+C:\Jabbar\Git Repository\CCMSEJParser\NBE\bin\Debug\EJToCounterMapper.pdb
+C:\Jabbar\Git Repository\CCMSEJParser\NBE\bin\Debug\ServicesDAL.pdb
+C:\Jabbar\Git Repository\CCMSEJParser\NBE\obj\Debug\NBE.csproj.AssemblyReference.cache
+C:\Jabbar\Git Repository\CCMSEJParser\NBE\obj\Debug\NBE.csproj.CoreCompileInputs.cache
+C:\Jabbar\Git Repository\CCMSEJParser\NBE\obj\Debug\NBE.csproj.CopyComplete
+C:\Jabbar\Git Repository\CCMSEJParser\NBE\obj\Debug\Parser.dll
+C:\Jabbar\Git Repository\CCMSEJParser\NBE\obj\Debug\Parser.pdb
+D:\View360\Repository - View360 Depart\CCMSEJParser\NBE\bin\Debug\Parser.dll
+D:\View360\Repository - View360 Depart\CCMSEJParser\NBE\bin\Debug\Parser.pdb
+D:\View360\Repository - View360 Depart\CCMSEJParser\NBE\bin\Debug\EJToCounterMapper.dll
+D:\View360\Repository - View360 Depart\CCMSEJParser\NBE\bin\Debug\ServicesDAL.dll
+D:\View360\Repository - View360 Depart\CCMSEJParser\NBE\bin\Debug\EJToCounterMapper.pdb
+D:\View360\Repository - View360 Depart\CCMSEJParser\NBE\bin\Debug\ServicesDAL.pdb
+D:\View360\Repository - View360 Depart\CCMSEJParser\NBE\obj\Debug\NBE.csproj.AssemblyReference.cache
+D:\View360\Repository - View360 Depart\CCMSEJParser\NBE\obj\Debug\NBE.csproj.CoreCompileInputs.cache
+D:\View360\Repository - View360 Depart\CCMSEJParser\NBE\obj\Debug\NBE.csproj.CopyComplete
+D:\View360\Repository - View360 Depart\CCMSEJParser\NBE\obj\Debug\Parser.dll
+D:\View360\Repository - View360 Depart\CCMSEJParser\NBE\obj\Debug\Parser.pdb

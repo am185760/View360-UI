@@ -1,0 +1,32 @@
+C:\Jabbar\Git Repository\Services\EView360\EView360ATMStreamingService\bin\Debug\EView360ATMStreamingService.exe.config
+C:\Jabbar\Git Repository\Services\EView360\EView360ATMStreamingService\bin\Debug\EView360ATMStreamingService.exe
+C:\Jabbar\Git Repository\Services\EView360\EView360ATMStreamingService\bin\Debug\EView360ATMStreamingService.pdb
+C:\Jabbar\Git Repository\Services\EView360\EView360ATMStreamingService\obj\Debug\EView360ATMStreamingService.csproj.AssemblyReference.cache
+C:\Jabbar\Git Repository\Services\EView360\EView360ATMStreamingService\obj\Debug\ATM360.Installer1.resources
+C:\Jabbar\Git Repository\Services\EView360\EView360ATMStreamingService\obj\Debug\EView360ATMStreamingService.csproj.GenerateResource.cache
+C:\Jabbar\Git Repository\Services\EView360\EView360ATMStreamingService\obj\Debug\EView360ATMStreamingService.csproj.CoreCompileInputs.cache
+C:\Jabbar\Git Repository\Services\EView360\EView360ATMStreamingService\obj\Debug\EView360ATMStreamingService.exe
+C:\Jabbar\Git Repository\Services\EView360\EView360ATMStreamingService\obj\Debug\EView360ATMStreamingService.pdb
+D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\EView360ATMStreamingService.exe.config
+D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\EView360ATMStreamingService.exe
+D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\EView360ATMStreamingService.pdb
+D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\obj\Debug\ATM360.Installer1.resources
+D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\obj\Debug\EView360ATMStreamingService.csproj.GenerateResource.cache
+D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\obj\Debug\EView360ATMStreamingService.csproj.CoreCompileInputs.cache
+D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\obj\Debug\EView360ATMStreamingService.exe
+D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\obj\Debug\EView360ATMStreamingService.pdb
+D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\ICSharpCode.SharpZipLib.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\System.Buffers.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\System.Memory.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\System.Numerics.Vectors.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\System.Threading.Tasks.Extensions.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\ICSharpCode.SharpZipLib.pdb
+D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\ICSharpCode.SharpZipLib.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\System.Buffers.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\System.Memory.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\System.Numerics.Vectors.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\System.Threading.Tasks.Extensions.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\obj\Debug\EView360ATMStreamingService.csproj.AssemblyReference.cache
+D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\obj\Debug\EView360ATMStreamingService.csproj.CopyComplete

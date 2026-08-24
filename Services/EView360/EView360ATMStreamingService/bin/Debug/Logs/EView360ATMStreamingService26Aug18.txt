@@ -1,0 +1,2 @@
+18/08/2026 17:15:01 Info      File path D:\View360\Repository - View360 Depart\Services\EView360\EView360ATMStreamingService\bin\Debug\\Logs\EView360ATMStreamingService26Aug18.txt
+18/08/2026 17:15:01:42 Warning   EView360ATMStreaming.OnStop                  Service Stopped

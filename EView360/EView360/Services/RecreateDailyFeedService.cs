@@ -32,7 +32,7 @@ namespace EView360.Services
             try
             {
                 _logger.LogWarning("[RecreateDailyFeedService:GetDailyFeedSchedules] going in GetDailyFeedSchedules Recreate Daily Feed Service API");
-                using HttpResponseMessage response = await client.GetAsync($"{BaseUrl}GetDailyFeedSchedules/?fromDate={fromDate.ToString()}&toDate={toDate.ToString()}");
+                using HttpResponseMessage response = await client.GetAsync($"{BaseUrl}GetDailyFeedSchedules/?fromDate={fromDate.ToString("dd/MM/yyyy HH:mm:ss")}&toDate={toDate.ToString("dd/MM/yyyy HH:mm:ss")}");
                 _logger.LogWarning("[RecreateDailyFeedService:GetDailyFeedSchedules] returning from GetDailyFeedSchedules Recreate Daily Feed API");
 
                 string responseBody = await response.Content.ReadAsStringAsync();

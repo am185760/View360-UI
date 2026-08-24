@@ -1,0 +1,1905 @@
+﻿
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Data;
+using Avanza.iSuite.DAL;
+using System.Data.SqlClient;
+using System.Reflection;
+using System.Collections;
+using System.IO;
+using System.Globalization;
+using Avanza.CCMS.DAL;
+using System.Diagnostics;
+
+
+namespace Avanza.CCMS.Parser
+{
+    public class ReplenishmentExtractor
+    {
+        Task globalTask;
+        string[] dateFormats = { "MM/dd/yyyyHH:mm:ss", "MM/dd/yyyyHH:mm", "MM/dd/yy HH:mm:ss", "MM/dd/yyyy HH:mm:ss", "MM/dd/yy HH:mm:ss", "MM/dd/yyyy HH:mm", "MM/dd/yy HH:mm" };
+        string[] dateFormats1 = { "dd/MM/yyyyHH:mm:ss", "dd/MM/yyyyHH:mm", "dd/MM/yy HH:mm:ss", "dd/MM/yyyy HH:mm:ss", "dd/MM/yy HH:mm:ss", "dd/MM/yyyy HH:mm", "dd/MM/yy HH:mm" };
+        string[] TimeFormat = { "M/dd/yyyyHH:mm", "MM/dd/yyyyHH:mm", "dd/MM/yyyyHH:mm", "dd/MM/yyHH:mm:ss", "dd/MM/yy HH:mm" };
+
+        private Regex regex = new Regex(@"(\d{1,2}:\d{1,2}:\d{1,2}[ ]+CASH COUNTERS BEFORE (SOP)?[ ]*\r?\n?([ ]*[\*\w]+[ ]*\d{1,4}[ ]*(?<PrevCountType1>\d{1,4})\*?[ ]*\r?\n?)([ ]*[\*\w]+[ ]*\d{1,4}[ ]*(?<PrevCountType2>\d{1,4})\*?[ ]*\r?\n?)?([ ]*[\*\w]+[ ]*\d{1,4}[ ]*(?<PrevCountType3>\d{1,4})\*?[ ]*\r?\n?)?([ ]*[\*\w]+[ ]*\d{1,4}[ ]*(?<PrevCountType4>\d{1,4})\*?[ ]*\r?\n?)?[ ]*\r?\n?([ ]*[\*\w]+[ ]*\d{1,4}[ ]*(?<PrevCountType5>\d{1,4})\*?[ ]*\r?\n?)\r?\n?[ ]*?[ ]*RETRACTS:[ ]*\d+[ ]*[\r\n ]+(?<CashAddedTime>\d{1,2}:\d{1,2}:\d{1,2})[ ]+CASH COUNTERS AFTER (SOP)?[ ]*\r?\n?([ ]*[\*\w]+[ ]*(?<DenominationType1>\d{1,4})[ ]*(?<NewCountType1>\d{1,4})\*?[ ]*\r?\n?)([ ]*[\*\w]+[ ]*(?<DenominationType2>\d{1,4})[ ]*(?<NewCountType2>\d{1,4})\*?[ ]*\r?\n?)?([ ]*[\*\w]+[ ]*(?<DenominationType3>\d{1,4})[ ]*(?<NewCountType3>\d{1,4})\*?[ ]*\r?\n?)?([ ]*[\*\w]+[ ]*(?<DenominationType4>\d{1,4})[ ]*(?<NewCountType4>\d{1,4})\*?[ ]*\r?\n?)?[ ]*\r?\n?([ ]*[\*\w]+[ ]*(?<DenominationType5>\d{1,4})[ ]*(?<NewCountType5>\d{1,4})\*?[ ]*\r?\n?)\r?\n?[ ]*([ ]*RETRACTS[ ]*:[ ]*\d+[ ]*\r?\n?[ ]*))|((?<CashAddedTime>\d{1,2}:\d{1,2}:\d{1,2})[ ]+CASH COUNTERS BEFORE (SOP)?[ ]*\r?\n?([ ]*[\*\w]+[ ]*\d{1,4}[ ]*(?<PrevCountType1>\d{1,4})\*?[ ]*\r?\n?)([ ]*[\*\w]+[ ]*\d{1,4}[ ]*(?<PrevCountType2>\d{1,4})\*?[ ]*\r?\n?)?([ ]*[\*\w]+[ ]*\d{1,4}[ ]*(?<PrevCountType3>\d{1,4})\*?[ ]*\r?\n?)?([ ]*[\*\w]+[ ]*\d{1,4}[ ]*(?<PrevCountType4>\d{1,4})\*?[ ]*\r?\n?)?[ ]*\r?\n?[ ]*[ ]*RETRACTS[ ]*:[ ]*\d+[ ]*\r?\n?[ ]*REJECTS[ ]*:[ ]*(?<OldRejectCount>\d+)[ ]*[\r\n ]+\d{1,2}:\d{1,2}:\d{1,2}[ ]+CASH COUNTERS AFTER (SOP)?[ ]*\r?\n?([ ]*[\*\w]+[ ]*(?<DenominationType1>\d{1,4})[ ]*(?<NewCountType1>\d{1,4})\*?[ ]*\r?\n?)([ ]*[\*\w]+[ ]*(?<DenominationType2>\d{1,4})[ ]*(?<NewCountType2>\d{1,4})\*?[ ]*\r?\n?)?([ ]*[\*\w]+[ ]*(?<DenominationType3>\d{1,4})[ ]*(?<NewCountType3>\d{1,4})\*?[ ]*\r?\n?)?([ ]*[\*\w]+[ ]*(?<DenominationType4>\d{1,4})[ ]*(?<NewCountType4>\d{1,4})\*?[ ]*\r?\n?)?[ ]*\r?\n?[ ]*[ ]*RETRACTS:[ ]*\d+[ ]*\r?\n?[ ]*REJECTS:[ ]*(?<NewRejectCount>\d+))|(\d{1,2}:\d{1,2}:\d{1,2}[ ]+CASH COUNTERS BEFORE (SOP)?[ ]*\r?\n?([ ]*[\*\w]+[ ]*\d{1,4}[ ]*(?<PrevCountType1>\d{1,4})\*?[ ]*\r?\n?)([ ]*[\*\w]+[ ]*\d{1,4}[ ]*(?<PrevCountType2>\d{1,4})\*?[ ]*\r?\n?)?([ ]*[\*\w]+[ ]*\d{1,4}[ ]*(?<PrevCountType3>\d{1,4})\*?[ ]*\r?\n?)?([ ]*[\*\w]+[ ]*\d{1,4}[ ]*(?<PrevCountType4>\d{1,4})\*?[ ]*\r?\n?)?[ ]*\r?\n?([ ]*[\*\w]+[ ]*\d{1,4}[ ]*(?<PrevCountType5>\d{1,4})\*?[ ]*\r?\n?)\r?\n?[ ]*?[ ]*\r?\n?([ ]*[\*\w]+[ ]*\d{1,4}[ ]*(?<PrevCountType6>\d{1,4})\*?[ ]*\r?\n?)(\r?\n?[ ]*?[ ]*RETRACTS:[ ]*\d+[ ]*[\r\n ]+)?(?<CashAddedTime>\d{1,2}:\d{1,2}:\d{1,2})[ ]+CASH COUNTERS AFTER (SOP)?[ ]*\r?\n?([ ]*[\*\w]+[ ]*(?<DenominationType1>\d{1,4})[ ]*(?<NewCountType1>\d{1,4})\*?[ ]*\r?\n?)([ ]*[\*\w]+[ ]*(?<DenominationType2>\d{1,4})[ ]*(?<NewCountType2>\d{1,4})\*?[ ]*\r?\n?)?([ ]*[\*\w]+[ ]*(?<DenominationType3>\d{1,4})[ ]*(?<NewCountType3>\d{1,4})\*?[ ]*\r?\n?)?([ ]*[\*\w]+[ ]*(?<DenominationType4>\d{1,4})[ ]*(?<NewCountType4>\d{1,4})\*?[ ]*\r?\n?)?[ ]*\r?\n?([ ]*[\*\w]+[ ]*(?<DenominationType5>\d{1,4})[ ]*(?<NewCountType5>\d{1,4})\*?[ ]*\r?\n?)(([ ]*[\*\w]+[ ]*(?<DenominationType6>\d{1,4})[ ]*(?<NewCountType6>\d{1,4})\*?[ ]*\r?\n?)\r?\n?)?([ ]*([ ]*RETRACTS[ ]*:[ ]*\d+[ ]*\r?\n?[ ]*)?))");
+        Regex StartRepRegex = new Regex(@"((?<PrintCountersDateTime>\d{1,2}/\d{1,2}/\d{2,4}[ ]+\d{1,2}:\d{1,2})[ ]MACHINE NO)");
+        //Regex CountsClearingRegex = new Regex(@"((?<CountsClearingTime>\d+/\d+/\d+\*\d+:\d+)(:\d+)?\*\s*CASH[ ]COUNTS[ ]CLEARED\s*CASH[ ]DISPENSED\s*(TYPE[ ]\d[ ]=[ ](?<Dispensed>\d+)\s+)+CASH[ ]REMAINING\s*(TYPE[ ]\d[ ]=[ ](?<Remaining>\d+)\s+)+)");
+        //Regex CountsRegex = new Regex(@"(?<PrintCountersDateTime>\d{1,2}/\d{1,2}/\d{2,4}[ ]+\d{1,2}:\d{1,2})[ ]MACHINE NO\.:[ ]*\d+[ ]*[ \r\n]*TYPE[ ]*\d[ ]+TYPE[ ]*\d[ ]*\r?\n?[ ]*CASSETTE[ ]+(?<Cassette1>\d+)[ ]+(?<Cassette2>\d+)[ ]*\r?\n?[ ]*\+?REJECTED[ ]+(?<Rejected1>\d+)[ ]+(?<Rejected2>\d+)[ ]*\r?\n?[ ]*=?REMAINING[ ]+(?<Remaining1>\d+)[ ]+(?<Remaining2>\d+)[ ]*\r?\n?[ ]*\+?DISPENSED[ ]+(?<Dispensed1>\d+)[ ]+(?<Dispensed2>\d+)[ ]*\r?\n?[ ]*=?TOTAL[ ]+(?<Total1>\d+)[ ]+(?<Total2>\d+)[ \r\n]*TYPE[ ]*3[ ]+TYPE[ ]*4[ ]*\r?\n?[ ]*CASSETTE[ ]+(?<Cassette3>\d+)[ ]+(?<Cassette4>\d+)[ ]*\r?\n?[ ]*\+?REJECTED[ ]+(?<Rejected3>\d+)[ ]+(?<Rejected4>\d+)[ ]*\r?\n?[ ]*=?REMAINING[ ]+(?<Remaining3>\d+)[ ]+(?<Remaining4>\d+)[ ]*\r?\n?[ ]*\+?DISPENSED[ ]+(?<Dispensed3>\d+)[ ]+(?<Dispensed4>\d+)[ ]*\r?\n?[ ]*=?TOTAL[ ]+(?<Total3>\d+)[ ]+(?<Total4>\d+)[ \r\n]*ACTUAL RETRACTS[ ]*:[ ]*\d+[ ]*[ \r\n]*LAST CLEARED[ ]*:[ ]*(?<LastClearedDateTime>\d{1,2}/\d{1,2}/\d{2,4}[ ]+\d{1,2}:\d{1,2})[ ]*\r?\n?[ ]*CARDS CAPTURED[ ]+(?<CardCapturedCount>\d+)");
+        Regex CountsRegex = new Regex(@"(?<PrintCountersDateTime>\d{1,2}/\d{1,2}/\d{2,4}[ ]+\d{1,2}:\d{1,2})[ ]MACHINE NO\.:[ ]*.+[ ]*[ \r\n]*TYPE[ ]*\d[ ]+TYPE[ ]*\d[ ]*\r?\n?[ ]*CASSETTE[ ]+(?<Cassette1>\d+)[ ]+(?<Cassette2>\d+)[ ]*\r?\n?[ ]*\+?REJECTED[ ]+(?<Rejected1>\d+)[ ]+(?<Rejected2>\d+)[ ]*\r?\n?[ ]*=?REMAINING[ ]+(?<Remaining1>\d+)[ ]+(?<Remaining2>\d+)[ ]*\r?\n?[ ]*\+?DISPENSED[ ]+(?<Dispensed1>\d+)[ ]+(?<Dispensed2>\d+)[ ]*\r?\n?[ ]*=?TOTAL[ ]+(?<Total1>\d+)[ ]+(?<Total2>\d+)[ \r\n]*TYPE[ ]*3[ ]+TYPE[ ]*4[ ]*\r?\n?[ ]*CASSETTE[ ]+(?<Cassette3>\d+)[ ]+(?<Cassette4>\d+)[ ]*\r?\n?[ ]*\+?REJECTED[ ]+(?<Rejected3>\d+)[ ]+(?<Rejected4>\d+)[ ]*\r?\n?[ ]*=?REMAINING[ ]+(?<Remaining3>\d+)[ ]+(?<Remaining4>\d+)[ ]*\r?\n?[ ]*\+?DISPENSED[ ]+(?<Dispensed3>\d+)[ ]+(?<Dispensed4>\d+)[ ]*\r?\n?[ ]*=?TOTAL[ ]+(?<Total3>\d+)[ ]+(?<Total4>\d+)[ \r\n]*ACTUAL RETRACTS[ ]*:[ ]*\d+[ ]*[ \r\n]*LAST CLEARED[ ]*:[ ]*(?<LastClearedDateTime>\d{1,2}/\d{1,2}/\d{2,4}[ ]+\d{1,2}:\d{1,2})[ ]*\r?\n?[ ]*CARDS CAPTURED[ ]+(?<CardCapturedCount>\d+)");
+        Match match;
+        Match startMatch;
+
+        //To record Replenishment Date as it lies on different chunk
+        string cashAddedDate = "";
+        string cashAddedTime = "";
+        int notesRejOnTestCashFromEachCassette = 1;
+
+        //Regex CounterRegex = new Regex(@"(?<CashAddedDate>\d{1,2}/\d{1,2}/\d{2,4})[ ]+\d{1,2}:\d{1,2}[ ](MACHINE NO\.:[ ]*\d+[ ]*[ \r\n]*TYPE[ ]*\d[ ]+TYPE[ ]*\d[ ]*\r?\n?[ ]*CASSETTE[ ]+(?<Cassette1>\d+)[ ]+(?<Cassette2>\d+)[ ]*\r?\n?[ ]*\+?REJECTED[ ]+(?<Rejected1>\d+)[ ]+(?<Rejected2>\d+)[ ]*\r?\n?[ ]*=?REMAINING[ ]+(?<Remaining1>\d+)[ ]+(?<Remaining2>\d+)[ ]*\r?\n?[ ]*\+?DISPENSED[ ]+(?<Dispensed1>\d+)[ ]+(?<Dispensed2>\d+)[ ]*\r?\n?[ ]*=?TOTAL[ ]+(?<Total1>\d+)[ ]+(?<Total2>\d+)[ \r\n]*TYPE[ ]*3[ ]+TYPE[ ]*4[ ]*\r?\n?[ ]*CASSETTE[ ]+(?<Cassette3>\d+)[ ]+(?<Cassette4>\d+)[ ]*\r?\n?[ ]*\+?REJECTED[ ]+(?<Rejected3>\d+)[ ]+(?<Rejected4>\d+)[ ]*\r?\n?[ ]*=?REMAINING[ ]+(?<Remaining3>\d+)[ ]+(?<Remaining4>\d+)[ ]*\r?\n?[ ]*\+?DISPENSED[ ]+(?<Dispensed3>\d+)[ ]+(?<Dispensed4>\d+)[ ]*\r?\n?[ ]*=?TOTAL[ ]+(?<Total3>\d+)[ ]+(?<Total4>\d+)[ \r\n]*ACTUAL RETRACTS[ ]*:[ ]*\d+[ ]*[ \r\n]*LAST CLEARED[ ]*:[ ]*(?<LastClearedDateTime>\d{1,2}/\d{1,2}/\d{2,4}[ ]+\d{1,2}:\d{1,2})[ ]*\r?\n?[ ]*CARDS CAPTURED[ ]+(?<CardCapturedCount>\d+))");
+        //Regex CounterRegex = new Regex(@"(?<CashAddedDate>\d{1,2}/\d{1,2}/\d{2,4})[ ]+\d{1,2}:\d{1,2}[ ](MACHINE NO\.:[ ]*.+[ ]*[ \r\n]*TYPE[ ]*\d[ ]+TYPE[ ]*\d[ ]*\r?\n?[ ]*CASSETTE[ ]+(?<Cassette1>\d+)[ ]+(?<Cassette2>\d+)[ ]*\r?\n?[ ]*\+?REJECTED[ ]+(?<Rejected1>\d+)[ ]+(?<Rejected2>\d+)[ ]*\r?\n?[ ]*=?REMAINING[ ]+(?<Remaining1>\d+)[ ]+(?<Remaining2>\d+)[ ]*\r?\n?[ ]*\+?DISPENSED[ ]+(?<Dispensed1>\d+)[ ]+(?<Dispensed2>\d+)[ ]*\r?\n?[ ]*=?TOTAL[ ]+(?<Total1>\d+)[ ]+(?<Total2>\d+)[ \r\n]*TYPE[ ]*3[ ]+TYPE[ ]*4[ ]*\r?\n?[ ]*CASSETTE[ ]+(?<Cassette3>\d+)[ ]+(?<Cassette4>\d+)[ ]*\r?\n?[ ]*\+?REJECTED[ ]+(?<Rejected3>\d+)[ ]+(?<Rejected4>\d+)[ ]*\r?\n?[ ]*=?REMAINING[ ]+(?<Remaining3>\d+)[ ]+(?<Remaining4>\d+)[ ]*\r?\n?[ ]*\+?DISPENSED[ ]+(?<Dispensed3>\d+)[ ]+(?<Dispensed4>\d+)[ ]*\r?\n?[ ]*=?TOTAL[ ]+(?<Total3>\d+)[ ]+(?<Total4>\d+)[ \r\n]*ACTUAL RETRACTS[ ]*:[ ]*\d+[ ]*[ \r\n]*LAST CLEARED[ ]*:[ ]*(?<LastClearedDateTime>\d{1,2}/\d{1,2}/\d{2,4}[ ]+\d{1,2}:\d{1,2})[ ]*\r?\n?[ ]*CARDS CAPTURED[ ]+(?<CardCapturedCount>\d+))");
+        Regex NCRRegex = new Regex(@"((?<CashAddedTime>\d+/\d+/\d+\*\d+:\d+)\*[ ]*\r?\n?[ ]*C\d+ CASH[ ]ADDED[ ]*\r?\n?[ ]*(TYPE[ ]\d+[ ]=[ ]+(?<Added>\d+)\s+)+)|((?<CountsClearingTime>\d+/\d+/\d+\*\d+:\d+)\*\s*CASH[ ]COUNTS[ ]CLEARED\s*CASH[ ]DISPENSED\s*(TYPE[ ]\d[ ]=[ ](?<Dispensed>\d+)\s+)+CASH[ ]REMAINING\s*(TYPE[ ]\d[ ]=[ ](?<Remaining>\d+)\s+)+)|((DATE-TIME[ ]+=(?<PrintCountersDateTime>\d{2}/\d{2}/\d{2}[ ]\d{2}:\d{2}))?(\r[ ]+TYPE[ ]\d[ ]+TYPE[ ]\d[ ]*\r[ ]CASSETTE[ ]+(?<Cassette1>\d+)[ ]+(?<Cassette2>\d+)\r\+REJECTED[ ]+(?<Rejected1>\d+)[ ]+(?<Rejected2>\d+)\r=REMAINING[ |]+(?<Remaining1>\d+)[ ]+(?<Remaining2>\d+)\r\+DISPENSED[ ]+(?<Dispensed1>\d+)[ ]+(?<Dispensed2>\d+)\r=TOTAL[ ]+(?<Total1>\d+)[ ]+(?<Total2>\d+)\r)*[ ]LAST[ ]CLEARED[ ]+(?<LastClearedDateTime>\d+/\d+/\d+[ ]\d+:\d+)\r{3}[ ]CARDS[ ]CAPTURED[ ]+(?<CardsCapturedCount>\d+))");
+
+        int notesAfterRepType1 = 0;
+        int notesAfterRepType2 = 0;
+        int notesAfterRepType3 = 0;
+        int notesAfterRepType4 = 0;
+
+        AtmCounter prevCount = null;
+        AtmCounter remainingCount = null;
+
+        AtmCounter notesUsedInTestCash = null;
+        AtmCounter notesAvailable = null;
+        AtmCounter notesDenomination = null;
+
+        int newRejectCount = 0;
+        int oldRejectCount = 0;
+
+        int taskId = 0;
+
+        AtmCounter newCountNotes = null;
+
+        //To resolve Low Balance or Out of Cash Alerts
+        decimal minOperatingBalance = 0;
+        static List<DateTime> listNormalDays = Utility.GetEvents("Normal");
+
+
+        Regex rgxClearCash = new Regex("CLEAR[ ]*CASH[ ]*\r?\n?[ ]*ID[ ]+TOTAL");
+        Match matchClearCash;
+
+        private Replenishment AddReplenishmentInCCMS(ref Task downloadTask, ref EjParsedReplenishments cashAdded, ref SqlTransaction trxn, ref bool isSwap)
+        {
+            LogableTask.LogMonoActivityTask("ExtractRep", MethodBase.GetCurrentMethod(), TraceLevel.Info, "Going to Add Replenishment in CCMS for task: " + downloadTask.TaskId);
+            Replenishment replenishment2 = new Replenishment();
+            replenishment2.AtmId = downloadTask.ATMId;
+            replenishment2.RepDatetime = cashAdded.RepDatetime.Value;
+            replenishment2.CashAdded1 = cashAdded.NotesAddedType1.Value;
+            replenishment2.CashAdded2 = cashAdded.NotesAddedType2.Value;
+            replenishment2.CashAdded3 = cashAdded.NotesAddedType3.Value;
+            replenishment2.CashAdded4 = cashAdded.NotesAddedType4.Value;
+            replenishment2.CashAdded5 = cashAdded.NotesAddedType5 != null ? cashAdded.NotesAddedType5.Value : 0;
+            replenishment2.CashAdded6 = 0;
+            replenishment2.CashAdded7 = 0;
+            replenishment2.RepStatus = "Normal";
+            replenishment2.IsSwap = isSwap;
+
+            replenishment2.TaskId = downloadTask.TaskId;
+            replenishment2.CashOrderId = -1;
+            replenishment2.GeneratedAt = DateTime.Now;
+            replenishment2.GeneratedBy = 1;
+            replenishment2.Reason = cashAdded.EjParsedReplenishmentsId.ToString();
+
+            LogableTask.LogMonoActivityTask("ExtractRep", MethodBase.GetCurrentMethod(), TraceLevel.Info, "Going to save replenishment for task: " + downloadTask.TaskId);
+            replenishment2.Save(trxn.Connection, trxn);
+            LogableTask.LogMonoActivityTask("ExtractRep", MethodBase.GetCurrentMethod(), TraceLevel.Info, "Replenishment saved for task: " + downloadTask.TaskId);
+            ParserPostProcessingTask parserPostProcessingTask = new DAL.ParserPostProcessingTask();
+            parserPostProcessingTask.AtmId = replenishment2.AtmId;
+            parserPostProcessingTask.CreationTime = DateTime.Now;
+            parserPostProcessingTask.EntityId = replenishment2.ReplenishmentId;
+            parserPostProcessingTask.EventInfo = replenishment2.RepDatetime.ToString("MM/dd/yyyy HH:mm:ss") + "|Replenishment|OrderMissing|20180513132747|20180513132747|-1|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|" + replenishment2.CashAdded1 + "|" + replenishment2.CashAdded2 + "|" + replenishment2.CashAdded3 + "|" + replenishment2.CashAdded4 + "|0|0|0";
+            parserPostProcessingTask.EventOccuredAt = replenishment2.RepDatetime;
+            parserPostProcessingTask.EventType = "Replenishment";
+            parserPostProcessingTask.TaskId = replenishment2.TaskId;
+            LogableTask.LogMonoActivityTask("ExtractRep", MethodBase.GetCurrentMethod(), TraceLevel.Info, " before add to post processing: " + downloadTask.TaskId);
+            parserPostProcessingTask.Save();
+            LogableTask.LogMonoActivityTask("ExtractRep", MethodBase.GetCurrentMethod(), TraceLevel.Info, " after add to post processing: " + downloadTask.TaskId);
+
+            return replenishment2;
+        }
+
+
+        EjParsedReplenishments ExtractCashAdd(string ejData, ref bool isSwap)
+        {
+            LogableTask.LogMonoActivityTask("ExtractRep", MethodBase.GetCurrentMethod(), TraceLevel.Info, "Inside CashAdd function");
+
+            EjParsedReplenishments cashadded = new EjParsedReplenishments();
+            //DateTime date;
+            cashAddedTime = match.Groups["CashAddedTime"].Value;
+            LogableTask.LogMonoActivityTask("Just to test Replenishment", MethodBase.GetCurrentMethod(), TraceLevel.Info, "cashAddedDate: " + cashAddedDate + ", cashAddedTime : " + cashAddedTime + " task id: " + taskId);
+            DateTime temp;
+            DateTime.TryParseExact(cashAddedDate + " " + cashAddedTime, dateFormats, null, System.Globalization.DateTimeStyles.None, out temp);
+            if (DateTime.Now < temp || globalTask.CreationTime.Month != temp.Month)
+                DateTime.TryParseExact(cashAddedDate + " " + cashAddedTime, dateFormats1, null, System.Globalization.DateTimeStyles.None, out temp);
+            if (temp != null)
+                cashadded.RepDatetime = temp;
+            //cashadded.RepDatetime = date;
+
+            remainingCount = new AtmCounter();
+            prevCount = new AtmCounter();
+
+            cashadded.NotesAddedType7 = 0;
+            cashadded.NotesAddedType6 = 0;
+            cashadded.NotesAddedType5 = 0;
+            cashadded.NotesAddedType4 = 0;
+            cashadded.NotesAddedType3 = 0;
+            cashadded.NotesAddedType2 = 0;
+            cashadded.NotesAddedType1 = 0;
+
+            if (!isSwap)
+            {
+                if (int.Parse(match.Groups["DenominationType1"].Value) == 200)
+                {
+                    int a = int.Parse(match.Groups["NewCountType1"].Value) - int.Parse(match.Groups["PrevCountType1"].Value); ;
+                    if (a < 0)
+                    {
+                        cashadded.NotesAddedType4 += 0;
+                    }
+                    else
+                    {
+                        cashadded.NotesAddedType4 += int.Parse(match.Groups["NewCountType1"].Value) - int.Parse(match.Groups["PrevCountType1"].Value);
+                    }
+
+                }
+                if (int.Parse(match.Groups["DenominationType2"].Value) == 200)
+                {
+                    int a = int.Parse(match.Groups["NewCountType2"].Value) - int.Parse(match.Groups["PrevCountType2"].Value); ;
+                    if (a < 0)
+                    {
+                        cashadded.NotesAddedType4 += 0;
+                    }
+                    else
+                    {
+                        cashadded.NotesAddedType4 += int.Parse(match.Groups["NewCountType2"].Value) - int.Parse(match.Groups["PrevCountType2"].Value);
+                    }
+                }
+                if (int.Parse(match.Groups["DenominationType3"].Value) == 200)
+                {
+                    int a = int.Parse(match.Groups["NewCountType3"].Value) - int.Parse(match.Groups["PrevCountType3"].Value); ;
+                    if (a < 0)
+                    {
+                        cashadded.NotesAddedType4 += 0;
+                    }
+                    else
+                    {
+                        cashadded.NotesAddedType4 += int.Parse(match.Groups["NewCountType3"].Value) - int.Parse(match.Groups["PrevCountType3"].Value);
+                    }
+                }
+                if (int.Parse(match.Groups["DenominationType4"].Value) == 200)
+                {
+                    int a = int.Parse(match.Groups["NewCountType4"].Value) - int.Parse(match.Groups["PrevCountType4"].Value); ;
+                    if (a < 0)
+                    {
+                        cashadded.NotesAddedType4 += 0;
+                    }
+                    else
+                    {
+                        cashadded.NotesAddedType4 += int.Parse(match.Groups["NewCountType4"].Value) - int.Parse(match.Groups["PrevCountType4"].Value);
+                    }
+                }
+                if ((match.Groups["NewCountType5"].Success))
+                {
+                    if (int.Parse(match.Groups["DenominationType5"].Value) == 200)
+                    {
+                        int a = int.Parse(match.Groups["NewCountType5"].Value) - int.Parse(match.Groups["PrevCountType5"].Value); ;
+                        if (a < 0)
+                        {
+                            cashadded.NotesAddedType4 += 0;
+                        }
+                        else
+                        {
+                            cashadded.NotesAddedType4 += int.Parse(match.Groups["NewCountType5"].Value) - int.Parse(match.Groups["PrevCountType5"].Value);
+                        }
+                    }
+                }
+                if ((match.Groups["NewCountType6"].Success))
+                {
+                    if (int.Parse(match.Groups["DenominationType6"].Value) == 200)
+                    {
+                        int a = int.Parse(match.Groups["NewCountType6"].Value) - int.Parse(match.Groups["PrevCountType6"].Value); ;
+                        if (a < 0)
+                        {
+                            cashadded.NotesAddedType4 += 0;
+                        }
+                        else
+                        {
+                            cashadded.NotesAddedType4 += int.Parse(match.Groups["NewCountType6"].Value) - int.Parse(match.Groups["PrevCountType6"].Value);
+                        }
+                    }
+                }
+
+                if (int.Parse(match.Groups["DenominationType1"].Value) == 100)
+                {
+                    int a = int.Parse(match.Groups["NewCountType1"].Value) - int.Parse(match.Groups["PrevCountType1"].Value); ;
+                    if (a < 0)
+                    {
+                        cashadded.NotesAddedType3 += 0;
+                    }
+                    else
+                    {
+                        cashadded.NotesAddedType3 += int.Parse(match.Groups["NewCountType1"].Value) - int.Parse(match.Groups["PrevCountType1"].Value);
+                    }
+                }
+                if (int.Parse(match.Groups["DenominationType2"].Value) == 100)
+                {
+                    int a = int.Parse(match.Groups["NewCountType2"].Value) - int.Parse(match.Groups["PrevCountType2"].Value); ;
+                    if (a < 0)
+                    {
+                        cashadded.NotesAddedType3 += 0;
+                    }
+                    else
+                    {
+                        cashadded.NotesAddedType3 += int.Parse(match.Groups["NewCountType2"].Value) - int.Parse(match.Groups["PrevCountType2"].Value);
+                    }
+                }
+                if (int.Parse(match.Groups["DenominationType3"].Value) == 100)
+                {
+                    int a = int.Parse(match.Groups["NewCountType3"].Value) - int.Parse(match.Groups["PrevCountType3"].Value); ;
+                    if (a < 0)
+                    {
+                        cashadded.NotesAddedType3 += 0;
+                    }
+                    else
+                    {
+                        cashadded.NotesAddedType3 += int.Parse(match.Groups["NewCountType3"].Value) - int.Parse(match.Groups["PrevCountType3"].Value);
+                    }
+                }
+                if (int.Parse(match.Groups["DenominationType4"].Value) == 100)
+                {
+                    int a = int.Parse(match.Groups["NewCountType4"].Value) - int.Parse(match.Groups["PrevCountType4"].Value); ;
+                    if (a < 0)
+                    {
+                        cashadded.NotesAddedType3 += 0;
+                    }
+                    else
+                    {
+                        cashadded.NotesAddedType3 += int.Parse(match.Groups["NewCountType4"].Value) - int.Parse(match.Groups["PrevCountType4"].Value);
+                    }
+                }
+                if ((match.Groups["NewCountType5"].Success))
+                {
+                    if (int.Parse(match.Groups["DenominationType5"].Value) == 100)
+                    {
+                        int a = int.Parse(match.Groups["NewCountType5"].Value) - int.Parse(match.Groups["PrevCountType5"].Value); ;
+                        if (a < 0)
+                        {
+                            cashadded.NotesAddedType3 += 0;
+                        }
+                        else
+                        {
+                            cashadded.NotesAddedType3 += int.Parse(match.Groups["NewCountType5"].Value) - int.Parse(match.Groups["PrevCountType5"].Value);
+                        }
+                    }
+                }
+                if ((match.Groups["NewCountType6"].Success))
+                {
+                    if (int.Parse(match.Groups["DenominationType6"].Value) == 100)
+                    {
+                        int a = int.Parse(match.Groups["NewCountType6"].Value) - int.Parse(match.Groups["PrevCountType6"].Value); ;
+                        if (a < 0)
+                        {
+                            cashadded.NotesAddedType3 += 0;
+                        }
+                        else
+                        {
+                            cashadded.NotesAddedType3 += int.Parse(match.Groups["NewCountType6"].Value) - int.Parse(match.Groups["PrevCountType6"].Value);
+                        }
+                    }
+                }
+
+                if (int.Parse(match.Groups["DenominationType1"].Value) == 50)
+                {
+                    int a = int.Parse(match.Groups["NewCountType1"].Value) - int.Parse(match.Groups["PrevCountType1"].Value); ;
+                    if (a < 0)
+                    {
+                        cashadded.NotesAddedType2 += 0;
+                    }
+                    else
+                    {
+                        cashadded.NotesAddedType2 += int.Parse(match.Groups["NewCountType1"].Value) - int.Parse(match.Groups["PrevCountType1"].Value);
+                    }
+                }
+                if (int.Parse(match.Groups["DenominationType2"].Value) == 50)
+                {
+                    int a = int.Parse(match.Groups["NewCountType2"].Value) - int.Parse(match.Groups["PrevCountType2"].Value); ;
+                    if (a < 0)
+                    {
+                        cashadded.NotesAddedType2 += 0;
+                    }
+                    else
+                    {
+                        cashadded.NotesAddedType2 += int.Parse(match.Groups["NewCountType2"].Value) - int.Parse(match.Groups["PrevCountType2"].Value);
+                    }
+                }
+                if (int.Parse(match.Groups["DenominationType3"].Value) == 50)
+                {
+                    int a = int.Parse(match.Groups["NewCountType3"].Value) - int.Parse(match.Groups["PrevCountType3"].Value); ;
+                    if (a < 0)
+                    {
+                        cashadded.NotesAddedType2 += 0;
+                    }
+                    else
+                    {
+                        cashadded.NotesAddedType2 += int.Parse(match.Groups["NewCountType3"].Value) - int.Parse(match.Groups["PrevCountType3"].Value);
+                    }
+                }
+                if (int.Parse(match.Groups["DenominationType4"].Value) == 50)
+                {
+                    int a = int.Parse(match.Groups["NewCountType4"].Value) - int.Parse(match.Groups["PrevCountType4"].Value); ;
+                    if (a < 0)
+                    {
+                        cashadded.NotesAddedType2 += 0;
+                    }
+                    else
+                    {
+                        cashadded.NotesAddedType2 += int.Parse(match.Groups["NewCountType4"].Value) - int.Parse(match.Groups["PrevCountType4"].Value);
+                    }
+                }
+                if ((match.Groups["NewCountType5"].Success))
+                {
+                    if (int.Parse(match.Groups["DenominationType5"].Value) == 50)
+                    {
+                        int a = int.Parse(match.Groups["NewCountType5"].Value) - int.Parse(match.Groups["PrevCountType5"].Value); ;
+                        if (a < 0)
+                        {
+                            cashadded.NotesAddedType2 += 0;
+                        }
+                        else
+                        {
+                            cashadded.NotesAddedType2 += int.Parse(match.Groups["NewCountType5"].Value) - int.Parse(match.Groups["PrevCountType5"].Value);
+                        }
+                    }
+                }
+                if ((match.Groups["NewCountType6"].Success))
+                {
+                    if (int.Parse(match.Groups["DenominationType6"].Value) == 50)
+                    {
+                        int a = int.Parse(match.Groups["NewCountType6"].Value) - int.Parse(match.Groups["PrevCountType6"].Value); ;
+                        if (a < 0)
+                        {
+                            cashadded.NotesAddedType2 += 0;
+                        }
+                        else
+                        {
+                            cashadded.NotesAddedType2 += int.Parse(match.Groups["NewCountType6"].Value) - int.Parse(match.Groups["PrevCountType6"].Value);
+                        }
+                    }
+                }
+
+                if (int.Parse(match.Groups["DenominationType1"].Value) == 20)
+                {
+                    int a = int.Parse(match.Groups["NewCountType1"].Value) - int.Parse(match.Groups["PrevCountType1"].Value); ;
+                    if (a < 0)
+                    {
+                        cashadded.NotesAddedType1 += 0;
+                    }
+                    else
+                    {
+                        cashadded.NotesAddedType1 += int.Parse(match.Groups["NewCountType1"].Value) - int.Parse(match.Groups["PrevCountType1"].Value);
+                    }
+                }
+                if (int.Parse(match.Groups["DenominationType2"].Value) == 20)
+                {
+                    int a = int.Parse(match.Groups["NewCountType2"].Value) - int.Parse(match.Groups["PrevCountType2"].Value); ;
+                    if (a < 0)
+                    {
+                        cashadded.NotesAddedType1 += 0;
+                    }
+                    else
+                    {
+                        cashadded.NotesAddedType1 += int.Parse(match.Groups["NewCountType2"].Value) - int.Parse(match.Groups["PrevCountType2"].Value);
+                    }
+                }
+                if (int.Parse(match.Groups["DenominationType3"].Value) == 20)
+                {
+                    int a = int.Parse(match.Groups["NewCountType3"].Value) - int.Parse(match.Groups["PrevCountType3"].Value); ;
+                    if (a < 0)
+                    {
+                        cashadded.NotesAddedType1 += 0;
+                    }
+                    else
+                    {
+                        cashadded.NotesAddedType1 += int.Parse(match.Groups["NewCountType3"].Value) - int.Parse(match.Groups["PrevCountType3"].Value);
+                    }
+                }
+                if (int.Parse(match.Groups["DenominationType4"].Value) == 20)
+                {
+                    int a = int.Parse(match.Groups["NewCountType4"].Value) - int.Parse(match.Groups["PrevCountType4"].Value); ;
+                    if (a < 0)
+                    {
+                        cashadded.NotesAddedType1 += 0;
+                    }
+                    else
+                    {
+                        cashadded.NotesAddedType1 += int.Parse(match.Groups["NewCountType4"].Value) - int.Parse(match.Groups["PrevCountType4"].Value);
+                    }
+                }
+                if ((match.Groups["NewCountType5"].Success))
+                {
+                    if (int.Parse(match.Groups["DenominationType5"].Value) == 20)
+                    {
+                        int a = int.Parse(match.Groups["NewCountType5"].Value) - int.Parse(match.Groups["PrevCountType5"].Value); ;
+                        if (a < 0)
+                        {
+                            cashadded.NotesAddedType1 += 0;
+                        }
+                        else
+                        {
+                            cashadded.NotesAddedType1 += int.Parse(match.Groups["NewCountType5"].Value) - int.Parse(match.Groups["PrevCountType5"].Value);
+                        }
+                    }
+                }
+                if ((match.Groups["NewCountType6"].Success))
+                {
+                    if (int.Parse(match.Groups["DenominationType6"].Value) == 20)
+                    {
+                        int a = int.Parse(match.Groups["NewCountType6"].Value) - int.Parse(match.Groups["PrevCountType6"].Value); ;
+                        if (a < 0)
+                        {
+                            cashadded.NotesAddedType1 += 0;
+                        }
+                        else
+                        {
+                            cashadded.NotesAddedType1 += int.Parse(match.Groups["NewCountType6"].Value) - int.Parse(match.Groups["PrevCountType6"].Value);
+                        }
+                    }
+                }
+
+            }
+            else
+            {
+                if (int.Parse(match.Groups["DenominationType1"].Value) == 200)
+                {
+                    int a = int.Parse(match.Groups["NewCountType1"].Value) - int.Parse(match.Groups["PrevCountType1"].Value); ;
+                    if (a < 0)
+                    {
+                        cashadded.NotesAddedType4 += 0;
+                    }
+                    else
+                    {
+                        cashadded.NotesAddedType4 += int.Parse(match.Groups["NewCountType1"].Value);
+                    }
+
+                }
+                if (int.Parse(match.Groups["DenominationType2"].Value) == 200)
+                {
+                    int a = int.Parse(match.Groups["NewCountType2"].Value) - int.Parse(match.Groups["PrevCountType2"].Value); ;
+                    if (a < 0)
+                    {
+                        cashadded.NotesAddedType4 += 0;
+                    }
+                    else
+                    {
+                        cashadded.NotesAddedType4 += int.Parse(match.Groups["NewCountType2"].Value);
+                    }
+                }
+                if (int.Parse(match.Groups["DenominationType3"].Value) == 200)
+                {
+                    int a = int.Parse(match.Groups["NewCountType3"].Value) - int.Parse(match.Groups["PrevCountType3"].Value); ;
+                    if (a < 0)
+                    {
+                        cashadded.NotesAddedType4 += 0;
+                    }
+                    else
+                    {
+                        cashadded.NotesAddedType4 += int.Parse(match.Groups["NewCountType3"].Value);
+                    }
+                }
+                if (int.Parse(match.Groups["DenominationType4"].Value) == 200)
+                {
+                    int a = int.Parse(match.Groups["NewCountType4"].Value) - int.Parse(match.Groups["PrevCountType4"].Value); ;
+                    if (a < 0)
+                    {
+                        cashadded.NotesAddedType4 += 0;
+                    }
+                    else
+                    {
+                        cashadded.NotesAddedType4 += int.Parse(match.Groups["NewCountType4"].Value);
+                    }
+                }
+                if ((match.Groups["NewCountType5"].Success))
+                {
+                    if (int.Parse(match.Groups["DenominationType5"].Value) == 200)
+                    {
+                        int a = int.Parse(match.Groups["NewCountType5"].Value) - int.Parse(match.Groups["PrevCountType5"].Value); ;
+                        if (a < 0)
+                        {
+                            cashadded.NotesAddedType4 += 0;
+                        }
+                        else
+                        {
+                            cashadded.NotesAddedType4 += int.Parse(match.Groups["NewCountType5"].Value);
+                        }
+                    }
+                }
+                if ((match.Groups["NewCountType6"].Success))
+                {
+                    if (int.Parse(match.Groups["DenominationType6"].Value) == 200)
+                    {
+                        int a = int.Parse(match.Groups["NewCountType6"].Value) - int.Parse(match.Groups["PrevCountType6"].Value); ;
+                        if (a < 0)
+                        {
+                            cashadded.NotesAddedType4 += 0;
+                        }
+                        else
+                        {
+                            cashadded.NotesAddedType4 += int.Parse(match.Groups["NewCountType6"].Value);
+                        }
+                    }
+                }
+
+                if (int.Parse(match.Groups["DenominationType1"].Value) == 100)
+                {
+                    int a = int.Parse(match.Groups["NewCountType1"].Value) - int.Parse(match.Groups["PrevCountType1"].Value); ;
+                    if (a < 0)
+                    {
+                        cashadded.NotesAddedType3 += 0;
+                    }
+                    else
+                    {
+                        cashadded.NotesAddedType3 += int.Parse(match.Groups["NewCountType1"].Value);
+                    }
+                }
+                if (int.Parse(match.Groups["DenominationType2"].Value) == 100)
+                {
+                    int a = int.Parse(match.Groups["NewCountType2"].Value) - int.Parse(match.Groups["PrevCountType2"].Value); ;
+                    if (a < 0)
+                    {
+                        cashadded.NotesAddedType3 += 0;
+                    }
+                    else
+                    {
+                        cashadded.NotesAddedType3 += int.Parse(match.Groups["NewCountType2"].Value);
+                    }
+                }
+                if (int.Parse(match.Groups["DenominationType3"].Value) == 100)
+                {
+                    int a = int.Parse(match.Groups["NewCountType3"].Value) - int.Parse(match.Groups["PrevCountType3"].Value); ;
+                    if (a < 0)
+                    {
+                        cashadded.NotesAddedType3 += 0;
+                    }
+                    else
+                    {
+                        cashadded.NotesAddedType3 += int.Parse(match.Groups["NewCountType3"].Value);
+                    }
+                }
+                if (int.Parse(match.Groups["DenominationType4"].Value) == 100)
+                {
+                    int a = int.Parse(match.Groups["NewCountType4"].Value) - int.Parse(match.Groups["PrevCountType4"].Value); ;
+                    if (a < 0)
+                    {
+                        cashadded.NotesAddedType3 += 0;
+                    }
+                    else
+                    {
+                        cashadded.NotesAddedType3 += int.Parse(match.Groups["NewCountType4"].Value);
+                    }
+                }
+                if ((match.Groups["NewCountType5"].Success))
+                {
+                    if (int.Parse(match.Groups["DenominationType5"].Value) == 100)
+                    {
+                        int a = int.Parse(match.Groups["NewCountType5"].Value) - int.Parse(match.Groups["PrevCountType5"].Value); ;
+                        if (a < 0)
+                        {
+                            cashadded.NotesAddedType3 += 0;
+                        }
+                        else
+                        {
+                            cashadded.NotesAddedType3 += int.Parse(match.Groups["NewCountType5"].Value);
+                        }
+                    }
+                }
+                if ((match.Groups["NewCountType6"].Success))
+                {
+                    if (int.Parse(match.Groups["DenominationType6"].Value) == 100)
+                    {
+                        int a = int.Parse(match.Groups["NewCountType6"].Value) - int.Parse(match.Groups["PrevCountType6"].Value); ;
+                        if (a < 0)
+                        {
+                            cashadded.NotesAddedType3 += 0;
+                        }
+                        else
+                        {
+                            cashadded.NotesAddedType3 += int.Parse(match.Groups["NewCountType6"].Value);
+                        }
+                    }
+                }
+
+                if (int.Parse(match.Groups["DenominationType1"].Value) == 50)
+                {
+                    int a = int.Parse(match.Groups["NewCountType1"].Value) - int.Parse(match.Groups["PrevCountType1"].Value); ;
+                    if (a < 0)
+                    {
+                        cashadded.NotesAddedType2 += 0;
+                    }
+                    else
+                    {
+                        cashadded.NotesAddedType2 += int.Parse(match.Groups["NewCountType1"].Value);
+                    }
+                }
+                if (int.Parse(match.Groups["DenominationType2"].Value) == 50)
+                {
+                    int a = int.Parse(match.Groups["NewCountType2"].Value) - int.Parse(match.Groups["PrevCountType2"].Value); ;
+                    if (a < 0)
+                    {
+                        cashadded.NotesAddedType2 += 0;
+                    }
+                    else
+                    {
+                        cashadded.NotesAddedType2 += int.Parse(match.Groups["NewCountType2"].Value);
+                    }
+                }
+                if (int.Parse(match.Groups["DenominationType3"].Value) == 50)
+                {
+                    int a = int.Parse(match.Groups["NewCountType3"].Value) - int.Parse(match.Groups["PrevCountType3"].Value); ;
+                    if (a < 0)
+                    {
+                        cashadded.NotesAddedType2 += 0;
+                    }
+                    else
+                    {
+                        cashadded.NotesAddedType2 += int.Parse(match.Groups["NewCountType3"].Value);
+                    }
+                }
+                if (int.Parse(match.Groups["DenominationType4"].Value) == 50)
+                {
+                    int a = int.Parse(match.Groups["NewCountType4"].Value) - int.Parse(match.Groups["PrevCountType4"].Value); ;
+                    if (a < 0)
+                    {
+                        cashadded.NotesAddedType2 += 0;
+                    }
+                    else
+                    {
+                        cashadded.NotesAddedType2 += int.Parse(match.Groups["NewCountType4"].Value);
+                    }
+                }
+                if ((match.Groups["NewCountType5"].Success))
+                {
+                    if (int.Parse(match.Groups["DenominationType5"].Value) == 50)
+                    {
+                        int a = int.Parse(match.Groups["NewCountType5"].Value) - int.Parse(match.Groups["PrevCountType5"].Value); ;
+                        if (a < 0)
+                        {
+                            cashadded.NotesAddedType2 += 0;
+                        }
+                        else
+                        {
+                            cashadded.NotesAddedType2 += int.Parse(match.Groups["NewCountType5"].Value);
+                        }
+                    }
+                }
+                if ((match.Groups["NewCountType6"].Success))
+                {
+                    if (int.Parse(match.Groups["DenominationType6"].Value) == 50)
+                    {
+                        int a = int.Parse(match.Groups["NewCountType6"].Value) - int.Parse(match.Groups["PrevCountType6"].Value); ;
+                        if (a < 0)
+                        {
+                            cashadded.NotesAddedType2 += 0;
+                        }
+                        else
+                        {
+                            cashadded.NotesAddedType2 += int.Parse(match.Groups["NewCountType6"].Value);
+                        }
+                    }
+                }
+
+                if (int.Parse(match.Groups["DenominationType1"].Value) == 20)
+                {
+                    int a = int.Parse(match.Groups["NewCountType1"].Value) - int.Parse(match.Groups["PrevCountType1"].Value); ;
+                    if (a < 0)
+                    {
+                        cashadded.NotesAddedType1 += 0;
+                    }
+                    else
+                    {
+                        cashadded.NotesAddedType1 += int.Parse(match.Groups["NewCountType1"].Value);
+                    }
+                }
+                if (int.Parse(match.Groups["DenominationType2"].Value) == 20)
+                {
+                    int a = int.Parse(match.Groups["NewCountType2"].Value) - int.Parse(match.Groups["PrevCountType2"].Value); ;
+                    if (a < 0)
+                    {
+                        cashadded.NotesAddedType1 += 0;
+                    }
+                    else
+                    {
+                        cashadded.NotesAddedType1 += int.Parse(match.Groups["NewCountType2"].Value);
+                    }
+                }
+                if (int.Parse(match.Groups["DenominationType3"].Value) == 20)
+                {
+                    int a = int.Parse(match.Groups["NewCountType3"].Value) - int.Parse(match.Groups["PrevCountType3"].Value); ;
+                    if (a < 0)
+                    {
+                        cashadded.NotesAddedType1 += 0;
+                    }
+                    else
+                    {
+                        cashadded.NotesAddedType1 += int.Parse(match.Groups["NewCountType3"].Value);
+                    }
+                }
+                if (int.Parse(match.Groups["DenominationType4"].Value) == 20)
+                {
+                    int a = int.Parse(match.Groups["NewCountType4"].Value) - int.Parse(match.Groups["PrevCountType4"].Value); ;
+                    if (a < 0)
+                    {
+                        cashadded.NotesAddedType1 += 0;
+                    }
+                    else
+                    {
+                        cashadded.NotesAddedType1 += int.Parse(match.Groups["NewCountType4"].Value);
+                    }
+                }
+                if ((match.Groups["NewCountType5"].Success))
+                {
+                    if (int.Parse(match.Groups["DenominationType5"].Value) == 20)
+                    {
+                        int a = int.Parse(match.Groups["NewCountType5"].Value) - int.Parse(match.Groups["PrevCountType5"].Value); ;
+                        if (a < 0)
+                        {
+                            cashadded.NotesAddedType1 += 0;
+                        }
+                        else
+                        {
+                            cashadded.NotesAddedType1 += int.Parse(match.Groups["NewCountType5"].Value);
+                        }
+                    }
+                }
+                if ((match.Groups["NewCountType6"].Success))
+                {
+                    if (int.Parse(match.Groups["DenominationType6"].Value) == 20)
+                    {
+                        int a = int.Parse(match.Groups["NewCountType6"].Value) - int.Parse(match.Groups["PrevCountType6"].Value); ;
+                        if (a < 0)
+                        {
+                            cashadded.NotesAddedType1 += 0;
+                        }
+                        else
+                        {
+                            cashadded.NotesAddedType1 += int.Parse(match.Groups["NewCountType6"].Value);
+                        }
+                    }
+                }
+
+            }
+
+            #region Prev And New Counters Assignment
+            ///Edited by Ali Shah  on 27 Feb,2017
+            ///++NewCountType token for some cassettes might be null value.
+            ///++To avoid same verification again and again, we are using object to store NewCountType token values.
+            ///
+            //remainingCount.Type1 = int.Parse(match.Groups["NewCountType1"].Value);
+            //remainingCount.Type2 = int.Parse(match.Groups["NewCountType2"].Value);
+            //remainingCount.Type3 = int.Parse(match.Groups["NewCountType3"].Value);
+            //remainingCount.Type4 = int.Parse(match.Groups["NewCountType4"].Value);
+            //if ((match.Groups["NewCountType5"].Success))
+            //{
+            //    remainingCount.Type5 = int.Parse(match.Groups["NewCountType5"].Value);
+            //}
+
+            //remainingCount.Type1 = notesAvailable.Type1;
+            //remainingCount.Type2 = notesAvailable.Type2;
+            //remainingCount.Type3 = notesAvailable.Type3;
+            //remainingCount.Type4 = notesAvailable.Type4;
+            //if ((match.Groups["NewCountType5"].Success))
+            //{
+            //    remainingCount.Type5 = notesAvailable.Type5;
+            //}
+
+            //prevCount.Type1 = int.Parse(match.Groups["PrevCountType1"].Value);
+            //prevCount.Type2 = int.Parse(match.Groups["PrevCountType2"].Value);
+            //prevCount.Type3 = int.Parse(match.Groups["PrevCountType3"].Value);
+            //prevCount.Type4 = int.Parse(match.Groups["PrevCountType4"].Value);
+            //if (match.Groups["PrevCountType5"].Success)
+            //{
+            //    prevCount.Type4 = match.Groups["PrevCountType1"].Success ? int.Parse(match.Groups["PrevCountType1"].Value) : 0;
+            //    prevCount.Type4 += match.Groups["PrevCountType2"].Success ? int.Parse(match.Groups["PrevCountType2"].Value) : 0;
+            //    prevCount.Type3 = match.Groups["PrevCountType3"].Success ? int.Parse(match.Groups["PrevCountType3"].Value) : 0;
+            //    prevCount.Type2 = match.Groups["PrevCountType4"].Success ? int.Parse(match.Groups["PrevCountType4"].Value) : 0;
+            //    prevCount.Type1 = match.Groups["PrevCountType5"].Success ? int.Parse(match.Groups["PrevCountType5"].Value) : 0;
+            //}
+            //else
+            //{
+            //    prevCount.Type4 = match.Groups["PrevCountType1"].Success ? int.Parse(match.Groups["PrevCountType1"].Value) : 0;
+            //    prevCount.Type3 = match.Groups["PrevCountType2"].Success ? int.Parse(match.Groups["PrevCountType2"].Value) : 0;
+            //    prevCount.Type2 = match.Groups["PrevCountType3"].Success ? int.Parse(match.Groups["PrevCountType3"].Value) : 0;
+            //    prevCount.Type1 = match.Groups["PrevCountType4"].Success ? int.Parse(match.Groups["PrevCountType4"].Value) : 0;
+            //}
+
+
+            #endregion
+
+            string piece = ejData.Substring(0, match.Index + 1);
+            int serviceModeIndex = piece.Contains("SERVICEMODE ENTERED") ? piece.LastIndexOf("SERVICEMODE ENTERED") : 0;
+            string currentActivityChunk = piece.Substring(serviceModeIndex);
+
+            int newRejectCount = 0;
+            int oldRejectCount = 0;
+            ///<Summary>
+            ///Edited by Ali Shah on 2nd July, 2016
+            //if (currentActivityChunk.Contains("CLEAR CASH"))
+            //if (currentActivityChunk.Contains("CLEAR CASH") || newRejectCount < oldRejectCount)
+            //{
+            //    //change by wajahat31 march 2021
+            //    //cashadded.NotesAddedType1 = notesAfterRepType1;
+            //    //cashadded.NotesAddedType2 = notesAfterRepType2;
+            //    //cashadded.NotesAddedType3 = notesAfterRepType3;
+            //    //cashadded.NotesAddedType4 = notesAfterRepType4;
+
+            //    //Edited by Ali Shah on 3rd Feb, 2017
+            //    //isSwap was not updating in case of swap in repenishment
+            //    isSwap = true;
+            //}
+            //else
+            //{
+            //    cashadded.NotesAddedType1 = remainingCount.Type1 != prevCount.Type1 ? (remainingCount.Type1 - prevCount.Type1 + notesRejOnTestCashFromEachCassette) : 0;
+            //    cashadded.NotesAddedType2 = remainingCount.Type2 != prevCount.Type2 ? (remainingCount.Type2 - prevCount.Type2 + notesRejOnTestCashFromEachCassette) : 0;
+            //    cashadded.NotesAddedType3 = remainingCount.Type3 != prevCount.Type3 ? (remainingCount.Type3 - prevCount.Type3 + notesRejOnTestCashFromEachCassette) : 0;
+            //    cashadded.NotesAddedType4 = remainingCount.Type4 != prevCount.Type4 ? (remainingCount.Type4 - prevCount.Type4 + notesRejOnTestCashFromEachCassette) : 0;
+            //    cashadded.NotesAddedType5 = remainingCount.Type5 != prevCount.Type5 ? (remainingCount.Type5 - prevCount.Type5 + notesRejOnTestCashFromEachCassette) : 0;
+
+            //    //Edited by Ali Shah on 3rd Feb, 2017
+            //    //isSwap was not updating in case of swap in repenishment
+            //    //isSwap = false;
+            //}
+
+
+            //
+            cashadded.StartIndex = match.Index;
+            cashadded.EndIndex = match.Index + match.Length;
+            cashadded.ProcessingDatetime = DateTime.Now;
+
+            return cashadded;
+        }
+
+        EjNotesDispensed ExtractCashCounts()
+        {
+            EjNotesDispensed cashcountsclear = new EjNotesDispensed();
+            //DateTime date;
+            //DateTime.TryParseExact(match.Groups["CountsClearingTime"].Captures[0].Value.Replace("*", ""), TimeFormat, null, DateTimeStyles.None, out date);
+
+            //cashcountsclear.ClearingDatetime = DateTime.ParseExact(cashAddedDate + " " + cashAddedTime, "dd/MM/yyyy HH:mm:ss", null);
+            DateTime temp;
+            DateTime.TryParseExact(cashAddedDate + " " + cashAddedTime, dateFormats, null, System.Globalization.DateTimeStyles.None, out temp);
+            if (DateTime.Now < temp || globalTask.CreationTime.Month != temp.Month)
+                DateTime.TryParseExact(cashAddedDate + " " + cashAddedTime, dateFormats1, null, System.Globalization.DateTimeStyles.None, out temp);
+
+            cashcountsclear.ClearingDatetime = temp;
+
+            //cashcountsclear.ClearingDatetime = date;
+
+            LogableTask.LogMonoActivityTask("Just to test", MethodBase.GetCurrentMethod(), TraceLevel.Info, "cashAddedDate: " + cashAddedDate + ", cashAddedTime : " + cashAddedTime);
+
+            cashcountsclear.NotesDispensedType1 = int.Parse(match.Groups["Dispensed1"].Value);
+            cashcountsclear.NotesDispensedType2 = int.Parse(match.Groups["Dispensed2"].Value);
+            cashcountsclear.NotesDispensedType3 = int.Parse(match.Groups["Dispensed3"].Value);
+            cashcountsclear.NotesDispensedType4 = int.Parse(match.Groups["Dispensed4"].Value);
+
+            cashcountsclear.NotesRemainingType1 = int.Parse(match.Groups["Remaining1"].Value);
+            cashcountsclear.NotesRemainingType2 = int.Parse(match.Groups["Remaining2"].Value);
+            cashcountsclear.NotesRemainingType3 = int.Parse(match.Groups["Remaining3"].Value);
+            cashcountsclear.NotesRemainingType4 = int.Parse(match.Groups["Remaining4"].Value);
+
+            //cashcountsclear.NotesRemainingType1 = remainingCount.Type1;
+            //cashcountsclear.NotesRemainingType2 = remainingCount.Type2;
+            //cashcountsclear.NotesRemainingType3 = remainingCount.Type3;
+            //cashcountsclear.NotesRemainingType4 = remainingCount.Type4;
+
+            //cashcountsclear.StartIndex = match.Index;
+            //cashcountsclear.EndIndex = match.Index + match.Length;
+            return cashcountsclear;
+        }
+
+
+        //Dispensed ExtractCashCountsClearing()
+        //{
+        //    Dispensed cashcountsclear = new Dispensed();
+        //    DateTime date;
+        //    DateTime.TryParseExact(match.Groups["CountsClearingTime"].Captures[0].Value.Replace("*", ""), TimeFormat, null, DateTimeStyles.None, out date);
+        //    cashcountsclear.ClearingDatetime = date;
+
+        //    cashcountsclear.CashDispensed1 = int.Parse(match.Groups["Dispensed"].Captures[0].Value);
+        //    cashcountsclear.CashDispensed2 = int.Parse(match.Groups["Dispensed"].Captures[1].Value);
+        //    cashcountsclear.CashDispensed3 = int.Parse(match.Groups["Dispensed"].Captures[2].Value);
+        //    cashcountsclear.CashDispensed4 = int.Parse(match.Groups["Dispensed"].Captures[3].Value);
+
+        //    cashcountsclear.CashRemaining1 = int.Parse(match.Groups["Remaining"].Captures[0].Value);
+        //    cashcountsclear.CashRemaining2 = int.Parse(match.Groups["Remaining"].Captures[1].Value);
+        //    cashcountsclear.CashRemaining3 = int.Parse(match.Groups["Remaining"].Captures[2].Value);
+        //    cashcountsclear.CashRemaining4 = int.Parse(match.Groups["Remaining"].Captures[3].Value);
+
+        //    //cashcountsclear.StartIndex = match.Index;
+        //    //cashcountsclear.EndIndex = match.Index + match.Length;
+        //    return cashcountsclear;
+        //}
+
+        public void ParseAndSaveReplenishment(ref string ejData, Task downloadTask, LogableTask task, SqlTransaction trxn)
+        {
+            SqlCommand cmd = null;
+            try
+            {
+                globalTask = downloadTask;
+                Atm atm = Atm.LoadAtmByPk(downloadTask.ATMId);
+                if (atm.AtmType.ToLower().Contains("ncr"))
+                {
+                    ExtractAllNCRReplenishments(ref ejData, downloadTask, task, trxn);
+                }
+                else
+                {
+                    bool isSwap = true; //Always will be true in Qatar case. As per Talha, Clear Cash is must before each Replenishment.
+
+                    //Variable added by Ali Shah on 3rd June, 2016
+                    //To make sure that replenishment has been found then ExtractCashCount function would be executed
+                    bool isRepFound = false;
+
+                    cmd = ConnectionFactory.GetNewCommand(true);
+                    match = regex.Match(ejData);
+
+                    EjParsedReplenishments cashAdded;
+                    Replenishment lastSavedReplenishment = null;
+                    ///<Summary>
+                    ///Edited by Ali Shah on 1st July, 2016
+                    cashAddedDate = DateTime.Today.ToString("dd/MM/yyyy");
+
+                    taskId = downloadTask.TaskId;
+
+                    ///<Summary>
+                    ///Added by Ali Shah on 28th May, 2017
+                    ///To handle Alerts when replenishment occurred.
+                    bool isOutOfCashAlertGenerated = false;
+                    bool isOutOfCashAlertResolved = false;
+                    bool isLowBalanceAlertResolved = false;
+                    bool isLowBalanceAlertGenerated = false;
+
+                    //Commented by Ali Shah on 19th March, 2017.
+                    LogableTask.LogMonoActivityTask("ExtractRep", MethodBase.GetCurrentMethod(), TraceLevel.Info, "Going to match SOP Chunks for task: " + downloadTask.TaskId);
+                    while (match.Success)
+                    {
+
+                        /////Edited by Ali Shah on 26thFeb2017
+                        /////Issue occurred when there were three cassette's counters were available instead of four in BBQ.
+                        //newCountNotes = new AtmCounter();
+
+                        //Commented by Ali Shah on 19th March, 2017.
+                        LogableTask.LogMonoActivityTask("ExtractRep", MethodBase.GetCurrentMethod(), TraceLevel.Info, "Match Succeeded for SOP Chunks for task: " + downloadTask.TaskId);
+
+                        if (this.match.Groups["CountsClearingTime"].Success)
+                        {
+                            isSwap = true;
+                            // this.match = this.match.NextMatch();
+                        }
+
+                        else
+                        {
+                            //if (this.match.Groups["CashAddedDate"].Success)
+                            //{
+                            //    cashAddedDate = this.match.Groups["CashAddedDate"].Value;
+                            //}
+                            if (this.match.Groups["CashAddedTime"].Success)
+                            {
+                                //Commented by Ali Shah on 19th March, 2017.
+                                LogableTask.LogMonoActivityTask("ExtractRep", MethodBase.GetCurrentMethod(), TraceLevel.Info, "CashAddedTime token found for task: " + downloadTask.TaskId);
+
+                                isRepFound = true;
+                                string piece = ejData.Substring(0, match.Index + 350);
+                                int datelastIndex = piece.LastIndexOf("DATE");
+                                cashAddedDate = piece.Substring(datelastIndex + 7, 14).Replace(" ", "");
+                                //int machineKeywordIndex = piece.LastIndexOf("MACHINE NO");CASH COUNTERS
+                                int machineKeywordIndex = piece.LastIndexOf("CASH COUNTERS");
+                                //int serviceKeywordIndex = piece.LastIndexOf("SERVICEMODE LEFT");
+                                string piece2 = string.Empty;
+                                if (machineKeywordIndex > 2000)
+                                {
+                                    piece2 = ejData.Substring(machineKeywordIndex - 2000, 2200);
+                                }
+                                //bool MatchCashClear = piece2.Contains("CLEAR CASH");
+                                //startMatch = StartRepRegex.Match(piece2);
+
+                                oldRejectCount = match.Groups["NewRejectCount"].Success ? int.Parse(match.Groups["NewRejectCount"].Value) : 0;
+
+                                if (oldRejectCount < 10)
+                                {
+                                    isSwap = true;
+                                }
+                                else
+                                {
+                                    isSwap = false;
+                                }
+                                if (machineKeywordIndex < 0)
+                                {
+                                    LogableTask.LogMonoActivityTask("ExtractRep", MethodBase.GetCurrentMethod(), TraceLevel.Info, "Cash counters not found to extract replenishment for taskID:" + downloadTask.TaskId);
+                                    match = match.NextMatch();
+                                    continue;
+                                }
+                                Match matchCounters = NCRRegex.Match(piece.Substring(machineKeywordIndex));
+
+                                ///<Summary>
+                                ///Edited by Ali Shah on 13th Feb, 2017
+                                ///matchCounters were not matched and that made the file to 'failed to parse'
+                                ///Change for HDB
+                                int SOPKeywordIndex = piece.LastIndexOf("CASH COUNTERS BEFORE SOP");
+                                if (SOPKeywordIndex < 1)
+                                {
+                                    if (!matchCounters.Success)
+                                    {
+                                        LogableTask.LogMonoActivityTask("ExtractRep", MethodBase.GetCurrentMethod(), TraceLevel.Warning, "Cash counters not matched to extract replenishment for taskID:" + downloadTask.TaskId);
+                                        match = match.NextMatch();
+                                        continue;
+                                    }
+                                }
+
+
+                                notesUsedInTestCash = new AtmCounter();
+                                notesAvailable = new AtmCounter();
+                                notesDenomination = new AtmCounter();
+
+                                //if(matchCounters.Groups["Cassette1"].Success)
+                                //    notesAfterRepType1 = int.Parse(matchCounters.Groups["Cassette1"].Value);
+                                //if(matchCounters.Groups["Cassette2"].Success)
+                                //    notesAfterRepType2 = int.Parse(matchCounters.Groups["Cassette2"].Value);
+                                //if(matchCounters.Groups["Cassette3"].Success)
+                                //    notesAfterRepType3 = int.Parse(matchCounters.Groups["Cassette3"].Value);
+                                //if(matchCounters.Groups["Cassette4"].Success)
+                                //    notesAfterRepType4 = int.Parse(matchCounters.Groups["Cassette4"].Value);
+
+                                ///<Summary>
+                                ///
+                                if (matchCounters.Groups["CashAddedDate"].Success)
+                                    cashAddedDate = matchCounters.Groups["CashAddedDate"].Value;
+                                ///<Summary>
+                                ///Added by Ali Shah on 3rd June, 2016
+                                //Extracting Notes Count just after Replenishment to get correct Replenishment
+                                if (matchCounters.Groups["Remaining1"].Success)
+                                    notesAfterRepType1 = int.Parse(matchCounters.Groups["Remaining1"].Value);
+                                if (matchCounters.Groups["Remaining2"].Success)
+                                    notesAfterRepType2 = int.Parse(matchCounters.Groups["Remaining2"].Value);
+                                if (matchCounters.Groups["Remaining3"].Success)
+                                    notesAfterRepType3 = int.Parse(matchCounters.Groups["Remaining3"].Value);
+                                if (matchCounters.Groups["Remaining4"].Success)
+                                    notesAfterRepType4 = int.Parse(matchCounters.Groups["Remaining4"].Value);
+
+                                #region NewCountAssignment
+
+                                //newCountNotes.Type1 = match.Groups["NewCountType1"].Success ? int.Parse(match.Groups["NewCountType1"].Value) : 0;
+                                //newCountNotes.Type2 = match.Groups["NewCountType2"].Success ? int.Parse(match.Groups["NewCountType2"].Value) : 0;
+                                //newCountNotes.Type3 = match.Groups["NewCountType3"].Success ? int.Parse(match.Groups["NewCountType3"].Value) : 0;
+                                //newCountNotes.Type4 = match.Groups["NewCountType4"].Success ? int.Parse(match.Groups["NewCountType4"].Value) : 0;
+                                //Extracting Notes Count just after Replenishment to get correct Replenishment
+                                //Calling changed to improve these object's utilization and to avoid calling through match again and again.
+                                //if (match.Groups["NewCountType1"].Success)
+                                //    notesAvailable.Type1 = int.Parse(match.Groups["NewCountType1"].Value);
+                                //if (match.Groups["NewCountType2"].Success)
+                                //    notesAvailable.Type2 = int.Parse(match.Groups["NewCountType2"].Value);
+                                //if (match.Groups["NewCountType3"].Success)
+                                //    notesAvailable.Type3 = int.Parse(match.Groups["NewCountType3"].Value);
+                                //if (match.Groups["NewCountType4"].Success)
+                                //    notesAvailable.Type4 = int.Parse(match.Groups["NewCountType4"].Value);
+                                //if (match.Groups["NewCountType5"].Success)
+                                //    notesAvailable.Type5 = int.Parse(match.Groups["NewCountType5"].Value);
+
+                                #endregion
+                                ///<Summary>
+                                ///Added by Ali Shah on 6th June, 2016
+                                //Extracting Notes Count just after Replenishment to get correct Replenishment
+                                if (matchCounters.Groups["Rejected1"].Success && int.Parse(matchCounters.Groups["Rejected1"].Value) > 0)
+                                    notesUsedInTestCash.Type1 = int.Parse(matchCounters.Groups["Rejected1"].Value);
+                                else
+                                    //notesUsedInTestCash.Type1 = int.Parse(matchCounters.Groups["Remaining1"].Value) - int.Parse(match.Groups["NewCountType1"].Value);
+                                    notesUsedInTestCash.Type1 = int.Parse(!String.IsNullOrEmpty(matchCounters.Groups["Remaining1"].Value) ? matchCounters.Groups["Remaining1"].Value : "0") - notesAvailable.Type1;
+
+                                if (matchCounters.Groups["Rejected2"].Success && int.Parse(matchCounters.Groups["Rejected2"].Value) > 0)
+                                    notesUsedInTestCash.Type2 = int.Parse(matchCounters.Groups["Rejected2"].Value);
+                                else
+                                    //notesUsedInTestCash.Type2 = int.Parse(matchCounters.Groups["Remaining2"].Value) - int.Parse(match.Groups["NewCountType2"].Value);
+                                    notesUsedInTestCash.Type2 = int.Parse(!String.IsNullOrEmpty(matchCounters.Groups["Remaining2"].Value) ? matchCounters.Groups["Remaining2"].Value : "0") - notesAvailable.Type2;
+
+                                if (matchCounters.Groups["Rejected3"].Success && int.Parse(matchCounters.Groups["Rejected3"].Value) > 0)
+                                    notesUsedInTestCash.Type3 = int.Parse(matchCounters.Groups["Rejected3"].Value);
+                                else
+                                    //notesUsedInTestCash.Type3 = int.Parse(matchCounters.Groups["Remaining3"].Value) - int.Parse(match.Groups["NewCountType3"].Value);
+                                    notesUsedInTestCash.Type3 = int.Parse(!String.IsNullOrEmpty(matchCounters.Groups["Remaining3"].Value) ? matchCounters.Groups["Remaining3"].Value : "0") - notesAvailable.Type3;
+
+                                if (matchCounters.Groups["Rejected4"].Success && int.Parse(matchCounters.Groups["Rejected4"].Value) > 0)
+                                    notesUsedInTestCash.Type4 = int.Parse(matchCounters.Groups["Rejected4"].Value);
+                                else
+                                    //notesUsedInTestCash.Type4 = int.Parse(matchCounters.Groups["Remaining4"].Value) - int.Parse(match.Groups["NewCountType4"].Value);
+                                    notesUsedInTestCash.Type4 = int.Parse(!String.IsNullOrEmpty(matchCounters.Groups["Remaining4"].Value) ? matchCounters.Groups["Remaining4"].Value : "0") - notesAvailable.Type4;
+
+
+                                ///<Summary>
+                                ///Added by Ali Shah on 6th June, 2016
+                                ////Extracting Notes Count just after Replenishment to get correct Replenishment
+                                ///
+                                //// open for HDB
+                                //if (match.Groups["NewCountType1"].Success)
+                                //    notesAvailable.Type1 = int.Parse(match.Groups["NewCountType1"].Value);
+                                //if (match.Groups["NewCountType2"].Success)
+                                //    notesAvailable.Type2 = int.Parse(match.Groups["NewCountType2"].Value);
+                                //if (match.Groups["NewCountType3"].Success)
+                                //    notesAvailable.Type3 = int.Parse(match.Groups["NewCountType3"].Value);
+                                //if (match.Groups["NewCountType4"].Success)
+                                //    notesAvailable.Type4 = int.Parse(match.Groups["NewCountType4"].Value);
+                                //if (match.Groups["NewCountType5"].Success)
+                                //    notesAvailable.Type5 = int.Parse(match.Groups["NewCountType5"].Value);
+
+                                ///<Summary>
+                                ///Added by Ali Shah on 6th June, 2016
+                                //Extracting Denomination to calculate amount of test cash
+                                //Changes for HDB
+                                //if (match.Groups["DenominationType5"].Success)
+                                //{
+                                //    if (match.Groups["DenominationType1"].Success)
+                                //        notesDenomination.Type4 = int.Parse(match.Groups["DenominationType1"].Value);
+                                //    if (match.Groups["DenominationType2"].Success)
+                                //        notesDenomination.Type4 = int.Parse(match.Groups["DenominationType2"].Value);
+                                //    if (match.Groups["DenominationType3"].Success)
+                                //        notesDenomination.Type3 = int.Parse(match.Groups["DenominationType3"].Value);
+                                //    if (match.Groups["DenominationType4"].Success)
+                                //        notesDenomination.Type2 = int.Parse(match.Groups["DenominationType4"].Value);
+                                //    if (match.Groups["DenominationType5"].Success)
+                                //        notesDenomination.Type1 = int.Parse(match.Groups["DenominationType5"].Value);
+                                //}
+                                //else
+                                //{
+                                //    if (match.Groups["DenominationType1"].Success)
+                                //        notesDenomination.Type4 = int.Parse(match.Groups["DenominationType1"].Value);
+                                //    if (match.Groups["DenominationType2"].Success)
+                                //        notesDenomination.Type3 = int.Parse(match.Groups["DenominationType2"].Value);
+                                //    if (match.Groups["DenominationType3"].Success)
+                                //        notesDenomination.Type2 = int.Parse(match.Groups["DenominationType3"].Value);
+                                //    if (match.Groups["DenominationType4"].Success)
+                                //        notesDenomination.Type1 = int.Parse(match.Groups["DenominationType4"].Value);
+
+                                //}
+
+
+                                ///<Summary>
+                                ///Changed the location of below two lines
+                                ///Changed by Ali Shah n 2nd June, 2016
+                                ///There is a need to record Reject Count in ExtractCashAdd function.
+                                newRejectCount = match.Groups["NewRejectCount"].Success ? int.Parse(match.Groups["NewRejectCount"].Value) : 0;
+                                oldRejectCount = match.Groups["OldRejectCount"].Success ? int.Parse(match.Groups["OldRejectCount"].Value) : 0;
+
+                                //Edited parameter by Ali Shah on 3rd Feb, 2017
+                                //isSwap variable should be pass to update its value when there is a case of Swap replenishment found.
+                                //cashAdded = ExtractCashAdd(ejData);
+                                cashAdded = ExtractCashAdd(ejData, ref isSwap);
+                                cashAdded.TaskId = downloadTask.TaskId;
+                                cashAdded.AtmId = downloadTask.ATMId;
+
+                                LogableTask.LogMonoActivityTask("Replenishment Found", MethodBase.GetCurrentMethod(), TraceLevel.Info, "cashAdded.RepDatetime: " + cashAdded.RepDatetime + ", cashAddedTime : " + cashAddedTime + ", task id: " + downloadTask.TaskId);
+                                //cmd.CommandText = "isRepCountersExists";
+                                cmd.CommandText = "isRepCountersInHourExists";
+                                cmd.CommandType = CommandType.StoredProcedure;
+                                cmd.Parameters.Clear();
+                                cmd.Parameters.Add(new SqlParameter("RepDate", SqlDbType.DateTime));
+                                cmd.Parameters[0].Value = cashAdded.RepDatetime;
+                                cmd.Parameters.Add(new SqlParameter("atmID", SqlDbType.Int));
+                                cmd.Parameters[1].Value = downloadTask.ATMId;
+                                cmd.Parameters.Add(new SqlParameter("notes1", SqlDbType.Int));
+                                cmd.Parameters[2].Value = cashAdded.NotesAddedType1;
+                                cmd.Parameters.Add(new SqlParameter("notes2", SqlDbType.Int));
+                                cmd.Parameters[3].Value = cashAdded.NotesAddedType2;
+                                cmd.Parameters.Add(new SqlParameter("notes3", SqlDbType.Int));
+                                cmd.Parameters[4].Value = cashAdded.NotesAddedType3;
+                                cmd.Parameters.Add(new SqlParameter("notes4", SqlDbType.Int));
+                                cmd.Parameters[5].Value = cashAdded.NotesAddedType4;
+
+
+
+                                if ((int)cmd.ExecuteScalar() > 0)
+                                {
+                                    task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, "Ignoring Transaction  " + ejData.Substring(match.Index, match.Length) + ".because this already exists in ej_parsed_replenishment table. For Task Id: " + downloadTask.TaskId);
+                                    match = match.NextMatch();
+                                    //isSwap = false;
+                                    isRepFound = false;
+                                    continue;
+                                }
+
+                                //if (cashAdded.NotesAddedType1 == 0 && cashAdded.NotesAddedType2 == 0 && cashAdded.NotesAddedType3 == 0 && cashAdded.NotesAddedType4 == 0)
+                                //{
+                                //    task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, "Ignoring Transaction  " + ejData.Substring(match.Index, match.Length) + ".becauseall counters are 0.");
+                                //    match = match.NextMatch();
+                                //    //isSwap = false;
+                                //    isRepFound = false;
+                                //    continue;
+                                //}
+
+                                //Function call added by Ali Shah on 6th June, 2016
+                                //To insert Test Cash as Transaction
+                                EjParsedTransactions trans = EjParsedTransactions.LoadEjParsedTransactions("ATM_id = " + downloadTask.ATMId + " and trxn_datetime = Convert(datetime,'" + Convert.ToDateTime(cashAdded.RepDatetime).ToString("dd/MM/yyyy HH:mm:ss") + "',103)");
+                                if (trans != null)  //Case if test cash transaction already inserted at same time
+                                {
+                                    task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, "Ignoring Test Cash Transaction " + ejData.Substring(match.Index, match.Length) + " as it already exist.");
+                                    match = match.NextMatch();
+                                    continue;
+                                }
+
+                                ///Edited by Ali Shah on 19July2020
+                                ///#Reference Point 1.0
+                                ///
+                                string ejChunk = ejData.Substring(0, match.Index);
+                                int indxReplenishmentStart = ejChunk.LastIndexOf("SERVICEMODE ENTERED");
+                                string repChunk = indxReplenishmentStart > 0 ? ejChunk.Substring(indxReplenishmentStart) : ejChunk.Substring(0);
+                                if (SOPKeywordIndex < 1)
+                                {
+                                    matchClearCash = rgxClearCash.Match(repChunk);
+
+                                    //Edited by Ali Shah on 10th June, 2016
+                                    //To correct the calculation of Test Cash
+
+                                    //bool isTestCashActivityOnly = IsTestCashActivityOnly(remainingCount, newRejectCount, prevCount, oldRejectCount);
+                                    ///Edited by Ali Faiyaz Shah on 19th July, 2020
+                                    ///Taking into considertation for Qatar, No Clear Cash means No Replenishment as per Talha Recommendation.
+                                    bool isTestCashActivityOnly = false;
+                                    if (!matchClearCash.Success)
+                                    {
+                                        task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, "Ignoring as Replenishment, in Qatar, Clear Cash must be done before Replenishment");
+                                        isTestCashActivityOnly = true;
+                                    }
+                                    else
+                                        isTestCashActivityOnly = false; // IsTestCashActivityOnly(remainingCount, newRejectCount, prevCount, oldRejectCount, matchClearCash.Success);
+
+                                    if (isTestCashActivityOnly)
+                                    {
+                                        //Commented by Ali Shah on 19th March, 2017.
+                                        LogableTask.LogMonoActivityTask("TestCash Activity Only", MethodBase.GetCurrentMethod(), TraceLevel.Info, "This is test cash activity only for task: " + downloadTask.TaskId);
+                                        int totalTestCash = newRejectCount - oldRejectCount;
+                                        int[,] arrayBeforeChunk = new int[4, 3];
+                                        int[,] arrayAfterChunk = new int[4, 3];
+                                        //enum columnName {Denomination, Counters , IsProcessed };
+                                        if (totalTestCash > 0)
+                                        {
+                                            int i = 0;
+                                            //int j = 0;
+                                            PopulateArrayThroughCounterObject(ref arrayBeforeChunk, notesDenomination, prevCount);
+                                            PopulateArrayThroughCounterObject(ref arrayAfterChunk, notesDenomination, notesAvailable);
+                                            while (i < 4)
+                                            {
+                                                for (int j = 0; j < 4; j++)
+                                                {
+                                                    if (arrayBeforeChunk[i, 0] == arrayAfterChunk[j, 0] && (Math.Abs(arrayBeforeChunk[i, 1] - arrayAfterChunk[j, 1]) <= totalTestCash) && arrayAfterChunk[j, 2] == 0)
+                                                    {
+                                                        totalTestCash -= arrayBeforeChunk[i, 1] - arrayAfterChunk[j, 1];
+                                                        arrayAfterChunk[j, 2] = 1;
+                                                        switch (i)
+                                                        {
+                                                            case 0:
+                                                                notesUsedInTestCash.Type1 = arrayBeforeChunk[i, 1] - arrayAfterChunk[j, 1];
+                                                                break;
+                                                            case 1:
+                                                                notesUsedInTestCash.Type2 = arrayBeforeChunk[i, 1] - arrayAfterChunk[j, 1];
+                                                                break;
+                                                            case 2:
+                                                                notesUsedInTestCash.Type3 = arrayBeforeChunk[i, 1] - arrayAfterChunk[j, 1];
+                                                                break;
+                                                            case 3:
+                                                                notesUsedInTestCash.Type4 = arrayBeforeChunk[i, 1] - arrayAfterChunk[j, 1];
+                                                                break;
+                                                            default:
+                                                                break;
+                                                        }
+                                                        break;
+                                                    }
+                                                    //else
+                                                    //    continue;
+
+                                                }
+                                                i++;
+                                            }
+                                        }
+                                    }
+                                    decimal amount = CalculateAmount(notesUsedInTestCash, notesDenomination);
+                                    InsertTestCashAsTransaction(cashAdded, amount, notesUsedInTestCash, downloadTask, notesAvailable, task, trxn);
+
+                                    //int newRejectCount = match.Groups["NewRejectCount"].Success ? int.Parse(match.Groups["NewRejectCount"].Value) : 0;
+                                    //int oldRejectCount = match.Groups["OldRejectCount"].Success ? int.Parse(match.Groups["OldRejectCount"].Value) : 0;
+                                    //if (IsTestCashActivityOnly(remainingCount, newRejectCount, prevCount, oldRejectCount))
+
+                                    if (isTestCashActivityOnly) //Till here
+                                    {
+                                        task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, "Ignoring Replenishment: " + ejData.Substring(match.Index, match.Length) + " because this is not replenishment. It is just Test Cash. For Task Id: " + downloadTask.TaskId);
+                                        match = match.NextMatch();
+                                        isRepFound = false;
+                                        continue;
+                                    }
+                                }
+                                ///<Summary>
+                                ///Sequence of calling this chunk changed on 14th Feb, 2017.
+                                ///There were test cash activity only performed and below chunk were executing as cash added were zero, before test cash entry as transaction.
+                                if (cashAdded.NotesAddedType1 == 0 && cashAdded.NotesAddedType2 == 0 && cashAdded.NotesAddedType3 == 0 && cashAdded.NotesAddedType4 == 0)
+                                {
+                                    task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, "Ignoring Replenishment: " + ejData.Substring(match.Index, match.Length) + " because all counters are 0. For Task Id: " + downloadTask.TaskId);
+                                    match = match.NextMatch();
+                                    //isSwap = false;
+                                    isRepFound = false;
+                                    continue;
+                                }
+                                //Commented by Ali Shah on 19th March, 2017.
+                                LogableTask.LogMonoActivityTask("Replenishment Extracted", MethodBase.GetCurrentMethod(), TraceLevel.Info, "Replenishment going to save for Task Id: " + downloadTask.TaskId + " and Replenishment time : " + cashAdded.RepDatetime.ToString());
+                                cashAdded.Save(trxn.Connection, trxn);
+
+                                cmd.CommandText = "isReplenishmentSameInHour";
+                                cmd.CommandType = CommandType.StoredProcedure;
+                                cmd.Parameters.Clear();
+                                cmd.Parameters.Add(new SqlParameter("RepDate", SqlDbType.DateTime));
+                                cmd.Parameters[0].Value = cashAdded.RepDatetime;
+                                cmd.Parameters.Add(new SqlParameter("atmID", SqlDbType.Int));
+                                cmd.Parameters[1].Value = downloadTask.ATMId;
+                                cmd.Parameters.Add(new SqlParameter("notes1", SqlDbType.Int));
+                                cmd.Parameters[2].Value = cashAdded.NotesAddedType1;
+                                cmd.Parameters.Add(new SqlParameter("notes2", SqlDbType.Int));
+                                cmd.Parameters[3].Value = cashAdded.NotesAddedType2;
+                                cmd.Parameters.Add(new SqlParameter("notes3", SqlDbType.Int));
+                                cmd.Parameters[4].Value = cashAdded.NotesAddedType3;
+                                cmd.Parameters.Add(new SqlParameter("notes4", SqlDbType.Int));
+                                cmd.Parameters[5].Value = cashAdded.NotesAddedType4;
+
+
+
+                                if ((int)cmd.ExecuteScalar() > 0)
+                                {
+                                    task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, "Replenishment already extracted from counters so ignoring it for atm " + cashAdded.AtmId + " for the date " + cashAdded.RepDatetime + " for Task Id: " + downloadTask.TaskId);
+                                    match = match.NextMatch();
+                                    //isSwap = false;
+                                    isRepFound = false;
+                                    continue;
+                                }
+                                else
+                                {
+                                    lastSavedReplenishment = this.AddReplenishmentInCCMS(ref downloadTask, ref cashAdded, ref trxn, ref isSwap);
+                                    task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, "Extracting replenishment " + this.match.ToString() + " for Task Id: " + downloadTask.TaskId);
+                                }
+                                //Replenishment replenishment = Replenishment.LoadReplenishment(string.Concat(new object[] { "atm_id = ", downloadTask.ATMId, " and rep_datetime>=convert(datetime,'", cashAdded.RepDatetime.Value.ToString("dd/MM/yyyy"), "',103)  and rep_datetime<=convert(datetime,'", cashAdded.RepDatetime.Value.ToString("dd/MM/yyyy"), " 23:59:59',103) " }));
+
+                                //if (replenishment == null) // This means Replenishment not inserted by EJ & Counters also so insert it
+                                //{
+                                //    lastSavedReplenishment = this.AddReplenishmentInCCMS(ref downloadTask, ref cashAdded, ref trxn, ref isSwap);
+                                //    task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, "Extracting replenishment " + this.match.ToString() + " for Task Id: " + downloadTask.TaskId);
+                                //    //Added on 05/02/2015
+                                //    isSwap = false;
+                                //}
+                                //else
+                                //{
+
+                                //    if (replenishment.Reason != null)
+                                //    {
+                                //        //If it's extracted from EJ then update it.
+                                //        if (isSwap)
+                                //        {
+                                //            replenishment.CashAdded1 = cashAdded.NotesAddedType1.Value;
+                                //            replenishment.CashAdded2 = cashAdded.NotesAddedType2.Value;
+                                //            replenishment.CashAdded3 = cashAdded.NotesAddedType3.Value;
+                                //            replenishment.CashAdded4 = cashAdded.NotesAddedType4.Value;
+
+                                //        }
+                                //        else
+                                //        {
+                                //            replenishment.CashAdded1 += cashAdded.NotesAddedType1.Value;
+                                //            replenishment.CashAdded2 += cashAdded.NotesAddedType2.Value;
+                                //            replenishment.CashAdded3 += cashAdded.NotesAddedType3.Value;
+                                //            replenishment.CashAdded4 += cashAdded.NotesAddedType4.Value;
+
+                                //        }
+                                //        replenishment.IsSwap = isSwap;
+                                //        replenishment.Save(trxn.Connection, trxn);
+                                //        lastSavedReplenishment = replenishment;
+                                //        isSwap = false;
+                                //    }
+                                //    else
+                                //    {
+                                //        //If Replenishment is extracted from counter file do not update it
+                                //        task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, "Replenishment already extracted from counters so ignoring it for atm " + replenishment.AtmId + " for the date " + replenishment.RepDatetime + " for Task Id: " + downloadTask.TaskId);
+                                //    }
+                                //}
+                            }
+                        }
+
+                        if (isRepFound)
+                        {
+                            EjNotesDispensed cashCountClear;
+
+                            cashCountClear = ExtractCashCounts();
+
+                            cmd.CommandText = "isEjClearingCounterExists";
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.Parameters.Clear();
+                            cmd.Parameters.Add(new SqlParameter("DisDate", SqlDbType.DateTime));
+                            cmd.Parameters[0].Value = cashCountClear.ClearingDatetime;
+                            cmd.Parameters.Add(new SqlParameter("atmID", SqlDbType.Int));
+                            cmd.Parameters[1].Value = downloadTask.ATMId;
+
+                            if ((int)cmd.ExecuteScalar() > 0)
+                            {
+                                task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, "Ignoring Dispension:  " + ejData.Substring(match.Index, match.Length) + ".because this already exists in dispensed table.");
+                                match = match.NextMatch();
+                                continue;
+                            }
+
+                            cashCountClear.TaskId = downloadTask.TaskId;
+                            cashCountClear.AtmId = downloadTask.ATMId;
+                            cashCountClear.Save(trxn.Connection, trxn);
+
+                            /// Added by Ali Shah on 08th Feb, 2017
+                            /// To update cash position just after replenishment, before it was updating 
+                            /// when first withdrawal transaction occurs after replenishment
+                            //UpdateCashPositionAfterReplenishment(cashCountClear, downloadTask.TaskId, task, trxn, ref isOutOfCashAlertResolved, ref isLowBalanceAlertResolved, ref isOutOfCashAlertGenerated, ref isLowBalanceAlertGenerated);
+                            //    
+                            isRepFound = false;
+                        }
+
+                        match = match.NextMatch();
+                    }
+
+                    ///<Summary>
+                    ///Added by Ali Shah
+                    ///Extract those Replenishments who dont have SOP Chunk for Wincor machines
+                    try
+                    {
+                        ExtractAllWincorReplenishments(ref ejData, downloadTask, task, trxn);
+                    }
+                    catch (Exception ex)
+                    {
+                        task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Error, ex);
+                    }
+
+
+                }
+            }
+            catch (Exception e)
+            {
+                task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Error, e);
+            }
+
+            finally
+            {
+                if (cmd != null)
+                    if (cmd.Connection != null)
+                        cmd.Connection.Close();
+            }
+        }
+
+
+
+        private void InsertTestCashAsTransaction(EjParsedReplenishments cashAdded, decimal amount, AtmCounter notesDispensed, Task downloadTask, AtmCounter notesRemaining, LogableTask task, SqlTransaction dbTrxn)
+        {
+            EjParsedTransactions parsedTrxn = null;
+            try
+            {
+                parsedTrxn = new EjParsedTransactions();
+                parsedTrxn.TrxnDatetime = cashAdded.RepDatetime;
+                parsedTrxn.Amount = amount;
+                parsedTrxn.NotesDispensedType1 = notesDispensed.Type1;
+                parsedTrxn.NotesDispensedType2 = notesDispensed.Type2;
+                parsedTrxn.NotesDispensedType3 = notesDispensed.Type3;
+                parsedTrxn.NotesDispensedType4 = notesDispensed.Type4;
+
+                parsedTrxn.AtmId = downloadTask.ATMId;
+                parsedTrxn.TaskId = downloadTask.TaskId;
+                parsedTrxn.TransactionTypeId = CommentSaver.GetTransactionTypeId("TestCash");
+                parsedTrxn.ProcessingDatetime = DateTime.Now;
+                parsedTrxn.StartIndex = cashAdded.StartIndex;
+                parsedTrxn.EndIndex = cashAdded.EndIndex;
+                parsedTrxn.Status = 0;
+                parsedTrxn.NotesRemainingType1 = notesAvailable.Type1;
+                parsedTrxn.NotesRemainingType2 = notesAvailable.Type2;
+                parsedTrxn.NotesRemainingType3 = notesAvailable.Type3;
+                parsedTrxn.NotesRemainingType4 = notesAvailable.Type4;
+
+                parsedTrxn.Save(dbTrxn.Connection, dbTrxn);
+            }
+            catch (Exception ex)
+            {
+                task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Error, ex);
+            }
+        }
+
+        private decimal CalculateAmount(AtmCounter notesDispensed, AtmCounter denomination)
+        {
+            decimal amount = 0;
+            amount = (notesDispensed.Type1 * denomination.Type1) + (notesDispensed.Type2 * denomination.Type2) + (notesDispensed.Type3 * denomination.Type3) + (notesDispensed.Type4 * denomination.Type4);
+            return amount;
+        }
+
+        ///<summary>
+        ///Edited by Ali Shah on 11Dec2017
+        ///#Reference Point 1.0
+        ///To handle the case where after SOP counters decreases in After SOP as compare to Before SOP, but actually replenishment occured.
+        ///Case 1: Replenishment with less amount
+        ///Case 2: Replenishment reflected in Before SOP and Test Cash reflected in After SOP
+        /// </summary>
+
+        //private bool IsTestCashActivityOnly(AtmCounter newCount, int newRejectCount, AtmCounter oldCount, int oldRejectCount)
+        //{
+        //    bool isTestCash = false;
+        //    int newTotalCount = newCount.Type1 + newCount.Type2 + newCount.Type3 + newCount.Type4;
+        //    int oldTotalCount = oldCount.Type1 + oldCount.Type2 + oldCount.Type3 + oldCount.Type4;
+        //    newTotalCount += newRejectCount;
+        //    oldTotalCount += oldRejectCount;
+        //    isTestCash = (newTotalCount == oldTotalCount);
+        //    ///<Summary>
+        //    ///Edited by Ali Shah on 2nd July, 2016
+        //    ///To deal some exceptional cases
+        //    if (!isTestCash)
+        //        isTestCash = (newTotalCount <= oldTotalCount);
+        //    return isTestCash;
+        //}
+
+        ///<summary>
+        ///Edited by Ali Shah on 11Dec2017
+        ///#Reference Point 1.0
+        ///To handle the case where after SOP counters decreases in After SOP as compare to Before SOP, but actually replenishment occured.
+        ///Case 1: Replenishment with less amount
+        ///Case 2: Replenishment reflected in Before SOP and Test Cash reflected in After SOP
+        /// </summary>
+
+        private bool IsTestCashActivityOnly(AtmCounter newCount, int newRejectCount, AtmCounter oldCount, int oldRejectCount, bool isClearCash)
+        {
+            bool isTestCash = false;
+            int newTotalCount = newCount.Type1 + newCount.Type2 + newCount.Type3 + newCount.Type4;
+            int oldTotalCount = oldCount.Type1 + oldCount.Type2 + oldCount.Type3 + oldCount.Type4;
+
+
+            //newTotalCount += newRejectCount;
+            //oldTotalCount += oldRejectCount;
+            isTestCash = ((newTotalCount + newRejectCount) == (oldTotalCount + oldRejectCount));
+            ///<Summary>
+            ///Edited by Ali Shah on 2nd July, 2016
+            ///To deal some exceptional cases
+            if (!isTestCash)
+                //isTestCash = (newTotalCount <= oldTotalCount);
+                isTestCash = (newTotalCount <= oldTotalCount && !isClearCash);
+
+
+            return isTestCash;
+        }
+
+        //private bool IsTestCashActivityOnly(AtmCounter newCount, int newRejectCount, AtmCounter oldCount, int oldRejectCount)
+        //{
+        //    bool isTestCash = false;
+        //    int newTotalCount = newCount.Type1 + newCount.Type2 + newCount.Type3 + newCount.Type4;
+        //    int oldTotalCount = oldCount.Type1 + oldCount.Type2 + oldCount.Type3 + oldCount.Type4;
+        //    //newTotalCount += newRejectCount;
+        //    //oldTotalCount += oldRejectCount;
+        //    isTestCash = ((newTotalCount + newRejectCount) == (oldTotalCount + oldRejectCount));
+        //    ///<Summary>
+        //    ///Edited by Ali Shah on 2nd July, 2016
+        //    ///To deal some exceptional cases
+        //    if (!isTestCash)
+        //        isTestCash = (newTotalCount <= oldTotalCount);
+        //    return isTestCash;
+        //}
+
+
+        private void PopulateArrayThroughCounterObject(ref int[,] arrayChunk, AtmCounter denomination, AtmCounter counter)
+        {
+            arrayChunk[0, 0] = denomination.Type1;
+            arrayChunk[0, 1] = counter.Type1;
+            arrayChunk[0, 2] = 0;
+
+            arrayChunk[1, 0] = denomination.Type2;
+            arrayChunk[1, 1] = counter.Type2;
+            arrayChunk[1, 2] = 0;
+
+            arrayChunk[2, 0] = denomination.Type3;
+            arrayChunk[2, 1] = counter.Type3;
+            arrayChunk[2, 2] = 0;
+
+            arrayChunk[3, 0] = denomination.Type4;
+            arrayChunk[3, 1] = counter.Type4;
+            arrayChunk[3, 2] = 0;
+        }
+
+        /// <summary>
+        /// Added by Ali Shah on 08th Feb, 2017
+        /// To update cash position just after replenishment, before it was updating 
+        /// when first withdrawal transaction occurs after replenishment.
+        /// </summary>
+
+        private void UpdateCashPositionAfterReplenishment(EjNotesDispensed cashCountRemaining, int TaskId, LogableTask task, SqlTransaction trxn, ref bool isOutOfCashAlertResolved, ref bool isLowBalanceAlertResolved, ref bool isOutOfCashAlertGenerated, ref bool isLowBalanceAlertGenerated)
+        {
+            //LogableTask task = LogableTask.NewTask();
+            try
+            {
+                DateTime lastTrxnAt = cashCountRemaining.ClearingDatetime.Value;
+
+                EjCashPosition cashPositionAfterReplenishment = EjCashPosition.LoadEjCashPosition("atm_id =" + cashCountRemaining.AtmId + " and last_trxn_at >=convert(datetime,'" + lastTrxnAt.ToString("dd/MM/yyyy") + "',103) " +
+                    " and last_trxn_at <=convert(datetime,'" + lastTrxnAt.ToString("dd/MM/yyyy") + " 23:59:59',103)");
+
+                if (cashPositionAfterReplenishment != null)
+                {
+
+                    if (cashCountRemaining.ClearingDatetime.Value < cashPositionAfterReplenishment.LastTrxnAt)
+                    {
+                        LogableTask.LogMonoActivityTask("Ignore Trxn", MethodBase.GetCurrentMethod(), TraceLevel.Info, "Cash position is not updated bcoz we have trxn of future date: " + cashPositionAfterReplenishment.LastTrxnAt);
+                        return;
+                    }
+
+                    if (cashCountRemaining.NotesRemainingType1.HasValue)
+                        cashPositionAfterReplenishment.Cassette1Notes = cashCountRemaining.NotesRemainingType1;
+                    else
+                        cashPositionAfterReplenishment.Cassette1Notes = 0;
+
+                    if (cashCountRemaining.NotesRemainingType2.HasValue)
+                        cashPositionAfterReplenishment.Cassette2Notes = cashCountRemaining.NotesRemainingType2;
+                    else
+                        cashPositionAfterReplenishment.Cassette2Notes = 0;
+
+                    if (cashCountRemaining.NotesRemainingType3.HasValue)
+                        cashPositionAfterReplenishment.Cassette3Notes = cashCountRemaining.NotesRemainingType3;
+                    else
+                        cashPositionAfterReplenishment.Cassette3Notes = 0;
+
+                    if (cashCountRemaining.NotesRemainingType4.HasValue)
+                        cashPositionAfterReplenishment.Cassette4Notes = cashCountRemaining.NotesRemainingType4;
+                    else
+                        cashPositionAfterReplenishment.Cassette4Notes = 0;
+
+                    cashPositionAfterReplenishment.Cassette5Notes = 0;
+                    cashPositionAfterReplenishment.Cassette6Notes = 0;
+                    cashPositionAfterReplenishment.Cassette7Notes = 0;
+
+                    cashPositionAfterReplenishment.TaskId = cashCountRemaining.TaskId.Value;
+                    //cashPositionAfterReplenishment.Save(trxn.Connection, trxn);
+                    cashPositionAfterReplenishment.Save();
+                    EJToCounterMapper.EJToCounterMapper.EjCashPositionMigrator(cashPositionAfterReplenishment, trxn);
+                }
+                else // If there's no cash position for current day.
+                {
+                    DateTime? lastAtmTrxnAt;
+                    cashPositionAfterReplenishment = new EjCashPosition();
+                    cashPositionAfterReplenishment.AtmId = cashCountRemaining.AtmId.Value;
+
+                    if (cashCountRemaining.NotesRemainingType1.HasValue)
+                        cashPositionAfterReplenishment.Cassette1Notes = cashCountRemaining.NotesRemainingType1;
+                    else
+                        cashPositionAfterReplenishment.Cassette1Notes = 0;
+
+                    if (cashCountRemaining.NotesRemainingType2.HasValue)
+                        cashPositionAfterReplenishment.Cassette2Notes = cashCountRemaining.NotesRemainingType2;
+                    else
+                        cashPositionAfterReplenishment.Cassette2Notes = 0;
+
+                    if (cashCountRemaining.NotesRemainingType3.HasValue)
+                        cashPositionAfterReplenishment.Cassette3Notes = cashCountRemaining.NotesRemainingType3;
+                    else
+                        cashPositionAfterReplenishment.Cassette3Notes = 0;
+
+                    if (cashCountRemaining.NotesRemainingType4.HasValue)
+                        cashPositionAfterReplenishment.Cassette4Notes = cashCountRemaining.NotesRemainingType4;
+                    else
+                        cashPositionAfterReplenishment.Cassette4Notes = 0;
+
+                    cashPositionAfterReplenishment.Cassette5Notes = 0;
+                    cashPositionAfterReplenishment.Cassette6Notes = 0;
+                    cashPositionAfterReplenishment.Cassette7Notes = 0;
+
+                    ///<Summary>
+                    ///Handling the case to get last transaction date when there is no cash position for today
+                    ///And even when there is no cash position on any day, it will insert the replenishment time.
+                    //cashPositionAfterReplenishment.LastTrxnAt = lastTrxnAt;
+                    object result = ConnectionFactory.ExecuteScalar("Select MAX(last_trxn_at) from ej_cash_position where atm_id = " + cashCountRemaining.AtmId + " and last_trxn_at <= CONVERT(datetime,'" + lastTrxnAt.ToString("dd/MM/yyyy HH:mm:ss") + "', 103)");
+                    lastAtmTrxnAt = (DateTime?)(result == DBNull.Value ? null : result);
+                    cashPositionAfterReplenishment.LastTrxnAt = lastAtmTrxnAt != null ? lastAtmTrxnAt.Value : lastTrxnAt;
+
+                    cashPositionAfterReplenishment.TaskId = cashCountRemaining.TaskId.Value;
+                    //cashPositionAfterReplenishment.Save(trxn.Connection, trxn);
+                    cashPositionAfterReplenishment.Save();
+                    EJToCounterMapper.EJToCounterMapper.EjCashPositionMigrator(cashPositionAfterReplenishment, trxn);
+                }
+
+                decimal currentBalance = 0;
+                Atm atm = null;
+                if (cashCountRemaining.AtmId != null)
+                {
+                    atm = Atm.LoadAtmByPk(cashCountRemaining.AtmId.Value);
+
+                    NoteSetType noteSetType = NoteSetType.LoadNoteSetType("note_set_type_id =" + atm.NoteSetTypeId);
+
+                    currentBalance = cashPositionAfterReplenishment.Cassette1Notes.Value * noteSetType.DenominationType1.Value
+                    + cashPositionAfterReplenishment.Cassette2Notes.Value * noteSetType.DenominationType2.Value
+                    + cashPositionAfterReplenishment.Cassette3Notes.Value * noteSetType.DenominationType3.Value
+                    + cashPositionAfterReplenishment.Cassette4Notes.Value * noteSetType.DenominationType4.Value
+                    + cashPositionAfterReplenishment.Cassette5Notes.Value * noteSetType.DenominationType5.Value
+                    + cashPositionAfterReplenishment.Cassette6Notes.Value * noteSetType.DenominationType6.Value
+                    + cashPositionAfterReplenishment.Cassette7Notes.Value * noteSetType.DenominationType7.Value;
+
+                    minOperatingBalance = GetATMMinOperatingBalance(atm, cashPositionAfterReplenishment.LastTrxnAt);
+
+                    ResolveAlerts(cashPositionAfterReplenishment, atm, TaskId, task, trxn, currentBalance, minOperatingBalance, ref isOutOfCashAlertResolved, ref isLowBalanceAlertResolved, ref isOutOfCashAlertGenerated, ref isLowBalanceAlertGenerated);
+                }
+
+
+
+
+            }
+            finally
+            {
+                try
+                {
+                    //task.EndTask();
+                }
+                catch (Exception ex)
+                {
+                    EventLog.WriteEntry("ReplenishmentInfo", ex.Message + " " + ex.StackTrace);
+                }
+
+            }
+        }
+
+        private void ResolveAlerts(EjCashPosition cashPosition, Atm atm, int TaskId, LogableTask task, SqlTransaction trxn, decimal currentBalance, decimal minOperatingBalance, ref bool isOutOfCashAlertResolved, ref bool isLowBalanceAlertResolved, ref bool isOutOfCashAlertGenerated, ref bool isLowBalanceAlertGenerated)
+        {
+            bool isAlertGenEnabled = true;
+
+            if ((int)ConnectionFactory.ExecuteScalar(" select count(*) from Cash_Position with (nolock) where atm_id =" + atm.ATMId + " and last_trxn_at > convert(datetime,'" + cashPosition.LastTrxnAt.ToString("dd/MM/yyyy HH:mm:ss") + "',103) ", trxn) > 0)
+                isAlertGenEnabled = false;
+
+            if (currentBalance < minOperatingBalance && currentBalance > atm.OutOfCashThreshold)
+            {
+                if (isAlertGenEnabled)
+                {
+                    if (!isLowBalanceAlertGenerated)
+                    {
+                        string msg = cashPosition.Cassette1Notes.Value + "," +
+                              cashPosition.Cassette2Notes.Value + "," + cashPosition.Cassette3Notes.Value + "," + cashPosition.Cassette4Notes.Value + "," +
+                                  cashPosition.Cassette5Notes.Value + "," + cashPosition.Cassette6Notes.Value + "," + cashPosition.Cassette7Notes.Value + "," + currentBalance + "," + minOperatingBalance;
+                        Utility.GenerateConditionalTerminalAlert(atm.ATMId, (int)EnumAlertType.MinOperatingBalance, msg, trxn, Event_Type.Alert, TaskId, null, null);
+                        isLowBalanceAlertResolved = false;
+                        isLowBalanceAlertGenerated = true;
+                    }
+                }
+            }
+
+            else if (currentBalance <= 0 || currentBalance <= atm.OutOfCashThreshold)
+            {
+                if (isAlertGenEnabled)
+                {
+                    if (!isOutOfCashAlertGenerated)
+                    {
+                        //Delete low balance alert before adding out of cash alert.
+                        AtmAlert atmAlert = AtmAlert.LoadAtmAlert("alert_type_id=" + (int)EnumAlertType.MinOperatingBalance + " and atm_id=" + atm.ATMId + " and resolve_at is null");
+                        if (atmAlert != null)
+                        {
+                            atmAlert.Delete();
+                            task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Verbose, "Low balance alert deleted for atm_id = " + atm.ATMId);
+                            CcmsIntegratedAlert ccmsIntAlert = CcmsIntegratedAlert.LoadCcmsIntegratedAlert("atm_alert_id=" + atmAlert.AtmAlertId);
+                            if (ccmsIntAlert != null)
+                            {
+                                ccmsIntAlert.Delete();
+                                task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Verbose, "Low balance alert deleted from ccms integrated alert for atm_id = " + atm.ATMId);
+                            }
+                        }
+
+
+                        string msg = cashPosition.Cassette1Notes.Value + "," +
+                           cashPosition.Cassette2Notes.Value + "," + cashPosition.Cassette3Notes.Value + "," + cashPosition.Cassette4Notes.Value + "," +
+                               cashPosition.Cassette5Notes.Value + "," + cashPosition.Cassette6Notes.Value + "," + cashPosition.Cassette7Notes.Value + "," + currentBalance;
+                        Utility.GenerateConditionalTerminalAlert(atm.ATMId, (int)EnumAlertType.ATMOutOfCash, msg, trxn, Event_Type.Alert, TaskId, null, null);
+                        isOutOfCashAlertResolved = false;
+                        isOutOfCashAlertGenerated = true;
+                    }
+                    //GenerateCCMSEvent(
+                    //            EventType.ATMOutOfCash.ToString(),
+                    //            EventType.ATMOutOfCash.ToString(),
+                    //            Event_Type.Warning.ToString(),
+                    //            ATMID.ToString(),
+                    //            EntityType.ATM.ToString(),
+                    //            Actors.ATM.ToString(),
+                    //            Actors.CCMS.ToString(),
+                    //            trxn, null);
+                }
+            }
+
+            if (currentBalance > minOperatingBalance && isAlertGenEnabled)
+            {
+                if (!isLowBalanceAlertResolved)
+                {
+                    task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Verbose, "Going to fetch low balance alert for atm_id = " + atm.ATMId);
+                    AtmAlert atmAlert = AtmAlert.LoadAtmAlert("alert_type_id=" + (int)EnumAlertType.MinOperatingBalance + " and atm_id=" + atm.ATMId + " and resolve_at is null");
+                    if (atmAlert != null)
+                    {
+                        atmAlert.ResolveAt = DateTime.Now;
+                        atmAlert.Save(trxn.Connection, trxn);
+                        task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Verbose, "Low balance alert resolved for atm_id = " + atm.ATMId);
+                        CcmsIntegratedAlert ccmsIntAlert = CcmsIntegratedAlert.LoadCcmsIntegratedAlert("atm_alert_id=" + atmAlert.AtmAlertId);
+                        if (ccmsIntAlert != null)
+                        {
+                            ccmsIntAlert.ResolvedAt = DateTime.Now;
+                            ccmsIntAlert.Save(trxn.Connection, trxn);
+                            task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Verbose, "Low balance alert from ccms integrated alert resolved for atm_id = " + atm.ATMId);
+                        }
+                        isLowBalanceAlertResolved = true;
+                        isLowBalanceAlertGenerated = false;
+                    }
+                    else
+                    {
+                        isLowBalanceAlertResolved = true;//No need to look in database as there is no alert
+                        isLowBalanceAlertGenerated = false;
+                    }
+                }
+            }
+
+            if (currentBalance > atm.OutOfCashThreshold && isAlertGenEnabled)
+            {
+                if (!isOutOfCashAlertResolved)
+                {
+                    AtmAlert atmAlert = AtmAlert.LoadAtmAlert("alert_type_id=" + (int)EnumAlertType.ATMOutOfCash + " and atm_id=" + atm.ATMId + " and resolve_at is null");
+                    if (atmAlert != null)
+                    {
+                        atmAlert.ResolveAt = DateTime.Now;
+                        atmAlert.Save(trxn.Connection, trxn);
+                        task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Verbose, "Out Of Cash alert resolved for atm_id = " + atm.ATMId);
+                        CcmsIntegratedAlert ccmsIntAlert = CcmsIntegratedAlert.LoadCcmsIntegratedAlert("atm_alert_id=" + atmAlert.AtmAlertId);
+                        if (ccmsIntAlert != null)
+                        {
+                            ccmsIntAlert.ResolvedAt = DateTime.Now;
+                            ccmsIntAlert.Save(trxn.Connection, trxn);
+                            task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Verbose, "Out Of Cash alert from ccms integrated alert resolved for atm_id = " + atm.ATMId);
+                        }
+                        isOutOfCashAlertResolved = true;
+                        isOutOfCashAlertGenerated = false;
+                    }
+                    else
+                    {
+                        isOutOfCashAlertResolved = true;
+                        isOutOfCashAlertGenerated = false;
+                    }
+                }
+            }
+        }
+
+        ///<Summary>
+        ///Added by Ali Shah
+        ///Extract those Replenishments who dont have SOP Chunk for Wincor machines
+        private void ExtractAllWincorReplenishments(ref string ejData, Task downloadTask, LogableTask task, SqlTransaction trxn)
+        {
+            NCR.CCMS.Parser.WincorReplenishmentExtractor WincorReplExtractor = new NCR.CCMS.Parser.WincorReplenishmentExtractor();
+            WincorReplExtractor.ParseAndSaveReplenishment(ref ejData, downloadTask, task, trxn);
+            LogableTask.LogMonoActivityTask("Extracting ej from db", MethodBase.GetCurrentMethod(), TraceLevel.Info, "Wincor Replenishment without SOP extratced for Task Id: " + downloadTask.TaskId);
+        }
+
+        private void ExtractAllNCRReplenishments(ref string ejData, Task downloadTask, LogableTask task, SqlTransaction trxn)
+        {
+            NCR.CCMS.Parser.ReplenishmentExtractor NCRReplenishmentExtractor = new NCR.CCMS.Parser.ReplenishmentExtractor();
+            NCRReplenishmentExtractor.ParseAndSaveReplenishment(ref ejData, downloadTask, task, trxn);
+            LogableTask.LogMonoActivityTask("Extracting ej from db", MethodBase.GetCurrentMethod(), TraceLevel.Info, "NCR Replenishment extratced for Task Id: " + downloadTask.TaskId);
+
+        }
+
+        decimal GetATMMinOperatingBalance(Atm atm, DateTime Day)
+        {
+            // decimal minOperatingBalance = 0;
+            if (listNormalDays.Contains(Day.Date))
+            {
+                if (atm.MinOperatingBalanceNormalDays.HasValue)
+                    minOperatingBalance = atm.MinOperatingBalanceNormalDays.Value;
+                else
+                    minOperatingBalance = atm.MinOperatingBalance.Value;
+            }
+            else
+            {
+                //Salary day...
+                if (atm.MinOperatingBalanceSalaryDays.HasValue)
+                    minOperatingBalance = atm.MinOperatingBalanceSalaryDays.Value;
+                else
+                    minOperatingBalance = atm.MinOperatingBalance.HasValue ? atm.MinOperatingBalance.Value : 0;
+            }
+            return minOperatingBalance;
+
+        }
+    }
+}
+

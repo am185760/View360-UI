@@ -1,0 +1,139 @@
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\EView360Consumer.exe.config
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\EView360Consumer.exe
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\EView360Consumer.pdb
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\Data Requestor.dll
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\Encryption.dll
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\ServicesDAL.dll
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\Newtonsoft.Json.dll
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\Data Requestor.pdb
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\ServicesDAL.pdb
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\Newtonsoft.Json.xml
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\obj\Debug\EV360Consumer.csproj.AssemblyReference.cache
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\obj\Debug\EV360Consumer.ThreadExtension.resources
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\obj\Debug\EV360Consumer.Installer1.resources
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\obj\Debug\EV360Consumer.csproj.GenerateResource.cache
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\obj\Debug\EV360Consumer.csproj.CoreCompileInputs.cache
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\obj\Debug\EV360Consumer.csproj.CopyComplete
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\obj\Debug\EView360Consumer.exe
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\obj\Debug\EView360Consumer.pdb
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.Caching.Memory.dll
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.Caching.Abstractions.dll
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.Options.dll
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.Primitives.dll
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\System.ValueTuple.dll
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\System.Threading.Tasks.Extensions.dll
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\System.Memory.dll
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\System.Buffers.dll
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\System.Runtime.CompilerServices.Unsafe.dll
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\System.Numerics.Vectors.dll
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\Data Requestor.dll.config
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.Caching.Memory.xml
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.Caching.Abstractions.xml
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.Options.xml
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.DependencyInjection.Abstractions.xml
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.Logging.Abstractions.xml
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.Primitives.xml
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\System.ValueTuple.xml
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\Microsoft.Bcl.AsyncInterfaces.xml
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\System.Threading.Tasks.Extensions.xml
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\System.Memory.xml
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\System.Buffers.xml
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\System.Runtime.CompilerServices.Unsafe.xml
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\bin\System.Numerics.Vectors.xml
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\obj\Debug\EV360Consumer.csproj.SuggestedBindingRedirects.cache
+C:\Jabbar\GitProject\Services\EView360\EV360Consumer\obj\Debug\EView360Consumer.exe.config
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\EView360Consumer.exe.config
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\EView360Consumer.exe
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\EView360Consumer.pdb
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\Data Requestor.dll
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\Encryption.dll
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\ServicesDAL.dll
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\Newtonsoft.Json.dll
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.Caching.Memory.dll
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.Caching.Abstractions.dll
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.Options.dll
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.Primitives.dll
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\System.ValueTuple.dll
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\System.Threading.Tasks.Extensions.dll
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\System.Memory.dll
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\System.Buffers.dll
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\System.Runtime.CompilerServices.Unsafe.dll
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\System.Numerics.Vectors.dll
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\Data Requestor.pdb
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\Data Requestor.dll.config
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\ServicesDAL.pdb
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\Newtonsoft.Json.xml
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.Caching.Memory.xml
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.Caching.Abstractions.xml
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.Options.xml
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.DependencyInjection.Abstractions.xml
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.Logging.Abstractions.xml
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.Primitives.xml
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\System.ValueTuple.xml
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\Microsoft.Bcl.AsyncInterfaces.xml
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\System.Threading.Tasks.Extensions.xml
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\System.Memory.xml
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\System.Buffers.xml
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\System.Runtime.CompilerServices.Unsafe.xml
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\bin\System.Numerics.Vectors.xml
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\obj\Debug\EV360Consumer.csproj.AssemblyReference.cache
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\obj\Debug\EV360Consumer.csproj.SuggestedBindingRedirects.cache
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\obj\Debug\EView360Consumer.exe.config
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\obj\Debug\EV360Consumer.ThreadExtension.resources
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\obj\Debug\EV360Consumer.Installer1.resources
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\obj\Debug\EV360Consumer.csproj.GenerateResource.cache
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\obj\Debug\EV360Consumer.csproj.CoreCompileInputs.cache
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\obj\Debug\EV360Consumer.csproj.CopyComplete
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\obj\Debug\EView360Consumer.exe
+C:\Jabbar\Git Repository\Services\EView360\EV360Consumer\obj\Debug\EView360Consumer.pdb
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\EView360Consumer.exe.config
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\EView360Consumer.exe
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\EView360Consumer.pdb
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\Data Requestor.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\Encryption.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\ServicesDAL.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\Newtonsoft.Json.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.Caching.Memory.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.Caching.Abstractions.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.Options.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.Logging.Abstractions.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.Primitives.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\System.ValueTuple.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\Microsoft.Bcl.AsyncInterfaces.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\System.Threading.Tasks.Extensions.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\System.Memory.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\System.Buffers.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\System.Runtime.CompilerServices.Unsafe.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\System.Numerics.Vectors.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\Data Requestor.pdb
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\Data Requestor.dll.config
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\ServicesDAL.pdb
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\Newtonsoft.Json.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.Caching.Memory.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.Caching.Abstractions.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.Options.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.DependencyInjection.Abstractions.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.Logging.Abstractions.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\Microsoft.Extensions.Primitives.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\System.ValueTuple.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\Microsoft.Bcl.AsyncInterfaces.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\System.Threading.Tasks.Extensions.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\System.Memory.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\System.Buffers.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\System.Runtime.CompilerServices.Unsafe.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\bin\System.Numerics.Vectors.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\obj\Debug\EView360Consumer.exe.config
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\obj\Debug\EV360Consumer.ThreadExtension.resources
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\obj\Debug\EV360Consumer.Installer1.resources
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\obj\Debug\EV360Consumer.csproj.GenerateResource.cache
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\obj\Debug\EV360Consumer.csproj.CoreCompileInputs.cache
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\obj\Debug\EV360Consumer.csproj.CopyComplete
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\obj\Debug\EView360Consumer.exe
+D:\View360\Repository - View360 Depart\Services\EView360\EV360Consumer\obj\Debug\EView360Consumer.pdb

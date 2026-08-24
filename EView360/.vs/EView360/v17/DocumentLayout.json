@@ -1,0 +1,133 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\View360\\View360-UI\\EView360\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{411B7B9A-CA95-4B17-A2A8-2B455E19F8D9}|EView360\\EView360.csproj|d:\\view360\\view360-ui\\eview360\\eview360\\pages\\operations\\atmtask.razor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{411B7B9A-CA95-4B17-A2A8-2B455E19F8D9}|EView360\\EView360.csproj|solutionrelative:eview360\\pages\\operations\\atmtask.razor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{411B7B9A-CA95-4B17-A2A8-2B455E19F8D9}|EView360\\EView360.csproj|d:\\view360\\view360-ui\\eview360\\eview360\\pages\\operations\\atmtask.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{411B7B9A-CA95-4B17-A2A8-2B455E19F8D9}|EView360\\EView360.csproj|solutionrelative:eview360\\pages\\operations\\atmtask.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{411B7B9A-CA95-4B17-A2A8-2B455E19F8D9}|EView360\\EView360.csproj|d:\\view360\\view360-ui\\eview360\\eview360\\wwwroot\\scripts\\common.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{411B7B9A-CA95-4B17-A2A8-2B455E19F8D9}|EView360\\EView360.csproj|solutionrelative:eview360\\wwwroot\\scripts\\common.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 17,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:130:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:131:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:130:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:131:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:1:0:{e8b06f52-6d01-11d2-aa7d-00c04f990343}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{74946827-37a0-11d2-a273-00c04f8ef4ff}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c64b9c2-e352-428e-a56d-0ace190b99a6}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{131369f2-062d-44a2-8671-91ff31efb4f4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:1:0:{dc011dfb-bf23-4410-a356-0988806881fd}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{13b12e3e-c1b4-4539-9371-4fe9a0d523fc}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Common.js",
+              "DocumentMoniker": "D:\\View360\\View360-UI\\EView360\\EView360\\wwwroot\\scripts\\Common.js",
+              "RelativeDocumentMoniker": "EView360\\wwwroot\\scripts\\Common.js",
+              "ToolTip": "D:\\View360\\View360-UI\\EView360\\EView360\\wwwroot\\scripts\\Common.js",
+              "RelativeToolTip": "EView360\\wwwroot\\scripts\\Common.js",
+              "ViewState": "AgIAADQAAAAAAAAAAAAiwDwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2026-07-30T11:52:17.303Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "AtmTask.razor.cs",
+              "DocumentMoniker": "D:\\View360\\View360-UI\\EView360\\EView360\\Pages\\Operations\\AtmTask.razor.cs",
+              "RelativeDocumentMoniker": "EView360\\Pages\\Operations\\AtmTask.razor.cs",
+              "ToolTip": "D:\\View360\\View360-UI\\EView360\\EView360\\Pages\\Operations\\AtmTask.razor.cs",
+              "RelativeToolTip": "EView360\\Pages\\Operations\\AtmTask.razor.cs",
+              "ViewState": "AgIAAGkBAAAAAAAAAIAwwHwBAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-30T11:51:08.365Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "AtmTask.razor",
+              "DocumentMoniker": "D:\\View360\\View360-UI\\EView360\\EView360\\Pages\\Operations\\AtmTask.razor",
+              "RelativeDocumentMoniker": "EView360\\Pages\\Operations\\AtmTask.razor",
+              "ToolTip": "D:\\View360\\View360-UI\\EView360\\EView360\\Pages\\Operations\\AtmTask.razor",
+              "RelativeToolTip": "EView360\\Pages\\Operations\\AtmTask.razor",
+              "ViewState": "AgIAANYAAAAAAAAAAIAwwPAAAABLAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-07-30T11:50:22.875Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

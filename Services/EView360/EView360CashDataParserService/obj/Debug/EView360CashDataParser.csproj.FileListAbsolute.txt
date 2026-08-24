@@ -1,0 +1,93 @@
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\Data Requestor.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\Encryption.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\ICSharpCode.SharpZipLib.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\Newtonsoft.Json.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\ServicesDAL.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\System.Data.SqlClient.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\Microsoft.Extensions.Caching.Memory.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\Microsoft.Extensions.Caching.Abstractions.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\Microsoft.Extensions.Primitives.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\System.ValueTuple.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\System.Threading.Tasks.Extensions.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\System.Memory.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\System.Buffers.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\System.Runtime.CompilerServices.Unsafe.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\System.Numerics.Vectors.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\Data Requestor.pdb
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\Data Requestor.dll.config
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\ICSharpCode.SharpZipLib.pdb
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\ICSharpCode.SharpZipLib.xml
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\Newtonsoft.Json.xml
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\ServicesDAL.pdb
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\System.Data.SqlClient.xml
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\Microsoft.Extensions.Caching.Memory.xml
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\Microsoft.Extensions.Caching.Abstractions.xml
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\Microsoft.Extensions.DependencyInjection.Abstractions.xml
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\Microsoft.Extensions.Logging.Abstractions.xml
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\Microsoft.Extensions.Primitives.xml
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\System.ValueTuple.xml
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\Microsoft.Bcl.AsyncInterfaces.xml
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\System.Threading.Tasks.Extensions.xml
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\System.Memory.xml
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\System.Buffers.xml
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\System.Runtime.CompilerServices.Unsafe.xml
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\System.Numerics.Vectors.xml
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\obj\Debug\EView360CashDataParser.csproj.AssemblyReference.cache
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\obj\Debug\EView360CashDataParser.csproj.CoreCompileInputs.cache
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\obj\Debug\EView360CashDataParser.csproj.CopyComplete
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\Parser.dll
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\Parser.pdb
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\EView360CashDataParser.exe.config
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\EView360CashDataParser.exe
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\bin\EView360CashDataParser.pdb
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\obj\Debug\EView360CashDataParser.exe
+C:\Jabbar\Git Repository\Services\EView360\EView360CashDataParserService\obj\Debug\EView360CashDataParser.pdb
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\EView360CashDataParser.exe.config
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\EView360CashDataParser.exe
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\EView360CashDataParser.pdb
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\Data Requestor.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\Encryption.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\ICSharpCode.SharpZipLib.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\Newtonsoft.Json.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\Parser.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\ServicesDAL.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\System.Data.SqlClient.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\Microsoft.Extensions.Caching.Memory.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\Microsoft.Extensions.Caching.Abstractions.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\Microsoft.Extensions.Logging.Abstractions.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\Microsoft.Extensions.Primitives.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\System.ValueTuple.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\Microsoft.Bcl.AsyncInterfaces.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\System.Threading.Tasks.Extensions.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\System.Memory.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\System.Buffers.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\System.Runtime.CompilerServices.Unsafe.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\System.Numerics.Vectors.dll
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\Data Requestor.pdb
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\Data Requestor.dll.config
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\ICSharpCode.SharpZipLib.pdb
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\ICSharpCode.SharpZipLib.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\Newtonsoft.Json.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\Parser.pdb
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\ServicesDAL.pdb
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\System.Data.SqlClient.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\Microsoft.Extensions.Caching.Memory.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\Microsoft.Extensions.Caching.Abstractions.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\Microsoft.Extensions.DependencyInjection.Abstractions.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\Microsoft.Extensions.Logging.Abstractions.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\Microsoft.Extensions.Primitives.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\System.ValueTuple.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\Microsoft.Bcl.AsyncInterfaces.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\System.Threading.Tasks.Extensions.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\System.Memory.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\System.Buffers.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\System.Runtime.CompilerServices.Unsafe.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\bin\System.Numerics.Vectors.xml
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\obj\Debug\EView360CashDataParser.csproj.CoreCompileInputs.cache
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\obj\Debug\EView360CashDataParser.csproj.CopyComplete
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\obj\Debug\EView360CashDataParser.exe
+D:\View360\Repository - View360 Depart\Services\EView360\EView360CashDataParserService\obj\Debug\EView360CashDataParser.pdb

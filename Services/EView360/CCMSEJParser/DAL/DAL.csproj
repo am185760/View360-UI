@@ -1,0 +1,345 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{CD4A5893-C8F9-47C7-A2C8-AD67EEC80518}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DAL</RootNamespace>
+    <AssemblyName>DAL</AssemblyName>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DevComponents.DotNetBar2, Version=10.2.0.1, Culture=neutral, PublicKeyToken=7eb7c3a35b91de04, processorArchitecture=MSIL" />
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\Banks\ADIB\CCMS_UI\bin\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AlertEscalation.cs" />
+    <Compile Include="AlertHistory.cs" />
+    <Compile Include="AlertInterface.cs" />
+    <Compile Include="AlertTemplate.cs" />
+    <Compile Include="AlertTemplateDevices.cs" />
+    <Compile Include="AlertType.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="AppSetting.cs" />
+    <Compile Include="AppUser.cs" />
+    <Compile Include="AppUserApprover.cs" />
+    <Compile Include="Atm.cs" />
+    <Compile Include="AtmAlert.cs" />
+    <Compile Include="AtmBandwidth.cs" />
+    <Compile Include="AtmCashPosition.cs" />
+    <Compile Include="AtmCashPositionHistory.cs" />
+    <Compile Include="AtmDevices.cs" />
+    <Compile Include="AtmDeviceState.cs" />
+    <Compile Include="AtmDeviceStateHistory.cs" />
+    <Compile Include="AtmGeneralInventory.cs" />
+    <Compile Include="AtmHardwareInventory.cs" />
+    <Compile Include="AtmHistory.cs" />
+    <Compile Include="AtmInactivity.cs" />
+    <Compile Include="AtmInterfaceCurrentStatus.cs" />
+    <Compile Include="AtmInterfaceInfo.cs" />
+    <Compile Include="AtmInterfaceInfoHistory.cs" />
+    <Compile Include="AtmInternalProperty.cs" />
+    <Compile Include="AtmModel.cs" />
+    <Compile Include="AtmSettlement.cs" />
+    <Compile Include="AtmSettlementHistory.cs" />
+    <Compile Include="AtmSettlementInfo.cs" />
+    <Compile Include="AtmSettlementOtherDetails.cs" />
+    <Compile Include="AtmSoftwareInventory.cs" />
+    <Compile Include="ATMsToUpload.cs" />
+    <Compile Include="AuditLog.cs" />
+    <Compile Include="BatchSchedule.cs" />
+    <Compile Include="BnaCountsCleared.cs" />
+    <Compile Include="CapturedEvent.cs" />
+    <Compile Include="CapturedTransactions.cs" />
+    <Compile Include="CashAdded.cs" />
+    <Compile Include="CcmsAlertNotification.cs" />
+    <Compile Include="CcmsAlertNotificationApprover.cs" />
+    <Compile Include="CcmsAtmNoteSet.cs" />
+    <Compile Include="CcmsAtmReplenishmentDispenseDetail.cs" />
+    <Compile Include="CcmsAtmReplenishmentPurgeDetail.cs" />
+    <Compile Include="CcmsAtmReplenishmentResidualDetail.cs" />
+    <Compile Include="CcmsCheque.cs" />
+    <Compile Include="CcmsChequeDetail.cs" />
+    <Compile Include="CcmsCit.cs" />
+    <Compile Include="CcmsDenomination.cs" />
+    <Compile Include="CcmsEmailLog.cs" />
+    <Compile Include="CcmsEvent.cs" />
+    <Compile Include="CcmsIntegratedAlert.cs" />
+    <Compile Include="CcmsInvoice.cs" />
+    <Compile Include="CcmsInvoiceCode.cs" />
+    <Compile Include="CcmsInvoiceLineItem.cs" />
+    <Compile Include="CcmsInvoiceLineOrder.cs" />
+    <Compile Include="CcmsInvoiceStatus.cs" />
+    <Compile Include="CcmsOrganizationUser.cs" />
+    <Compile Include="CcmsServices.cs" />
+    <Compile Include="CcmsTask.cs" />
+    <Compile Include="CcmsTempVaultDayBalance.cs" />
+    <Compile Include="CcmsTempVaultDayBalanceSummary.cs" />
+    <Compile Include="CcmsTempVaultLedger.cs" />
+    <Compile Include="CcmsTempVaultLedgerDetail.cs" />
+    <Compile Include="CcmsUserCit.cs" />
+    <Compile Include="CcmsUserCitApprover.cs" />
+    <Compile Include="CcmsUserNcr.cs" />
+    <Compile Include="CcmsUserOrganization.cs" />
+    <Compile Include="CcmsVault.cs" />
+    <Compile Include="CcmsVaultAdjustments.cs" />
+    <Compile Include="CcmsVaultAdjustmentsDetail.cs" />
+    <Compile Include="CcmsVaultDayBalance.cs" />
+    <Compile Include="CcmsVaultDayBalanceSummary.cs" />
+    <Compile Include="CcmsVaultLedger.cs" />
+    <Compile Include="CcmsVaultLedgerDetail.cs" />
+    <Compile Include="CcmsVaultNoteType.cs" />
+    <Compile Include="AtmDffGenerationHaltHistory.cs" />
+    <Compile Include="AtmDateTimeSyncIssue.cs" />
+    <Compile Include="CcmsCounterMismatched.cs" />
+    <Compile Include="BwacCashPosition.cs" />
+    <Compile Include="BwacUploadProcess.cs" />
+    <Compile Include="AtmClassification.cs" />
+    <Compile Include="CcmsSmsTemplate.cs" />
+    <Compile Include="CommentAuditLogs.cs" />
+    <Compile Include="GroupRightsApprover.cs" />
+    <Compile Include="GroupsApprover.cs" />
+    <Compile Include="GroupUsersApprover.cs" />
+    <Compile Include="Package.cs" />
+    <Compile Include="PackageInstallationDetail.cs" />
+    <Compile Include="ParserPostProcessingTask.cs" />
+    <Compile Include="ReconciliationBnaHostData.cs" />
+    <Compile Include="ReconciliationBnaSwitchData.cs" />
+    <Compile Include="ReportTemplate.cs" />
+    <Compile Include="ScheduledDownloadsDetails.cs" />
+    <Compile Include="ObjectPerformanceCumulativeAvailability.cs" />
+    <Compile Include="EjPowerupEvents.cs" />
+    <Compile Include="ObjectPerformanceReportDetail.cs" />
+    <Compile Include="ObjectPerformanceReport.cs" />
+    <Compile Include="ExceptionHandlingCriteria.cs" />
+    <Compile Include="IncidentDetail.cs" />
+    <Compile Include="SmsTask.cs" />
+    <Compile Include="SmsCustomerDetail.cs" />
+    <Compile Include="SmsTaskHelper.cs" />
+    <Compile Include="SmsTemplateConfiguration.cs" />
+    <Compile Include="SmsTransactionTypeDetail.cs" />
+    <Compile Include="Classification.cs" />
+    <Compile Include="OperationalHour.cs" />
+    <Compile Include="Incident.cs" />
+    <Compile Include="EjParsedCpmTransactionDetail.cs" />
+    <Compile Include="EjParsedBnaTransaction.cs" />
+    <Compile Include="EjParsedBnaTransactionDetail.cs" />
+    <Compile Include="EjParsedCpmTransaction.cs" />
+    <Compile Include="EjParsedDeviceStatus.cs" />
+    <Compile Include="ErrorLog.cs" />
+    <Compile Include="FilesToUpload.cs" />
+    <Compile Include="FileUploadStatus.cs" />
+    <Compile Include="GasperTicket.cs" />
+    <Compile Include="NotesInconsistency.cs" />
+    <Compile Include="MissingNotes.cs" />
+    <Compile Include="ExplodedReplenishment.cs" />
+    <Compile Include="Comment.cs" />
+    <Compile Include="CommentSaver.cs" />
+    <Compile Include="CpmCountsCleared.cs" />
+    <Compile Include="Device.cs" />
+    <Compile Include="DeviceCurrentmodeMapping.cs" />
+    <Compile Include="DeviceStatusMapping.cs" />
+    <Compile Include="DeviceTallyMapping.cs" />
+    <Compile Include="DeviceTemplate.cs" />
+    <Compile Include="DeviceTemplateDevices.cs" />
+    <Compile Include="DispensedLogic.cs" />
+    <Compile Include="DispenserEndOfDayBalance.cs" />
+    <Compile Include="EjCapturedCard.cs" />
+    <Compile Include="EjCashPosition.cs" />
+    <Compile Include="EjEvents.cs" />
+    <Compile Include="EjFileDownloadStatus.cs" />
+    <Compile Include="EjNotesDispensed.cs" />
+    <Compile Include="EjParsedReplenishments.cs" />
+    <Compile Include="EjParsedTransactions.cs" />
+    <Compile Include="EjSummary.cs" />
+    <Compile Include="FITMapping.cs" />
+    <Compile Include="Flm.cs" />
+    <Compile Include="FlmMonitoring.cs" />
+    <Compile Include="GroupDevices.cs" />
+    <Compile Include="Groups.cs" />
+    <Compile Include="HeartBeat.cs" />
+    <Compile Include="CashDataStatus.cs" />
+    <Compile Include="CashOrderMonitoring.cs" />
+    <Compile Include="CashOrders.cs" />
+    <Compile Include="CashPosition.cs" />
+    <Compile Include="CcmsAtmEvent.cs" />
+    <Compile Include="CcmsAtmLedger.cs" />
+    <Compile Include="CcmsAtmLedgerDetail.cs" />
+    <Compile Include="CcmsAtmLog.cs" />
+    <Compile Include="CcmsOrder.cs" />
+    <Compile Include="CcmsOrderDetail.cs" />
+    <Compile Include="CcmsOrganization.cs" />
+    <Compile Include="CcmsOrgNoteSet.cs" />
+    <Compile Include="CcmsOrgNoteSetItem.cs" />
+    <Compile Include="CcmsReplenishment.cs" />
+    <Compile Include="CcmsReplenishmentDetail.cs" />
+    <Compile Include="CcmsReplenishmentPurgeDetail.cs" />
+    <Compile Include="Cit.cs" />
+    <Compile Include="ConfigurationInfo.cs" />
+    <Compile Include="ConnectionFactory.cs" />
+    <Compile Include="DailyFeedConfig.cs" />
+    <Compile Include="DailyFeedSchedule.cs" />
+    <Compile Include="DailyFeedScheme.cs" />
+    <Compile Include="DepositPosition.cs" />
+    <Compile Include="Dispensed.cs" />
+    <Compile Include="DownloadingSchedule.cs" />
+    <Compile Include="EjStatus.cs" />
+    <Compile Include="GeneralAlert.cs" />
+    <Compile Include="HeartBeatSchedule.cs" />
+    <Compile Include="Investigation.cs" />
+    <Compile Include="InvestigationComments.cs" />
+    <Compile Include="IssueLog.cs" />
+    <Compile Include="Keylookup.cs" />
+    <Compile Include="Logger.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Enums.cs" />
+    <Compile Include="FileType.cs" />
+    <Compile Include="FtpFileInfo.cs" />
+    <Compile Include="GroupRights.cs" />
+    <Compile Include="GroupUsers.cs" />
+    <Compile Include="McnAtms.cs" />
+    <Compile Include="MState.cs" />
+    <Compile Include="NoteSetType.cs" />
+    <Compile Include="OrganizationAlert.cs" />
+    <Compile Include="OrganizationSettlementsProcess.cs" />
+    <Compile Include="ParsedBnaCounter.cs" />
+    <Compile Include="ParsedCpmCounter.cs" />
+    <Compile Include="ParsedTransaction.cs" />
+    <Compile Include="PowerDown.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReconciledTransactions.cs" />
+    <Compile Include="ReconciliationBatch.cs" />
+    <Compile Include="ReconciliationGlAccount.cs" />
+    <Compile Include="ReconciliationGlAccountSummary.cs" />
+    <Compile Include="ReconciliationHostData.cs" />
+    <Compile Include="ReconciliationSwitchData.cs" />
+    <Compile Include="ReconciliationTransactionHistory.cs" />
+    <Compile Include="ReconciliationTransactions.cs" />
+    <Compile Include="Region.cs" />
+    <Compile Include="RegionCit.cs" />
+    <Compile Include="RegionReceipients.cs" />
+    <Compile Include="Replenishment.cs" />
+    <Compile Include="ReplenishmentHistory.cs" />
+    <Compile Include="ReportGenerationSchedule.cs" />
+    <Compile Include="ReportSchedule.cs" />
+    <Compile Include="ReportTask.cs" />
+    <Compile Include="ReportTaskDetail.cs" />
+    <Compile Include="Rights.cs" />
+    <Compile Include="ScheduledDownloads.cs" />
+    <Compile Include="SensorCurrentStatus.cs" />
+    <Compile Include="SensorOidMapping.cs" />
+    <Compile Include="SensorStatus.cs" />
+    <Compile Include="SettlementProcess.cs" />
+    <Compile Include="SeverityLevel.cs" />
+    <Compile Include="SmsMessage.cs" />
+    <Compile Include="Summary.cs" />
+    <Compile Include="SummaryCorrectionData.cs" />
+    <Compile Include="SummaryCorrectionDataHistory.cs" />
+    <Compile Include="Task.cs" />
+    <Compile Include="TaskType.cs" />
+    <Compile Include="TerminalType.cs" />
+    <Compile Include="TestCashPurgedNotes.cs" />
+    <Compile Include="Token.cs" />
+    <Compile Include="TransactionRule.cs" />
+    <Compile Include="TransactionType.cs" />
+    <Compile Include="Upload.cs" />
+    <Compile Include="UserATMs.cs" />
+    <Compile Include="UserATMsApprover.cs" />
+    <Compile Include="UserOrganization.cs" />
+    <Compile Include="UserOrganizationApprover.cs" />
+    <Compile Include="UserSetting.cs" />
+    <Compile Include="UserTask.cs" />
+    <Compile Include="UserTaskAssignment.cs" />
+    <Compile Include="UserTaskComments.cs" />
+    <Compile Include="Utility.cs" />
+    <Compile Include="VaultAtm.cs" />
+    <Compile Include="VaultSettlement.cs" />
+    <Compile Include="VaultSettlementDetail.cs" />
+    <Compile Include="VaultSummaryByCit.cs" />
+    <Compile Include="VEjParsedBNATransaction.cs" />
+    <Compile Include="VEjParsedCPMtransaction.cs" />
+    <Compile Include="VEjParsedTransactions.cs" />
+    <Compile Include="vTask.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
