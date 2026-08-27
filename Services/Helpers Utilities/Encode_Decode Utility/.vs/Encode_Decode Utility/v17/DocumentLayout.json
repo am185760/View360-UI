@@ -1,0 +1,70 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\View360\\Repository - View360 Depart\\Services\\Helpers Utilities\\Encode_Decode Utility\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{35CFB132-D724-4B93-8153-0FB8CC50DCA9}|Encode_Decode Utility\\Encode_Decode Utility.csproj|D:\\View360\\Repository - View360 Depart\\Services\\Helpers Utilities\\Encode_Decode Utility\\encode_decode utility\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{35CFB132-D724-4B93-8153-0FB8CC50DCA9}|Encode_Decode Utility\\Encode_Decode Utility.csproj|solutionrelative:encode_decode utility\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{35CFB132-D724-4B93-8153-0FB8CC50DCA9}|Encode_Decode Utility\\Encode_Decode Utility.csproj|D:\\View360\\Repository - View360 Depart\\Services\\Helpers Utilities\\Encode_Decode Utility\\encode_decode utility\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{35CFB132-D724-4B93-8153-0FB8CC50DCA9}|Encode_Decode Utility\\Encode_Decode Utility.csproj|solutionrelative:encode_decode utility\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{35CFB132-D724-4B93-8153-0FB8CC50DCA9}|Encode_Decode Utility\\Encode_Decode Utility.csproj|d:\\view360\\repository - view360 depart\\services\\helpers utilities\\encode_decode utility\\encode_decode utility\\form1.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{35CFB132-D724-4B93-8153-0FB8CC50DCA9}|Encode_Decode Utility\\Encode_Decode Utility.csproj|solutionrelative:encode_decode utility\\form1.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Form1.Designer.cs",
+              "DocumentMoniker": "D:\\View360\\Repository - View360 Depart\\Services\\Helpers Utilities\\Encode_Decode Utility\\Encode_Decode Utility\\Form1.Designer.cs",
+              "RelativeDocumentMoniker": "Encode_Decode Utility\\Form1.Designer.cs",
+              "ToolTip": "D:\\View360\\Repository - View360 Depart\\Services\\Helpers Utilities\\Encode_Decode Utility\\Encode_Decode Utility\\Form1.Designer.cs",
+              "RelativeToolTip": "Encode_Decode Utility\\Form1.Designer.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-13T09:42:53.512Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Form1.cs [Design]",
+              "DocumentMoniker": "D:\\View360\\Repository - View360 Depart\\Services\\Helpers Utilities\\Encode_Decode Utility\\Encode_Decode Utility\\Form1.cs",
+              "RelativeDocumentMoniker": "Encode_Decode Utility\\Form1.cs",
+              "ToolTip": "D:\\View360\\Repository - View360 Depart\\Services\\Helpers Utilities\\Encode_Decode Utility\\Encode_Decode Utility\\Form1.cs [Design]",
+              "RelativeToolTip": "Encode_Decode Utility\\Form1.cs [Design]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-13T09:42:53.668Z",
+              "EditorCaption": " [Design]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\View360\\Repository - View360 Depart\\Services\\Helpers Utilities\\Encode_Decode Utility\\Encode_Decode Utility\\Program.cs",
+              "RelativeDocumentMoniker": "Encode_Decode Utility\\Program.cs",
+              "ToolTip": "D:\\View360\\Repository - View360 Depart\\Services\\Helpers Utilities\\Encode_Decode Utility\\Encode_Decode Utility\\Program.cs",
+              "RelativeToolTip": "Encode_Decode Utility\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-13T09:42:53.669Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

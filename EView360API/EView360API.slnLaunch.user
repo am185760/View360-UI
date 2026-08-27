@@ -1,0 +1,67 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "TreeBuilderApi\\TreeBuilderApi.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "LoginApi\\LoginApi.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "NoteSetTypeApi\\NoteSetTypeApi.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "GroupUsers\\GroupUsers.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "UserManagementApi\\UserManagementApi.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "ApplicationConfiguration\\ApplicationConfiguration.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "AtmSetupApi\\AtmSetupApi.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "OperationsApi\\OperationsApi.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "MinimumThresholdDashboardAPI\\Dashboard.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "AlertTemplate\\AlertTemplate.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "SummaryApi\\SummaryApi.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "ReportApi\\ReportApi.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "ScheduleReportApi\\ScheduleReportApi.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "Analytics\\Analytics.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "RecreateDailyFeedApi\\RecreateDailyFeedApi.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

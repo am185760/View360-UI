@@ -1,0 +1,42 @@
+C:\Jabbar\Git Repository\Services\DailyFeedGenerator Old\DailyFeedGenerator\bin\Debug\DailyFeedGenerator.exe.config
+C:\Jabbar\Git Repository\Services\DailyFeedGenerator Old\DailyFeedGenerator\bin\Debug\DailyFeedGenerator.exe
+C:\Jabbar\Git Repository\Services\DailyFeedGenerator Old\DailyFeedGenerator\bin\Debug\DailyFeedGenerator.pdb
+C:\Jabbar\Git Repository\Services\DailyFeedGenerator Old\DailyFeedGenerator\bin\Debug\Encryption.dll
+C:\Jabbar\Git Repository\Services\DailyFeedGenerator Old\DailyFeedGenerator\bin\Debug\ICSharpCode.SharpZipLib.dll
+C:\Jabbar\Git Repository\Services\DailyFeedGenerator Old\DailyFeedGenerator\bin\Debug\Renci.SshNet.dll
+C:\Jabbar\Git Repository\Services\DailyFeedGenerator Old\DailyFeedGenerator\bin\Debug\ServicesDAL.dll
+C:\Jabbar\Git Repository\Services\DailyFeedGenerator Old\DailyFeedGenerator\bin\Debug\Summarizer.dll
+C:\Jabbar\Git Repository\Services\DailyFeedGenerator Old\DailyFeedGenerator\bin\Debug\Summarizer.pdb
+C:\Jabbar\Git Repository\Services\DailyFeedGenerator Old\DailyFeedGenerator\bin\Debug\Encryption.pdb
+C:\Jabbar\Git Repository\Services\DailyFeedGenerator Old\DailyFeedGenerator\bin\Debug\ICSharpCode.SharpZipLib.pdb
+C:\Jabbar\Git Repository\Services\DailyFeedGenerator Old\DailyFeedGenerator\bin\Debug\ICSharpCode.SharpZipLib.xml
+C:\Jabbar\Git Repository\Services\DailyFeedGenerator Old\DailyFeedGenerator\bin\Debug\Renci.SshNet.xml
+C:\Jabbar\Git Repository\Services\DailyFeedGenerator Old\DailyFeedGenerator\bin\Debug\ServicesDAL.pdb
+C:\Jabbar\Git Repository\Services\DailyFeedGenerator Old\DailyFeedGenerator\obj\x86\Debug\DailyFeedGenerator.csproj.AssemblyReference.cache
+C:\Jabbar\Git Repository\Services\DailyFeedGenerator Old\DailyFeedGenerator\obj\x86\Debug\DailyFeedGenerator.Installer1.resources
+C:\Jabbar\Git Repository\Services\DailyFeedGenerator Old\DailyFeedGenerator\obj\x86\Debug\DailyFeedGenerator.csproj.GenerateResource.cache
+C:\Jabbar\Git Repository\Services\DailyFeedGenerator Old\DailyFeedGenerator\obj\x86\Debug\DailyFeedGenerator.csproj.CoreCompileInputs.cache
+C:\Jabbar\Git Repository\Services\DailyFeedGenerator Old\DailyFeedGenerator\obj\x86\Debug\DailyFeedGenerator.csproj.CopyComplete
+C:\Jabbar\Git Repository\Services\DailyFeedGenerator Old\DailyFeedGenerator\obj\x86\Debug\DailyFeedGenerator.exe
+C:\Jabbar\Git Repository\Services\DailyFeedGenerator Old\DailyFeedGenerator\obj\x86\Debug\DailyFeedGenerator.pdb
+D:\View360\Repository - View360 Depart\Services\DailyFeedGenerator Old\DailyFeedGenerator\bin\Debug\DailyFeedGenerator.exe.config
+D:\View360\Repository - View360 Depart\Services\DailyFeedGenerator Old\DailyFeedGenerator\bin\Debug\DailyFeedGenerator.exe
+D:\View360\Repository - View360 Depart\Services\DailyFeedGenerator Old\DailyFeedGenerator\bin\Debug\DailyFeedGenerator.pdb
+D:\View360\Repository - View360 Depart\Services\DailyFeedGenerator Old\DailyFeedGenerator\bin\Debug\Encryption.dll
+D:\View360\Repository - View360 Depart\Services\DailyFeedGenerator Old\DailyFeedGenerator\bin\Debug\Renci.SshNet.dll
+D:\View360\Repository - View360 Depart\Services\DailyFeedGenerator Old\DailyFeedGenerator\bin\Debug\ServicesDAL.dll
+D:\View360\Repository - View360 Depart\Services\DailyFeedGenerator Old\DailyFeedGenerator\bin\Debug\Summarizer.dll
+D:\View360\Repository - View360 Depart\Services\DailyFeedGenerator Old\DailyFeedGenerator\bin\Debug\ICSharpCode.SharpZipLib.dll
+D:\View360\Repository - View360 Depart\Services\DailyFeedGenerator Old\DailyFeedGenerator\bin\Debug\Summarizer.pdb
+D:\View360\Repository - View360 Depart\Services\DailyFeedGenerator Old\DailyFeedGenerator\bin\Debug\Encryption.pdb
+D:\View360\Repository - View360 Depart\Services\DailyFeedGenerator Old\DailyFeedGenerator\bin\Debug\Renci.SshNet.xml
+D:\View360\Repository - View360 Depart\Services\DailyFeedGenerator Old\DailyFeedGenerator\bin\Debug\ServicesDAL.pdb
+D:\View360\Repository - View360 Depart\Services\DailyFeedGenerator Old\DailyFeedGenerator\bin\Debug\ICSharpCode.SharpZipLib.pdb
+D:\View360\Repository - View360 Depart\Services\DailyFeedGenerator Old\DailyFeedGenerator\bin\Debug\ICSharpCode.SharpZipLib.xml
+D:\View360\Repository - View360 Depart\Services\DailyFeedGenerator Old\DailyFeedGenerator\obj\x86\Debug\DailyFeedGenerator.csproj.AssemblyReference.cache
+D:\View360\Repository - View360 Depart\Services\DailyFeedGenerator Old\DailyFeedGenerator\obj\x86\Debug\DailyFeedGenerator.Installer1.resources
+D:\View360\Repository - View360 Depart\Services\DailyFeedGenerator Old\DailyFeedGenerator\obj\x86\Debug\DailyFeedGenerator.csproj.GenerateResource.cache
+D:\View360\Repository - View360 Depart\Services\DailyFeedGenerator Old\DailyFeedGenerator\obj\x86\Debug\DailyFeedGenerator.csproj.CoreCompileInputs.cache
+D:\View360\Repository - View360 Depart\Services\DailyFeedGenerator Old\DailyFeedGenerator\obj\x86\Debug\DailyFee.6EC4137C.Up2Date
+D:\View360\Repository - View360 Depart\Services\DailyFeedGenerator Old\DailyFeedGenerator\obj\x86\Debug\DailyFeedGenerator.exe
+D:\View360\Repository - View360 Depart\Services\DailyFeedGenerator Old\DailyFeedGenerator\obj\x86\Debug\DailyFeedGenerator.pdb

@@ -1,0 +1,771 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{65D3B10F-4EA5-40AC-A7C7-833051B75A4C}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>EView360BusinessIntelligence</RootNamespace>
+    <AssemblyName>EView360BusinessIntelligence</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisLogFile>bin\Debug\CCMSReportSchedular.exe.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisRuleDirectories>;C:\Program Files\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisLogFile>bin\Release\CCMSReportSchedular.exe.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisRuleDirectories>;C:\Program Files\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CrystalDecisions.CrystalReports.Engine, Version=13.0.4000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL" />
+    <Reference Include="CrystalDecisions.ReportAppServer.ClientDoc, Version=13.0.4000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\..\..\Program Files (x86)\SAP BusinessObjects\Crystal Reports for .NET Framework 4.0\Common\SAP BusinessObjects Enterprise XI 4.0\win32_x86\dotnet\CrystalDecisions.ReportAppServer.ClientDoc.dll</HintPath>
+    </Reference>
+    <Reference Include="CrystalDecisions.ReportAppServer.CommLayer, Version=13.0.4000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\..\..\Program Files (x86)\SAP BusinessObjects\Crystal Reports for .NET Framework 4.0\Common\SAP BusinessObjects Enterprise XI 4.0\win32_x86\dotnet\CrystalDecisions.ReportAppServer.CommLayer.dll</HintPath>
+    </Reference>
+    <Reference Include="CrystalDecisions.ReportAppServer.CommonControls, Version=13.0.4000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\..\..\Program Files (x86)\SAP BusinessObjects\Crystal Reports for .NET Framework 4.0\Common\SAP BusinessObjects Enterprise XI 4.0\win32_x86\dotnet\CrystalDecisions.ReportAppServer.CommonControls.dll</HintPath>
+    </Reference>
+    <Reference Include="CrystalDecisions.ReportAppServer.CommonObjectModel, Version=13.0.4000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\..\..\Program Files (x86)\SAP BusinessObjects\Crystal Reports for .NET Framework 4.0\Common\SAP BusinessObjects Enterprise XI 4.0\win32_x86\dotnet\CrystalDecisions.ReportAppServer.CommonObjectModel.dll</HintPath>
+    </Reference>
+    <Reference Include="CrystalDecisions.ReportAppServer.Controllers, Version=13.0.4000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\..\..\Program Files (x86)\SAP BusinessObjects\Crystal Reports for .NET Framework 4.0\Common\SAP BusinessObjects Enterprise XI 4.0\win32_x86\dotnet\CrystalDecisions.ReportAppServer.Controllers.dll</HintPath>
+    </Reference>
+    <Reference Include="CrystalDecisions.ReportAppServer.CubeDefModel, Version=13.0.4000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\..\..\Program Files (x86)\SAP BusinessObjects\Crystal Reports for .NET Framework 4.0\Common\SAP BusinessObjects Enterprise XI 4.0\win32_x86\dotnet\CrystalDecisions.ReportAppServer.CubeDefModel.dll</HintPath>
+    </Reference>
+    <Reference Include="CrystalDecisions.ReportAppServer.DataDefModel, Version=13.0.4000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\..\..\Program Files (x86)\SAP BusinessObjects\Crystal Reports for .NET Framework 4.0\Common\SAP BusinessObjects Enterprise XI 4.0\win32_x86\dotnet\CrystalDecisions.ReportAppServer.DataDefModel.dll</HintPath>
+    </Reference>
+    <Reference Include="CrystalDecisions.ReportAppServer.ReportDefModel, Version=13.0.4000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\..\..\Program Files (x86)\SAP BusinessObjects\Crystal Reports for .NET Framework 4.0\Common\SAP BusinessObjects Enterprise XI 4.0\win32_x86\dotnet\CrystalDecisions.ReportAppServer.ReportDefModel.dll</HintPath>
+    </Reference>
+    <Reference Include="CrystalDecisions.ReportSource, Version=13.0.4000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL" />
+    <Reference Include="CrystalDecisions.Shared, Version=13.0.4000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL" />
+    <Reference Include="CrystalDecisions.Web, Version=13.0.4000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files (x86)\SAP BusinessObjects\Crystal Reports for .NET Framework 4.0\Common\SAP BusinessObjects Enterprise XI 4.0\win32_x86\dotnet\CrystalDecisions.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="Data Requestor">
+      <HintPath>..\..\DataRequestorLayer\DataRequestor\DataRequestor\bin\Debug\Data Requestor.dll</HintPath>
+    </Reference>
+    <Reference Include="Encryption">
+      <HintPath>..\..\DataRequestorLayer\DataRequestor\DataRequestor\bin\Debug\Encryption.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\..\DataRequestorLayer\DataRequestor\DataRequestor\bin\Debug\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="ServicesDAL">
+      <HintPath>..\..\ServicesDAL\bin\Debug\ServicesDAL.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Configuration.Install" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AtmRequiredInfo.cs" />
+    <Compile Include="CurrencyReportSchedular.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CurrencyReportSchedular.Designer.cs">
+      <DependentUpon>CurrencyReportSchedular.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Installer1.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Installer1.Designer.cs">
+      <DependentUpon>Installer1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReportDataset\DataSetDeadAtm1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DataSetDeadAtm.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\DataSetPowerMonitoring.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DataSetPowerMonitoring.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\dsAlerts.cs">
+      <DependentUpon>dsAlerts.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\dsAlerts.Designer.cs">
+      <DependentUpon>dsAlerts.xsd</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Include="ReportDataset\dsATMSummary.cs">
+      <DependentUpon>dsATMSummary.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\dsATMSummary.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>dsATMSummary.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\DsBNACounter1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DsBNACounter.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\dsBNACountsClearedReport.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>dsBNACountsClearedReport.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\dsCardCaptured.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>dsCardCaptured.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\DsCashOrderRpt1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DsCashOrderRpt.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\dsCashPositions.cs">
+      <DependentUpon>dsCashPositions.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\dsCashPositions.Designer.cs" />
+    <Compile Include="ReportDataset\dsCashPositions1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>dsCashPositions.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\DSCashUtilization.cs">
+      <DependentUpon>DSCashUtilization.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\DSCashUtilization.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DSCashUtilization.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\dsCashWithdrawals.Designer.cs">
+      <DependentUpon>dsCashWithdrawals.xsd</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Include="ReportDataset\dsCashWithdrawalSummary.Designer.cs" />
+    <Compile Include="ReportDataset\dsCashWithdrawalSummary1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>dsCashWithdrawalSummary.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\dsCassetteFaultySummary1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>dsCassetteFaultySummary.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\DsCPMCounter1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DsCPMCounter.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\dsCPMCountsClearedReport.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>dsCPMCountsClearedReport.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\dsDeadATMs1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>dsDeadATMs.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\dsDepositPositionReport.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>dsDepositPositionReport.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\DsDispensing1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DsDispensing.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\dsMeanTimeToFailureAnalysis.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>dsMeanTimeToFailureAnalysis.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\dsMemberBankTransaction.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>dsMemberBankTransaction.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\dsNoCashWithdrawals.cs">
+      <DependentUpon>dsNoCashWithdrawals.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\dsNoCashWithdrawals1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>dsNoCashWithdrawals.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\dsOutOfCashReport.Designer.cs" />
+    <Compile Include="ReportDataset\dsOutOfCashReport1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>dsOutOfCashReport.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\DsPNCChequeDepSummary.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DsPNCChequeDepSummary.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\dsPNCIncidentsAnalysis.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>dsPNCIncidentsAnalysis.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\dsPNCNoteDepDetail.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>dsPNCNoteDepDetail.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\DsPNCNoteDepSummary.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DsPNCNoteDepSummary.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\dsPNCNotesDepWeeklyAnalysis.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>dsPNCNotesDepWeeklyAnalysis.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\dsReplenishmentRemainingNotes.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>dsReplenishmentRemainingNotes.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\dsReplenishmentReturned.cs">
+      <DependentUpon>dsReplenishmentReturned.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\dsReplenishmentReturned1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>dsReplenishmentReturned.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\DsScheduleTrackingRpt.cs">
+      <DependentUpon>DsScheduleTrackingRpt.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\DsScheduleTrackingRpt.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DsScheduleTrackingRpt.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\DsSuspiciousReplenishmentRpt.cs">
+      <DependentUpon>DsSuspiciousReplenishmentRpt.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\DsSuspiciousReplenishmentRpt1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DsSuspiciousReplenishmentRpt.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\DsTaskStatusRpt.cs">
+      <DependentUpon>DsTaskStatusRpt.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\DsTaskStatusRpt.Designer.cs">
+      <DependentUpon>DsTaskStatusRpt.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\DsTaskStatusRpt1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DsTaskStatusRpt.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportDataset\DsTerminalDowntimeRpt1.Designer.cs">
+      <DependentUpon>DsTerminalDowntimeRpt.xsd</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="ReportDataset\DataSetDeadAtm.xsc">
+      <DependentUpon>DataSetDeadAtm.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\DataSetDeadAtm.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>DataSetDeadAtm1.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ReportDataset\DataSetDeadAtm.xss">
+      <DependentUpon>DataSetDeadAtm.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\DataSetPowerMonitoring.xsc">
+      <DependentUpon>DataSetPowerMonitoring.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\DataSetPowerMonitoring.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>DataSetPowerMonitoring.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ReportDataset\DataSetPowerMonitoring.xss">
+      <DependentUpon>DataSetPowerMonitoring.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsAlerts.xsc">
+      <DependentUpon>dsAlerts.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsAlerts.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>dsAlerts.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="ReportDataset\dsAlerts.xss">
+      <DependentUpon>dsAlerts.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsATMSummary.xsc">
+      <DependentUpon>dsATMSummary.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsATMSummary.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>dsATMSummary.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ReportDataset\dsATMSummary.xss">
+      <DependentUpon>dsATMSummary.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\DsBNACounter.xsc">
+      <DependentUpon>DsBNACounter.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\DsBNACounter.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>DsBNACounter1.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ReportDataset\DsBNACounter.xss">
+      <DependentUpon>DsBNACounter.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsBNACountsClearedReport.xsc">
+      <DependentUpon>dsBNACountsClearedReport.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsBNACountsClearedReport.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>dsBNACountsClearedReport.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ReportDataset\dsBNACountsClearedReport.xss">
+      <DependentUpon>dsBNACountsClearedReport.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsCardCaptured.xsc">
+      <DependentUpon>dsCardCaptured.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsCardCaptured.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>dsCardCaptured.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ReportDataset\dsCardCaptured.xss">
+      <DependentUpon>dsCardCaptured.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\DsCashOrderRpt.xsc">
+      <DependentUpon>DsCashOrderRpt.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\DsCashOrderRpt.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>DsCashOrderRpt1.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ReportDataset\DsCashOrderRpt.xss">
+      <DependentUpon>DsCashOrderRpt.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsCashPositions.xsc">
+      <DependentUpon>dsCashPositions.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsCashPositions.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>dsCashPositions1.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ReportDataset\dsCashPositions.xss">
+      <DependentUpon>dsCashPositions.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\DSCashUtilization.xsc">
+      <DependentUpon>DSCashUtilization.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\DSCashUtilization.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>DSCashUtilization.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ReportDataset\DSCashUtilization.xss">
+      <DependentUpon>DSCashUtilization.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsCashWithdrawals.xsc">
+      <DependentUpon>dsCashWithdrawals.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsCashWithdrawals.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>dsCashWithdrawals.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="ReportDataset\dsCashWithdrawals.xss">
+      <DependentUpon>dsCashWithdrawals.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsCashWithdrawalSummary.xsc">
+      <DependentUpon>dsCashWithdrawalSummary.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsCashWithdrawalSummary.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>dsCashWithdrawalSummary1.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ReportDataset\dsCashWithdrawalSummary.xss">
+      <DependentUpon>dsCashWithdrawalSummary.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsCassetteFaultySummary.xsc">
+      <DependentUpon>dsCassetteFaultySummary.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsCassetteFaultySummary.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>dsCassetteFaultySummary1.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ReportDataset\dsCassetteFaultySummary.xss">
+      <DependentUpon>dsCassetteFaultySummary.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\DsCPMCounter.xsc">
+      <DependentUpon>DsCPMCounter.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\DsCPMCounter.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>DsCPMCounter1.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ReportDataset\DsCPMCounter.xss">
+      <DependentUpon>DsCPMCounter.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsCPMCountsClearedReport.xsc">
+      <DependentUpon>dsCPMCountsClearedReport.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsCPMCountsClearedReport.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>dsCPMCountsClearedReport.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ReportDataset\dsCPMCountsClearedReport.xss">
+      <DependentUpon>dsCPMCountsClearedReport.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsDeadATMs.xsc">
+      <DependentUpon>dsDeadATMs.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsDeadATMs.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>dsDeadATMs1.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ReportDataset\dsDeadATMs.xss">
+      <DependentUpon>dsDeadATMs.xsd</DependentUpon>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ReportDataset\dsDepositPositionReport.xsc">
+      <DependentUpon>dsDepositPositionReport.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsDepositPositionReport.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>dsDepositPositionReport.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ReportDataset\dsDepositPositionReport.xss">
+      <DependentUpon>dsDepositPositionReport.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\DsDispensing.xsc">
+      <DependentUpon>DsDispensing.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\DsDispensing.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>DsDispensing1.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ReportDataset\DsDispensing.xss">
+      <DependentUpon>DsDispensing.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsMeanTimeToFailureAnalysis.xsc">
+      <DependentUpon>dsMeanTimeToFailureAnalysis.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsMeanTimeToFailureAnalysis.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>dsMeanTimeToFailureAnalysis.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ReportDataset\dsMeanTimeToFailureAnalysis.xss">
+      <DependentUpon>dsMeanTimeToFailureAnalysis.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsMemberBankTransaction.xsc">
+      <DependentUpon>dsMemberBankTransaction.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsMemberBankTransaction.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>dsMemberBankTransaction.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ReportDataset\dsMemberBankTransaction.xss">
+      <DependentUpon>dsMemberBankTransaction.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsNoCashWithdrawals.xsc">
+      <DependentUpon>dsNoCashWithdrawals.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsNoCashWithdrawals.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>dsNoCashWithdrawals1.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="ReportDataset\dsNoCashWithdrawals.xss">
+      <DependentUpon>dsNoCashWithdrawals.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsOutOfCashReport.xsc">
+      <DependentUpon>dsOutOfCashReport.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsOutOfCashReport.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>dsOutOfCashReport1.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ReportDataset\dsOutOfCashReport.xss">
+      <DependentUpon>dsOutOfCashReport.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\DsPNCChequeDepSummary.xsc">
+      <DependentUpon>DsPNCChequeDepSummary.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\DsPNCChequeDepSummary.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>DsPNCChequeDepSummary.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ReportDataset\DsPNCChequeDepSummary.xss">
+      <DependentUpon>DsPNCChequeDepSummary.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsPNCIncidentsAnalysis.xsc">
+      <DependentUpon>dsPNCIncidentsAnalysis.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsPNCIncidentsAnalysis.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>dsPNCIncidentsAnalysis.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ReportDataset\dsPNCIncidentsAnalysis.xss">
+      <DependentUpon>dsPNCIncidentsAnalysis.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsPNCNoteDepDetail.xsc">
+      <DependentUpon>dsPNCNoteDepDetail.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsPNCNoteDepDetail.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>dsPNCNoteDepDetail.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ReportDataset\dsPNCNoteDepDetail.xss">
+      <DependentUpon>dsPNCNoteDepDetail.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\DsPNCNoteDepSummary.xsc">
+      <DependentUpon>DsPNCNoteDepSummary.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\DsPNCNoteDepSummary.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>DsPNCNoteDepSummary.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ReportDataset\DsPNCNoteDepSummary.xss">
+      <DependentUpon>DsPNCNoteDepSummary.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsPNCNotesDepWeeklyAnalysis.xsc">
+      <DependentUpon>dsPNCNotesDepWeeklyAnalysis.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsPNCNotesDepWeeklyAnalysis.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>dsPNCNotesDepWeeklyAnalysis.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ReportDataset\dsPNCNotesDepWeeklyAnalysis.xss">
+      <DependentUpon>dsPNCNotesDepWeeklyAnalysis.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsReplenishmentRemainingNotes.xsc">
+      <DependentUpon>dsReplenishmentRemainingNotes.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsReplenishmentRemainingNotes.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>dsReplenishmentRemainingNotes.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ReportDataset\dsReplenishmentRemainingNotes.xss">
+      <DependentUpon>dsReplenishmentRemainingNotes.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsReplenishmentReturned.xsc">
+      <DependentUpon>dsReplenishmentReturned.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\dsReplenishmentReturned.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>dsReplenishmentReturned1.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ReportDataset\dsReplenishmentReturned.xss">
+      <DependentUpon>dsReplenishmentReturned.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\DsScheduleTrackingRpt.xsc">
+      <DependentUpon>DsScheduleTrackingRpt.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\DsScheduleTrackingRpt.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>DsScheduleTrackingRpt.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ReportDataset\DsScheduleTrackingRpt.xss">
+      <DependentUpon>DsScheduleTrackingRpt.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\DsSuspiciousReplenishmentRpt.xsc">
+      <DependentUpon>DsSuspiciousReplenishmentRpt.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\DsSuspiciousReplenishmentRpt.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>DsSuspiciousReplenishmentRpt1.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ReportDataset\DsSuspiciousReplenishmentRpt.xss">
+      <DependentUpon>DsSuspiciousReplenishmentRpt.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\DsTaskStatusRpt.xsc">
+      <DependentUpon>DsTaskStatusRpt.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\DsTaskStatusRpt.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>DsTaskStatusRpt1.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ReportDataset\DsTaskStatusRpt.xss">
+      <DependentUpon>DsTaskStatusRpt.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\DsTerminalDowntimeRpt.xsc">
+      <DependentUpon>DsTerminalDowntimeRpt.xsd</DependentUpon>
+    </None>
+    <None Include="ReportDataset\DsTerminalDowntimeRpt.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>DsTerminalDowntimeRpt1.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="ReportDataset\DsTerminalDowntimeRpt.xss">
+      <DependentUpon>DsTerminalDowntimeRpt.xsd</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{C0C07587-41A7-46C8-8FBD-3F9C8EBE2DDC}" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Installer1.resx">
+      <DependentUpon>Installer1.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.8">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.8 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

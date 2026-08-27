@@ -1,0 +1,298 @@
+C:\Jabbar\GitProject\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.csproj.AssemblyReference.cache
+C:\Jabbar\GitProject\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.GeneratedMSBuildEditorConfig.editorconfig
+C:\Jabbar\GitProject\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.AssemblyInfoInputs.cache
+C:\Jabbar\GitProject\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.AssemblyInfo.cs
+C:\Jabbar\GitProject\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.csproj.CoreCompileInputs.cache
+C:\Jabbar\GitProject\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.MvcApplicationPartsAssemblyInfo.cs
+C:\Jabbar\GitProject\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.MvcApplicationPartsAssemblyInfo.cache
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\appsettings.Development.json
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\appsettings.json
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\web.config
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\OperationsApi.exe
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\OperationsApi.deps.json
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\OperationsApi.runtimeconfig.json
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\OperationsApi.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\OperationsApi.pdb
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Azure.Core.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Azure.Identity.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Humanizer.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.AspNetCore.OpenApi.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.Data.SqlClient.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.Design.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.Relational.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.SqlServer.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.Extensions.DependencyModel.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.Identity.Client.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.Identity.Client.Extensions.Msal.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.IdentityModel.Logging.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.IdentityModel.Protocols.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.IdentityModel.Tokens.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.OpenApi.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.SqlServer.Server.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.Win32.SystemEvents.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Mono.TextTemplating.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Newtonsoft.Json.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Swashbuckle.AspNetCore.Swagger.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\System.CodeDom.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\System.Configuration.ConfigurationManager.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\System.Data.SqlClient.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\System.Drawing.Common.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\System.IdentityModel.Tokens.Jwt.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\System.Memory.Data.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\System.Runtime.Caching.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\System.Security.Cryptography.ProtectedData.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\System.Security.Permissions.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\System.Windows.Extensions.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\unix\lib\netcoreapp3.1\Microsoft.Data.SqlClient.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win\lib\netcoreapp3.1\Microsoft.Data.SqlClient.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win-arm\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win\lib\netcoreapp3.0\Microsoft.Win32.SystemEvents.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win-arm64\native\sni.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win-x64\native\sni.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win-x86\native\sni.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\unix\lib\netcoreapp2.1\System.Data.SqlClient.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\unix\lib\netcoreapp3.0\System.Drawing.Common.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win\lib\netcoreapp3.0\System.Drawing.Common.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win\lib\netstandard2.0\System.Runtime.Caching.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win\lib\netcoreapp3.0\System.Windows.Extensions.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Common.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Data Requestor.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\EView360Models.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\ICSharpCode.SharpZipLib.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Services.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Encryption.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Common.pdb
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\EView360Models.pdb
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Data Requestor.pdb
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\ICSharpCode.SharpZipLib.pdb
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\ICSharpCode.SharpZipLib.xml
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Services.pdb
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Encryption.pdb
+C:\Jabbar\GitProject\EView360API\OperationsApi\obj\Debug\net7.0\staticwebassets\msbuild.OperationsApi.Microsoft.AspNetCore.StaticWebAssets.props
+C:\Jabbar\GitProject\EView360API\OperationsApi\obj\Debug\net7.0\staticwebassets\msbuild.build.OperationsApi.props
+C:\Jabbar\GitProject\EView360API\OperationsApi\obj\Debug\net7.0\staticwebassets\msbuild.buildMultiTargeting.OperationsApi.props
+C:\Jabbar\GitProject\EView360API\OperationsApi\obj\Debug\net7.0\staticwebassets\msbuild.buildTransitive.OperationsApi.props
+C:\Jabbar\GitProject\EView360API\OperationsApi\obj\Debug\net7.0\staticwebassets.pack.json
+C:\Jabbar\GitProject\EView360API\OperationsApi\obj\Debug\net7.0\staticwebassets.build.json
+C:\Jabbar\GitProject\EView360API\OperationsApi\obj\Debug\net7.0\staticwebassets.development.json
+C:\Jabbar\GitProject\EView360API\OperationsApi\obj\Debug\net7.0\scopedcss\bundle\OperationsApi.styles.css
+C:\Jabbar\GitProject\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.csproj.CopyComplete
+C:\Jabbar\GitProject\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\obj\Debug\net7.0\refint\OperationsApi.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.pdb
+C:\Jabbar\GitProject\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.genruntimeconfig.cache
+C:\Jabbar\GitProject\EView360API\OperationsApi\obj\Debug\net7.0\ref\OperationsApi.dll
+C:\Jabbar\GitProject\EView360API\OperationsApi\bin\Debug\net7.0\Data Requestor.dll.config
+C:\Jabbar\Git Repository\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.csproj.AssemblyReference.cache
+C:\Jabbar\Git Repository\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.GeneratedMSBuildEditorConfig.editorconfig
+C:\Jabbar\Git Repository\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.AssemblyInfoInputs.cache
+C:\Jabbar\Git Repository\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.AssemblyInfo.cs
+C:\Jabbar\Git Repository\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.csproj.CoreCompileInputs.cache
+C:\Jabbar\Git Repository\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.MvcApplicationPartsAssemblyInfo.cs
+C:\Jabbar\Git Repository\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.MvcApplicationPartsAssemblyInfo.cache
+C:\Jabbar\Git Repository\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\obj\Debug\net7.0\refint\OperationsApi.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.pdb
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\appsettings.Development.json
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\appsettings.json
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\web.config
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\OperationsApi.exe
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\OperationsApi.deps.json
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\OperationsApi.runtimeconfig.json
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\OperationsApi.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\OperationsApi.pdb
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Azure.Core.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Azure.Identity.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Humanizer.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.AspNetCore.OpenApi.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.Data.SqlClient.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.Design.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.Relational.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.SqlServer.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.Extensions.DependencyModel.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.Identity.Client.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.Identity.Client.Extensions.Msal.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.IdentityModel.Logging.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.IdentityModel.Protocols.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.IdentityModel.Tokens.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.OpenApi.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.SqlServer.Server.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.Win32.SystemEvents.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Mono.TextTemplating.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Newtonsoft.Json.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Swashbuckle.AspNetCore.Swagger.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\System.CodeDom.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\System.Configuration.ConfigurationManager.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\System.Data.SqlClient.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\System.Drawing.Common.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\System.IdentityModel.Tokens.Jwt.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\System.Memory.Data.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\System.Runtime.Caching.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\System.Security.Cryptography.ProtectedData.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\System.Security.Permissions.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\System.Windows.Extensions.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\unix\lib\netcoreapp3.1\Microsoft.Data.SqlClient.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win\lib\netcoreapp3.1\Microsoft.Data.SqlClient.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win-arm\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win\lib\netcoreapp3.0\Microsoft.Win32.SystemEvents.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win-arm64\native\sni.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win-x64\native\sni.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win-x86\native\sni.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\unix\lib\netcoreapp2.1\System.Data.SqlClient.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\unix\lib\netcoreapp3.0\System.Drawing.Common.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win\lib\netcoreapp3.0\System.Drawing.Common.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win\lib\netstandard2.0\System.Runtime.Caching.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win\lib\netcoreapp3.0\System.Windows.Extensions.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Common.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Data Requestor.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\EView360Models.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\ICSharpCode.SharpZipLib.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Services.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Encryption.dll
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Common.pdb
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\EView360Models.pdb
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Data Requestor.pdb
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Data Requestor.dll.config
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\ICSharpCode.SharpZipLib.pdb
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\ICSharpCode.SharpZipLib.xml
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Services.pdb
+C:\Jabbar\Git Repository\EView360API\OperationsApi\bin\Debug\net7.0\Encryption.pdb
+C:\Jabbar\Git Repository\EView360API\OperationsApi\obj\Debug\net7.0\staticwebassets\msbuild.OperationsApi.Microsoft.AspNetCore.StaticWebAssets.props
+C:\Jabbar\Git Repository\EView360API\OperationsApi\obj\Debug\net7.0\staticwebassets\msbuild.build.OperationsApi.props
+C:\Jabbar\Git Repository\EView360API\OperationsApi\obj\Debug\net7.0\staticwebassets\msbuild.buildMultiTargeting.OperationsApi.props
+C:\Jabbar\Git Repository\EView360API\OperationsApi\obj\Debug\net7.0\staticwebassets\msbuild.buildTransitive.OperationsApi.props
+C:\Jabbar\Git Repository\EView360API\OperationsApi\obj\Debug\net7.0\staticwebassets.pack.json
+C:\Jabbar\Git Repository\EView360API\OperationsApi\obj\Debug\net7.0\staticwebassets.build.json
+C:\Jabbar\Git Repository\EView360API\OperationsApi\obj\Debug\net7.0\staticwebassets.development.json
+C:\Jabbar\Git Repository\EView360API\OperationsApi\obj\Debug\net7.0\scopedcss\bundle\OperationsApi.styles.css
+C:\Jabbar\Git Repository\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.csproj.CopyComplete
+C:\Jabbar\Git Repository\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.genruntimeconfig.cache
+C:\Jabbar\Git Repository\EView360API\OperationsApi\obj\Debug\net7.0\ref\OperationsApi.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.csproj.AssemblyReference.cache
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\obj\Debug\net7.0\rpswa.dswa.cache.json
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.GeneratedMSBuildEditorConfig.editorconfig
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.AssemblyInfoInputs.cache
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.AssemblyInfo.cs
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.csproj.CoreCompileInputs.cache
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.MvcApplicationPartsAssemblyInfo.cs
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.MvcApplicationPartsAssemblyInfo.cache
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.sourcelink.json
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\obj\Debug\net7.0\refint\OperationsApi.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.pdb
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\appsettings.Development.json
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\appsettings.json
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\web.config
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\OperationsApi.staticwebassets.endpoints.json
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\OperationsApi.exe
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\OperationsApi.deps.json
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\OperationsApi.runtimeconfig.json
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\OperationsApi.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\OperationsApi.pdb
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Azure.Core.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Azure.Identity.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Humanizer.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.AspNetCore.OpenApi.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.Bcl.AsyncInterfaces.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.Data.SqlClient.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.Design.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.Relational.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.SqlServer.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.Extensions.DependencyModel.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.Identity.Client.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.Identity.Client.Extensions.Msal.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.IdentityModel.Abstractions.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.IdentityModel.JsonWebTokens.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.IdentityModel.Logging.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.IdentityModel.Protocols.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.IdentityModel.Tokens.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.OpenApi.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.SqlServer.Server.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Microsoft.Win32.SystemEvents.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Mono.TextTemplating.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Newtonsoft.Json.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Swashbuckle.AspNetCore.Swagger.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\System.CodeDom.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\System.Configuration.ConfigurationManager.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\System.Data.SqlClient.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\System.Drawing.Common.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\System.IdentityModel.Tokens.Jwt.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\System.Memory.Data.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\System.Runtime.Caching.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\System.Security.Cryptography.ProtectedData.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\System.Security.Permissions.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\System.Windows.Extensions.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\unix\lib\netcoreapp3.1\Microsoft.Data.SqlClient.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win\lib\netcoreapp3.1\Microsoft.Data.SqlClient.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win-arm\native\Microsoft.Data.SqlClient.SNI.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win\lib\netcoreapp3.0\Microsoft.Win32.SystemEvents.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win-arm64\native\sni.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win-x64\native\sni.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win-x86\native\sni.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\unix\lib\netcoreapp2.1\System.Data.SqlClient.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\unix\lib\netcoreapp3.0\System.Drawing.Common.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win\lib\netcoreapp3.0\System.Drawing.Common.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win\lib\netstandard2.0\System.Runtime.Caching.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\runtimes\win\lib\netcoreapp3.0\System.Windows.Extensions.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Common.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Data Requestor.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\EView360Models.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\ICSharpCode.SharpZipLib.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Services.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Encryption.dll
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Common.pdb
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\EView360Models.pdb
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Data Requestor.pdb
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Data Requestor.dll.config
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\ICSharpCode.SharpZipLib.pdb
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\ICSharpCode.SharpZipLib.xml
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Services.pdb
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\bin\Debug\net7.0\Encryption.pdb
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\obj\Debug\net7.0\rjimswa.dswa.cache.json
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\obj\Debug\net7.0\rjsmrazor.dswa.cache.json
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\obj\Debug\net7.0\rjsmcshtml.dswa.cache.json
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\obj\Debug\net7.0\scopedcss\bundle\OperationsApi.styles.css
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\obj\Debug\net7.0\staticwebassets.build.json
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\obj\Debug\net7.0\staticwebassets.build.json.cache
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\obj\Debug\net7.0\staticwebassets.development.json
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\obj\Debug\net7.0\staticwebassets.build.endpoints.json
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\obj\Debug\net7.0\staticwebassets.upToDateCheck.txt
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\obj\Debug\net7.0\Operatio.32D3A790.Up2Date
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\obj\Debug\net7.0\OperationsApi.genruntimeconfig.cache
+D:\View360\Repository - View360 Depart\EView360API\OperationsApi\obj\Debug\net7.0\ref\OperationsApi.dll

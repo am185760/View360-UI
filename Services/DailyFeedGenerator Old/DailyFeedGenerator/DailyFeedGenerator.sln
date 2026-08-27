@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33205.214
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DailyFeedGenerator", "DailyFeedGenerator.csproj", "{D2F16868-4E86-4529-9A58-1B3A69626349}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BSFSummarizer", "..\BSFSummarizer\BSFSummarizer.csproj", "{B12541B9-D8AD-4DFB-9826-06879D6E1C21}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServicesDAL", "..\..\..\ServicesDAL\ServicesDAL.csproj", "{BB77C108-FD46-4FB7-941F-0CFF108B7CC0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D2F16868-4E86-4529-9A58-1B3A69626349}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{D2F16868-4E86-4529-9A58-1B3A69626349}.Debug|x86.ActiveCfg = Debug|x86
+		{D2F16868-4E86-4529-9A58-1B3A69626349}.Debug|x86.Build.0 = Debug|x86
+		{D2F16868-4E86-4529-9A58-1B3A69626349}.Release|Any CPU.ActiveCfg = Release|x86
+		{D2F16868-4E86-4529-9A58-1B3A69626349}.Release|x86.ActiveCfg = Release|x86
+		{D2F16868-4E86-4529-9A58-1B3A69626349}.Release|x86.Build.0 = Release|x86
+		{B12541B9-D8AD-4DFB-9826-06879D6E1C21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B12541B9-D8AD-4DFB-9826-06879D6E1C21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B12541B9-D8AD-4DFB-9826-06879D6E1C21}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B12541B9-D8AD-4DFB-9826-06879D6E1C21}.Debug|x86.Build.0 = Debug|Any CPU
+		{B12541B9-D8AD-4DFB-9826-06879D6E1C21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B12541B9-D8AD-4DFB-9826-06879D6E1C21}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B12541B9-D8AD-4DFB-9826-06879D6E1C21}.Release|x86.ActiveCfg = Release|Any CPU
+		{B12541B9-D8AD-4DFB-9826-06879D6E1C21}.Release|x86.Build.0 = Release|Any CPU
+		{BB77C108-FD46-4FB7-941F-0CFF108B7CC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB77C108-FD46-4FB7-941F-0CFF108B7CC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB77C108-FD46-4FB7-941F-0CFF108B7CC0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BB77C108-FD46-4FB7-941F-0CFF108B7CC0}.Debug|x86.Build.0 = Debug|Any CPU
+		{BB77C108-FD46-4FB7-941F-0CFF108B7CC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB77C108-FD46-4FB7-941F-0CFF108B7CC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB77C108-FD46-4FB7-941F-0CFF108B7CC0}.Release|x86.ActiveCfg = Release|Any CPU
+		{BB77C108-FD46-4FB7-941F-0CFF108B7CC0}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B2E4545C-EA9E-47ED-85E5-D61168EECF0A}
+	EndGlobalSection
+EndGlobal

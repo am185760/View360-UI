@@ -1,0 +1,7 @@
+C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\HandleRegistry\HandleRegistry\bin\Debug\HandleRegistry.exe.config
+C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\HandleRegistry\HandleRegistry\bin\Debug\HandleRegistry.exe
+C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\HandleRegistry\HandleRegistry\bin\Debug\HandleRegistry.pdb
+C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\HandleRegistry\HandleRegistry\obj\Debug\HandleRegistry.csproj.AssemblyReference.cache
+C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\HandleRegistry\HandleRegistry\obj\Debug\HandleRegistry.csproj.CoreCompileInputs.cache
+C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\HandleRegistry\HandleRegistry\obj\Debug\HandleRegistry.exe
+C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\HandleRegistry\HandleRegistry\obj\Debug\HandleRegistry.pdb

@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\EView360Models\EView360Models\EView360Models.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Common">
+      <HintPath>..\..\Common\bin\Debug\net7.0\Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Data Requestor">
+		<HintPath>..\..\DataRequestorLayer\DataRequestor\DataRequestor\bin\Debug\Data Requestor.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.4" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
+    <PackageReference Include="System.Security.Permissions" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Common">
+      <HintPath>..\..\Common\bin\Debug\net7.0\Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Data Requestor">
+      <HintPath>..\..\DataRequestorLayer\DataRequestor\DataRequestor\bin\Debug\Data Requestor.dll</HintPath>
+    </Reference>
+    <Reference Include="EView360Models">
+      <HintPath>..\..\EView360Models\EView360Models\bin\Debug\net7.0\EView360Models.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,18 @@
+C:\Jabbar\Git Repository\Services\DailyFeedGenerator Old\BSFSummarizer\bin\Summarizer.dll
+C:\Jabbar\Git Repository\Services\DailyFeedGenerator Old\BSFSummarizer\bin\Summarizer.pdb
+C:\Jabbar\Git Repository\Services\DailyFeedGenerator Old\BSFSummarizer\bin\ServicesDAL.dll
+C:\Jabbar\Git Repository\Services\DailyFeedGenerator Old\BSFSummarizer\bin\ServicesDAL.pdb
+C:\Jabbar\Git Repository\Services\DailyFeedGenerator Old\BSFSummarizer\obj\Debug\BSFSummarizer.csproj.AssemblyReference.cache
+C:\Jabbar\Git Repository\Services\DailyFeedGenerator Old\BSFSummarizer\obj\Debug\BSFSummarizer.csproj.CoreCompileInputs.cache
+C:\Jabbar\Git Repository\Services\DailyFeedGenerator Old\BSFSummarizer\obj\Debug\BSFSummarizer.csproj.CopyComplete
+C:\Jabbar\Git Repository\Services\DailyFeedGenerator Old\BSFSummarizer\obj\Debug\Summarizer.dll
+C:\Jabbar\Git Repository\Services\DailyFeedGenerator Old\BSFSummarizer\obj\Debug\Summarizer.pdb
+D:\View360\Repository - View360 Depart\Services\DailyFeedGenerator Old\BSFSummarizer\bin\Summarizer.dll
+D:\View360\Repository - View360 Depart\Services\DailyFeedGenerator Old\BSFSummarizer\bin\Summarizer.pdb
+D:\View360\Repository - View360 Depart\Services\DailyFeedGenerator Old\BSFSummarizer\bin\ServicesDAL.dll
+D:\View360\Repository - View360 Depart\Services\DailyFeedGenerator Old\BSFSummarizer\bin\ServicesDAL.pdb
+D:\View360\Repository - View360 Depart\Services\DailyFeedGenerator Old\BSFSummarizer\obj\Debug\BSFSummarizer.csproj.AssemblyReference.cache
+D:\View360\Repository - View360 Depart\Services\DailyFeedGenerator Old\BSFSummarizer\obj\Debug\BSFSummarizer.csproj.CoreCompileInputs.cache
+D:\View360\Repository - View360 Depart\Services\DailyFeedGenerator Old\BSFSummarizer\obj\Debug\BSFSumma.E4B30A1C.Up2Date
+D:\View360\Repository - View360 Depart\Services\DailyFeedGenerator Old\BSFSummarizer\obj\Debug\Summarizer.dll
+D:\View360\Repository - View360 Depart\Services\DailyFeedGenerator Old\BSFSummarizer\obj\Debug\Summarizer.pdb

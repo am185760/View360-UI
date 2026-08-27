@@ -1,0 +1,164 @@
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\web.config
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\appsettings.Development.json
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\appsettings.json
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\RecreateDailyFeedApi.exe
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\RecreateDailyFeedApi.deps.json
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\RecreateDailyFeedApi.runtimeconfig.json
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\RecreateDailyFeedApi.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\RecreateDailyFeedApi.pdb
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Azure.Core.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Azure.Identity.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.AspNetCore.OpenApi.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.Data.SqlClient.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.Relational.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.SqlServer.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.Identity.Client.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.Identity.Client.Extensions.Msal.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.IdentityModel.Logging.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.IdentityModel.Protocols.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.IdentityModel.Tokens.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.OpenApi.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.SqlServer.Server.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.Win32.SystemEvents.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Newtonsoft.Json.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Swashbuckle.AspNetCore.Swagger.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\System.Configuration.ConfigurationManager.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\System.Drawing.Common.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\System.IdentityModel.Tokens.Jwt.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\System.Memory.Data.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\System.Runtime.Caching.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\System.Security.Cryptography.ProtectedData.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\System.Security.Permissions.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\System.Windows.Extensions.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\runtimes\unix\lib\netcoreapp3.1\Microsoft.Data.SqlClient.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\runtimes\win\lib\netcoreapp3.1\Microsoft.Data.SqlClient.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\runtimes\win-arm\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\runtimes\win\lib\netcoreapp3.0\Microsoft.Win32.SystemEvents.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\runtimes\unix\lib\netcoreapp3.0\System.Drawing.Common.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\runtimes\win\lib\netcoreapp3.0\System.Drawing.Common.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\runtimes\win\lib\netstandard2.0\System.Runtime.Caching.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\runtimes\win\lib\netcoreapp3.0\System.Windows.Extensions.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\EView360Models.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Encryption.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\ICSharpCode.SharpZipLib.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\EView360Models.pdb
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Encryption.pdb
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\ICSharpCode.SharpZipLib.pdb
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\ICSharpCode.SharpZipLib.xml
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\RecreateDailyFeedApi.csproj.AssemblyReference.cache
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\RecreateDailyFeedApi.GeneratedMSBuildEditorConfig.editorconfig
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\RecreateDailyFeedApi.AssemblyInfoInputs.cache
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\RecreateDailyFeedApi.AssemblyInfo.cs
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\RecreateDailyFeedApi.csproj.CoreCompileInputs.cache
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\RecreateDailyFeedApi.MvcApplicationPartsAssemblyInfo.cs
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\RecreateDailyFeedApi.MvcApplicationPartsAssemblyInfo.cache
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\staticwebassets\msbuild.RecreateDailyFeedApi.Microsoft.AspNetCore.StaticWebAssets.props
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\staticwebassets\msbuild.build.RecreateDailyFeedApi.props
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\staticwebassets\msbuild.buildMultiTargeting.RecreateDailyFeedApi.props
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\staticwebassets\msbuild.buildTransitive.RecreateDailyFeedApi.props
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\staticwebassets.pack.json
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\staticwebassets.build.json
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\staticwebassets.development.json
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\scopedcss\bundle\RecreateDailyFeedApi.styles.css
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\RecreateDailyFeedApi.csproj.CopyComplete
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\RecreateDailyFeedApi.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\refint\RecreateDailyFeedApi.dll
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\RecreateDailyFeedApi.pdb
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\RecreateDailyFeedApi.genruntimeconfig.cache
+C:\Jabbar\GitProject\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\ref\RecreateDailyFeedApi.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\appsettings.Development.json
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\appsettings.json
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\web.config
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\RecreateDailyFeedApi.staticwebassets.endpoints.json
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\RecreateDailyFeedApi.exe
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\RecreateDailyFeedApi.deps.json
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\RecreateDailyFeedApi.runtimeconfig.json
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\RecreateDailyFeedApi.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\RecreateDailyFeedApi.pdb
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Azure.Core.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Azure.Identity.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.AspNetCore.OpenApi.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.Bcl.AsyncInterfaces.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.Data.SqlClient.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.Relational.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.SqlServer.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.Identity.Client.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.Identity.Client.Extensions.Msal.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.IdentityModel.Abstractions.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.IdentityModel.JsonWebTokens.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.IdentityModel.Logging.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.IdentityModel.Protocols.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.IdentityModel.Tokens.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.OpenApi.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.SqlServer.Server.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Microsoft.Win32.SystemEvents.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Newtonsoft.Json.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Swashbuckle.AspNetCore.Swagger.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\System.Configuration.ConfigurationManager.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\System.Drawing.Common.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\System.IdentityModel.Tokens.Jwt.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\System.Memory.Data.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\System.Runtime.Caching.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\System.Security.Cryptography.ProtectedData.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\System.Security.Permissions.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\System.Windows.Extensions.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\runtimes\unix\lib\netcoreapp3.1\Microsoft.Data.SqlClient.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\runtimes\win\lib\netcoreapp3.1\Microsoft.Data.SqlClient.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\runtimes\win-arm\native\Microsoft.Data.SqlClient.SNI.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\runtimes\win\lib\netcoreapp3.0\Microsoft.Win32.SystemEvents.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\runtimes\unix\lib\netcoreapp3.0\System.Drawing.Common.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\runtimes\win\lib\netcoreapp3.0\System.Drawing.Common.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\runtimes\win\lib\netstandard2.0\System.Runtime.Caching.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\runtimes\win\lib\netcoreapp3.0\System.Windows.Extensions.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\EView360Models.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Encryption.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\ICSharpCode.SharpZipLib.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\EView360Models.pdb
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\Encryption.pdb
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\ICSharpCode.SharpZipLib.pdb
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\bin\Debug\net7.0\ICSharpCode.SharpZipLib.xml
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\RecreateDailyFeedApi.csproj.AssemblyReference.cache
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\rpswa.dswa.cache.json
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\RecreateDailyFeedApi.GeneratedMSBuildEditorConfig.editorconfig
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\RecreateDailyFeedApi.AssemblyInfoInputs.cache
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\RecreateDailyFeedApi.AssemblyInfo.cs
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\RecreateDailyFeedApi.csproj.CoreCompileInputs.cache
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\RecreateDailyFeedApi.MvcApplicationPartsAssemblyInfo.cs
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\RecreateDailyFeedApi.MvcApplicationPartsAssemblyInfo.cache
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\RecreateDailyFeedApi.sourcelink.json
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\rjimswa.dswa.cache.json
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\rjsmrazor.dswa.cache.json
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\rjsmcshtml.dswa.cache.json
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\scopedcss\bundle\RecreateDailyFeedApi.styles.css
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\staticwebassets.build.json
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\staticwebassets.build.json.cache
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\staticwebassets.development.json
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\staticwebassets.build.endpoints.json
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\staticwebassets.upToDateCheck.txt
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\Recreate.614BEFE4.Up2Date
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\RecreateDailyFeedApi.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\refint\RecreateDailyFeedApi.dll
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\RecreateDailyFeedApi.pdb
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\RecreateDailyFeedApi.genruntimeconfig.cache
+D:\View360\Repository - View360 Depart\EView360API\RecreateDailyFeedApi\obj\Debug\net7.0\ref\RecreateDailyFeedApi.dll

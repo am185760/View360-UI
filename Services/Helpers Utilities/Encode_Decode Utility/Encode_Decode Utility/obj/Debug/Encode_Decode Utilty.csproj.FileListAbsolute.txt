@@ -1,0 +1,10 @@
+C:\Users\ea185113\Downloads\mtdownload2377_2020.11.16_10.16\_From sf185093\Encode_Decode Utilty\Encode_Decode Utilty\bin\Debug\Encode_Decode Utilty.exe.config
+C:\Users\ea185113\Downloads\mtdownload2377_2020.11.16_10.16\_From sf185093\Encode_Decode Utilty\Encode_Decode Utilty\bin\Debug\Encode_Decode Utilty.exe
+C:\Users\ea185113\Downloads\mtdownload2377_2020.11.16_10.16\_From sf185093\Encode_Decode Utilty\Encode_Decode Utilty\bin\Debug\Encode_Decode Utilty.pdb
+C:\Users\ea185113\Downloads\mtdownload2377_2020.11.16_10.16\_From sf185093\Encode_Decode Utilty\Encode_Decode Utilty\obj\Debug\Encode_Decode Utilty.csprojAssemblyReference.cache
+C:\Users\ea185113\Downloads\mtdownload2377_2020.11.16_10.16\_From sf185093\Encode_Decode Utilty\Encode_Decode Utilty\obj\Debug\Encode_Decode_Utilty.Form1.resources
+C:\Users\ea185113\Downloads\mtdownload2377_2020.11.16_10.16\_From sf185093\Encode_Decode Utilty\Encode_Decode Utilty\obj\Debug\Encode_Decode_Utilty.Properties.Resources.resources
+C:\Users\ea185113\Downloads\mtdownload2377_2020.11.16_10.16\_From sf185093\Encode_Decode Utilty\Encode_Decode Utilty\obj\Debug\Encode_Decode Utilty.csproj.GenerateResource.cache
+C:\Users\ea185113\Downloads\mtdownload2377_2020.11.16_10.16\_From sf185093\Encode_Decode Utilty\Encode_Decode Utilty\obj\Debug\Encode_Decode Utilty.csproj.CoreCompileInputs.cache
+C:\Users\ea185113\Downloads\mtdownload2377_2020.11.16_10.16\_From sf185093\Encode_Decode Utilty\Encode_Decode Utilty\obj\Debug\Encode_Decode Utilty.exe
+C:\Users\ea185113\Downloads\mtdownload2377_2020.11.16_10.16\_From sf185093\Encode_Decode Utilty\Encode_Decode Utilty\obj\Debug\Encode_Decode Utilty.pdb

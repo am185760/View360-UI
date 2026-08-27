@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type='text/xsl' href='_UpgradeReport_Files/UpgradeReport.xslt'?><UpgradeLog>
+<Properties><Property Name="Solution" Value="SQLConfigurator">
+</Property><Property Name="Solution File" Value="D:\Emitac\Projects\NCR\branches\CCMS-Cash-Branch\Implementation artifacts\SQLConfigurator\SQLConfigurator.sln">
+</Property><Property Name="User Options File" Value="D:\Emitac\Projects\NCR\branches\CCMS-Cash-Branch\Implementation artifacts\SQLConfigurator\SQLConfigurator.suo">
+</Property><Property Name="Date" Value="Tuesday, December 20, 2011">
+</Property><Property Name="Time" Value="17:57 PM">
+</Property></Properties><Event ErrorLevel="0" Project="" Source="SQLConfigurator.sln" Description="File successfully backed up as D:\Emitac\Projects\NCR\branches\CCMS-Cash-Branch\Implementation artifacts\SQLConfigurator\Backup\SQLConfigurator.sln">
+</Event><Event ErrorLevel="0" Project="" Source="SQLConfigurator.suo" Description="File successfully backed up as D:\Emitac\Projects\NCR\branches\CCMS-Cash-Branch\Implementation artifacts\SQLConfigurator\Backup\SQLConfigurator.suo">
+</Event><Event ErrorLevel="0" Project="SQLConfigurator" Source="SQLConfigurator.csproj" Description="Project file successfully backed up as D:\Emitac\Projects\NCR\branches\CCMS-Cash-Branch\Implementation artifacts\SQLConfigurator\Backup\SQLConfigurator.csproj">
+</Event><Event ErrorLevel="0" Project="SQLConfigurator" Source="SQLConfigurator.csproj.user" Description="Project user file successfully backed up as D:\Emitac\Projects\NCR\branches\CCMS-Cash-Branch\Implementation artifacts\SQLConfigurator\Backup\SQLConfigurator.csproj.user">
+</Event><Event ErrorLevel="0" Project="SQLConfigurator" Source="Form1.cs" Description="File successfully backed up as D:\Emitac\Projects\NCR\branches\CCMS-Cash-Branch\Implementation artifacts\SQLConfigurator\Backup\Form1.cs">
+</Event><Event ErrorLevel="0" Project="SQLConfigurator" Source="Form1.Designer.cs" Description="File successfully backed up as D:\Emitac\Projects\NCR\branches\CCMS-Cash-Branch\Implementation artifacts\SQLConfigurator\Backup\Form1.Designer.cs">
+</Event><Event ErrorLevel="0" Project="SQLConfigurator" Source="Program.cs" Description="File successfully backed up as D:\Emitac\Projects\NCR\branches\CCMS-Cash-Branch\Implementation artifacts\SQLConfigurator\Backup\Program.cs">
+</Event><Event ErrorLevel="0" Project="SQLConfigurator" Source="Properties\AssemblyInfo.cs" Description="File successfully backed up as D:\Emitac\Projects\NCR\branches\CCMS-Cash-Branch\Implementation artifacts\SQLConfigurator\Backup\Properties\AssemblyInfo.cs">
+</Event><Event ErrorLevel="0" Project="SQLConfigurator" Source="Properties\Resources.Designer.cs" Description="File successfully backed up as D:\Emitac\Projects\NCR\branches\CCMS-Cash-Branch\Implementation artifacts\SQLConfigurator\Backup\Properties\Resources.Designer.cs">
+</Event><Event ErrorLevel="0" Project="SQLConfigurator" Source="Properties\Settings.Designer.cs" Description="File successfully backed up as D:\Emitac\Projects\NCR\branches\CCMS-Cash-Branch\Implementation artifacts\SQLConfigurator\Backup\Properties\Settings.Designer.cs">
+</Event><Event ErrorLevel="0" Project="SQLConfigurator" Source="app.config" Description="File successfully backed up as D:\Emitac\Projects\NCR\branches\CCMS-Cash-Branch\Implementation artifacts\SQLConfigurator\Backup\app.config">
+</Event><Event ErrorLevel="0" Project="SQLConfigurator" Source="Properties\Settings.settings" Description="File successfully backed up as D:\Emitac\Projects\NCR\branches\CCMS-Cash-Branch\Implementation artifacts\SQLConfigurator\Backup\Properties\Settings.settings">
+</Event><Event ErrorLevel="0" Project="SQLConfigurator" Source="Form1.resx" Description="File successfully backed up as D:\Emitac\Projects\NCR\branches\CCMS-Cash-Branch\Implementation artifacts\SQLConfigurator\Backup\Form1.resx">
+</Event><Event ErrorLevel="0" Project="SQLConfigurator" Source="Properties\Resources.resx" Description="File successfully backed up as D:\Emitac\Projects\NCR\branches\CCMS-Cash-Branch\Implementation artifacts\SQLConfigurator\Backup\Properties\Resources.resx">
+</Event><Event ErrorLevel="0" Project="SQLConfigurator" Source="SQLConfigurator.csproj" Description="The project file does not require conversion.">
+</Event><Event ErrorLevel="3" Project="SQLConfigurator" Source="SQLConfigurator.csproj" Description="No Conversion Required">
+</Event><Event ErrorLevel="0" Project="" Source="SQLConfigurator.sln" Description="Solution converted successfully">
+</Event><Event ErrorLevel="3" Project="" Source="SQLConfigurator.sln" Description="Converted">
+</Event></UpgradeLog>

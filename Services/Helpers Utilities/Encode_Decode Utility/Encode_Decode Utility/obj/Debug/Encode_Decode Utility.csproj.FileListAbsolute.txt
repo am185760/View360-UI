@@ -1,0 +1,20 @@
+C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\Encryption New Mechanism\Encode_Decode Utility\Encode_Decode Utility\bin\Debug\Encode_Decode Utility.exe.config
+C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\Encryption New Mechanism\Encode_Decode Utility\Encode_Decode Utility\bin\Debug\Encode_Decode Utility.exe
+C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\Encryption New Mechanism\Encode_Decode Utility\Encode_Decode Utility\bin\Debug\Encode_Decode Utility.pdb
+C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\Encryption New Mechanism\Encode_Decode Utility\Encode_Decode Utility\obj\Debug\Encode_Decode Utility.csproj.AssemblyReference.cache
+C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\Encryption New Mechanism\Encode_Decode Utility\Encode_Decode Utility\obj\Debug\Encode_Decode_Utilty.Form1.resources
+C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\Encryption New Mechanism\Encode_Decode Utility\Encode_Decode Utility\obj\Debug\Encode_Decode_Utility.Properties.Resources.resources
+C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\Encryption New Mechanism\Encode_Decode Utility\Encode_Decode Utility\obj\Debug\Encode_Decode Utility.csproj.GenerateResource.cache
+C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\Encryption New Mechanism\Encode_Decode Utility\Encode_Decode Utility\obj\Debug\Encode_Decode Utility.csproj.CoreCompileInputs.cache
+C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\Encryption New Mechanism\Encode_Decode Utility\Encode_Decode Utility\obj\Debug\Encode_Decode Utility.exe
+C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\Encryption New Mechanism\Encode_Decode Utility\Encode_Decode Utility\obj\Debug\Encode_Decode Utility.pdb
+C:\Jabbar\Git Repository\Services\Helpers Utilities\Encode_Decode Utility\Encode_Decode Utility\bin\Debug\Encode_Decode Utility.exe.config
+C:\Jabbar\Git Repository\Services\Helpers Utilities\Encode_Decode Utility\Encode_Decode Utility\bin\Debug\Encode_Decode Utility.exe
+C:\Jabbar\Git Repository\Services\Helpers Utilities\Encode_Decode Utility\Encode_Decode Utility\bin\Debug\Encode_Decode Utility.pdb
+C:\Jabbar\Git Repository\Services\Helpers Utilities\Encode_Decode Utility\Encode_Decode Utility\obj\Debug\Encode_Decode Utility.csproj.AssemblyReference.cache
+C:\Jabbar\Git Repository\Services\Helpers Utilities\Encode_Decode Utility\Encode_Decode Utility\obj\Debug\Encode_Decode_Utilty.Form1.resources
+C:\Jabbar\Git Repository\Services\Helpers Utilities\Encode_Decode Utility\Encode_Decode Utility\obj\Debug\Encode_Decode_Utility.Properties.Resources.resources
+C:\Jabbar\Git Repository\Services\Helpers Utilities\Encode_Decode Utility\Encode_Decode Utility\obj\Debug\Encode_Decode Utility.csproj.GenerateResource.cache
+C:\Jabbar\Git Repository\Services\Helpers Utilities\Encode_Decode Utility\Encode_Decode Utility\obj\Debug\Encode_Decode Utility.csproj.CoreCompileInputs.cache
+C:\Jabbar\Git Repository\Services\Helpers Utilities\Encode_Decode Utility\Encode_Decode Utility\obj\Debug\Encode_Decode Utility.exe
+C:\Jabbar\Git Repository\Services\Helpers Utilities\Encode_Decode Utility\Encode_Decode Utility\obj\Debug\Encode_Decode Utility.pdb
