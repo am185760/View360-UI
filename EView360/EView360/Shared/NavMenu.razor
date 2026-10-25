@@ -161,10 +161,10 @@
                                             {
                                                 <li> <a class="dropdown-item" @onclick="@(() => HandleClick("CashPositionDashboard"))">Cash Position Dashboard</a></li>
                                             }
-                                            @if (CheckPermission((int)Permissions.ViewCashPositionsDashBoard))
+                                            @* @if (CheckPermission((int)Permissions.ViewCashPositionsDashBoard))
                                             {
                                                 <li> <a class="dropdown-item" @onclick="@(() => HandleClick("CashPositionDashboard/0/true"))">Recycler Cash Position Dashboard</a></li>
-                                            }
+                                            } *@
                                             @if (CheckPermission((int)Permissions.ViewTransactions))
                                             {
                                                 <li> <a class="dropdown-item" @onclick="@(() => HandleClick("WithdrawalTransaction"))">Withdrawal Transaction (History)</a></li>
@@ -173,10 +173,10 @@
                                             {
                                                 <li> <a class="dropdown-item" @onclick="@(() => HandleClick("CashPosition"))">Cash Position (History)</a></li>
                                             }
-                                            @if (CheckPermission((int)Permissions.ViewCashPositions))
+                                            @* @if (CheckPermission((int)Permissions.ViewCashPositions))
                                             {
                                                 <li> <a class="dropdown-item" @onclick="@(() => HandleClick("CashPosition/0/true"))">Recycler Cash Position (History)</a></li>
-                                            }
+                                            } *@
                                             @if (CheckPermission((int)Permissions.ViewCashPositionVsDFF))
                                             {
                                                 <li> <a class="dropdown-item" href="#">Cash Position vs DFF (History)</a></li>
@@ -259,10 +259,10 @@
                                             {
                                                 <li> <a class="dropdown-item" href="CashPositionsReport">Cash Position Report</a></li>
                                             }
-                                            @if (CheckPermission((int)Permissions.ViewCashPositionReport))
+                                            @* @if (CheckPermission((int)Permissions.ViewCashPositionReport))
                                             {
                                                 <li> <a class="dropdown-item" href="CashPositionsReport/0/true">Recycler Cash Position Report</a></li>
-                                            }
+                                            } *@
                                             @if (CheckPermission((int)Permissions.CashUtilizationReport))
                                             {
                                                 <li> <a class="dropdown-item" @onclick="@(() => HandleClick("CashUtilizationReport"))">Cash Utilization Report</a></li>
@@ -346,10 +346,10 @@
                                                     {
                                                         <li> <a class="dropdown-item" @onclick="@(() => HandleClick("CashPosition/Archive"))">Cash Position (History)</a></li>
                                                     }
-                                                    @if (CheckPermission((int)Permissions.ViewRecyclerCashPositionHistoryArchive))
+                                                    @* @if (CheckPermission((int)Permissions.ViewRecyclerCashPositionHistoryArchive))
                                                     {
                                                         <li> <a class="dropdown-item" @onclick="@(() => HandleClick("CashPosition/Archive/true"))">Recycler Cash Position (History)</a></li>
-                                                    }
+                                                    } *@
                                                     @if (CheckPermission((int)Permissions.ViewBNATransactionHistoryArchive))
                                                     {
                                                         <li> <a class="dropdown-item" @onclick="@(() => HandleClick("BnaTransaction/Archive"))">BNA Transactions (History)</a></li>
@@ -415,10 +415,10 @@
                                                     {
                                                         <li> <a class="dropdown-item" href="CashPositionsReport/Archive">Cash Position Report</a></li>
                                                     }
-                                                    @if (CheckPermission((int)Permissions.ViewRecyclerCashPositionReportArchive))
+                                                    @* @if (CheckPermission((int)Permissions.ViewRecyclerCashPositionReportArchive))
                                                     {
                                                         <li> <a class="dropdown-item" href="CashPositionsReport/Archive/true">Recycler Cash Position Report</a></li>
-                                                    }
+                                                    } *@
                                                     @if (CheckPermission((int)Permissions.ViewCashUtilizationReportArchive))
                                                     {
                                                         <li> <a class="dropdown-item" href="CashUtilizationReport/Archive">Cash Utilization Report</a></li>

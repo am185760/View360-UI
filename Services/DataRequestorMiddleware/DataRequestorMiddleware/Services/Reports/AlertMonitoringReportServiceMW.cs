@@ -30,7 +30,7 @@ namespace DataRequestorMiddleware.Services.Reports
             if (filter.SelectedRegionIds != null || filter.SelectedRegionIds?.Count > 0)
                 queryFilter += " and atm.region_id in (" + string.Join(",", filter.SelectedRegionIds) + ") and user_ATMs.user_id = " + filter.UserId + " and atm.is_active=1 ";
             else
-                queryFilter += " and atm.atm_id in (" + string.Join(",", filter.SelectedAtmIds) + ")";
+                queryFilter += " and atm.atm_id in (" + string.Join(",", filter.SelectedAtmIds) + ")  and user_ATMs.user_id = " + filter.UserId +  "and atm.is_active=1 ";
 
             if (filter.fromDate.HasValue)
                 queryFilter += " and generated_at >= convert(datetime,'" + filter.fromDate.Value.ToString("dd/MM/yyyy HH:mm:ss") + "',103) ";

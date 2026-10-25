@@ -57,13 +57,13 @@ namespace DataRequestorMiddleware.Services.Reports
                 filter += " and note_set_type_id in ( " + string.Join(",", bnaCounterReportRequest.NoteSetTypeIds) + " ) ";
 
             if (bnaCounterReportRequest.isDeadATMExcluded)
-                filter += " and ATM_id in (select ATM_id from heart_beat where heart_beat_received_at >=convert(datetime,'" + bnaCounterReportRequest.FromDate.ToString("dd/MM/yyyy") + "',103) and " +
+                filter += " and deposited_notes.ATM_id in (select ATM_id from heart_beat where heart_beat_received_at >=convert(datetime,'" + bnaCounterReportRequest.FromDate.ToString("dd/MM/yyyy") + "',103) and " +
                                      "heart_beat_received_at <=convert(datetime,'" + bnaCounterReportRequest.ToDate.ToString("dd/MM/yyyy") + " 23:59:59',103))";
 
             if (bnaCounterReportRequest.SelectedRegionIds != null || bnaCounterReportRequest.SelectedRegionIds?.Count > 0)
                 filter += "and region_id in (" + string.Join(",", bnaCounterReportRequest.SelectedRegionIds) + ") ";
             else
-                filter += "and  atm_id in (" + string.Join(",", bnaCounterReportRequest.SelectedAtms) + ")";
+                filter += "and  deposited_notes.atm_id in (" + string.Join(",", bnaCounterReportRequest.SelectedAtms) + ")";
 
             SqlParameter[] sqlParameters = new SqlParameter[]
                 {

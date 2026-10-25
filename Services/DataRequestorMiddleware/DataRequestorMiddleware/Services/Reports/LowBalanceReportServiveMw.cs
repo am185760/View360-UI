@@ -44,13 +44,13 @@ namespace DataRequestorMiddleware.Services.Reports
             }
 
             if (lowBalance.SelectedRegionIds != null || lowBalance.SelectedRegionIds?.Count > 0)
-                filter += "and outerATM.region_id in (" + string.Join(",", lowBalance.SelectedRegionIds) + ") and outerATM.IS_ACTIVE = 1";
+                filter += " and outerATM.region_id in (" + string.Join(",", lowBalance.SelectedRegionIds) + ") and outerATM.IS_ACTIVE = 1";
             else
-                filter += "and  outerATM.atm_id in (" + string.Join(",", lowBalance.SelectedAtms) + ")";
+                filter += " and  outerATM.atm_id in (" + string.Join(",", lowBalance.SelectedAtms) + ")";
 
             if (lowBalance.minThreshold > 0 && (lowBalance.maxThreshold == null || lowBalance.maxThreshold == 0))
             {
-                filter += $"and (select CAST(ISNULL(note_set_type.denomination_type_1,0) as numeric(18,2)) * CAST(ISNULL(cassette1_notes,0) as numeric(18,2)) +" +
+                filter += $" and (select CAST(ISNULL(note_set_type.denomination_type_1,0) as numeric(18,2)) * CAST(ISNULL(cassette1_notes,0) as numeric(18,2)) +" +
                                     "CAST(ISNULL(note_set_type.denomination_type_2,0) as numeric(18,2)) * CAST(ISNULL(cassette2_notes,0) as numeric(18,2)) +" +
                                     "CAST(ISNULL(note_set_type.denomination_type_3,0) as numeric(18,2)) * CAST(ISNULL(cassette3_notes,0) as numeric(18,2)) +" +
                                     "CAST(ISNULL(note_set_type.denomination_type_4,0) as numeric(18,2)) * CAST(ISNULL(cassette4_notes,0) as numeric(18,2)) from Cash" + archiveYear + ".dbo.vCashPosition,atm , note_set_type " +
@@ -64,7 +64,7 @@ namespace DataRequestorMiddleware.Services.Reports
                                     "CAST(ISNULL(note_set_type.denomination_type_3,0) as numeric(18,2)) * CAST(ISNULL(cassette3_notes,0) as numeric(18,2)) +" +
                                     "CAST(ISNULL(note_set_type.denomination_type_4,0) as numeric(18,2)) * CAST(ISNULL(cassette4_notes,0) as numeric(18,2)) from Cash" + archiveYear + ".dbo.vCashPosition,atm , note_set_type " +
                                     "where vCashPosition.atm_id = atm.atm_id and atm.note_set_type_id = note_set_type.note_set_type_id and vCashPosition.atm_id = outerATM.atm_id " +
-                                    "and last_trxn_at = (select max(last_trxn_at) from Cash" + archiveYear + ".dbo.vCashPosition where atm_id = outerATM.atm_id)) <= " + lowBalance.minThreshold;
+                                    "and last_trxn_at = (select max(last_trxn_at) from Cash" + archiveYear + ".dbo.vCashPosition where atm_id = outerATM.atm_id)) <= " + lowBalance.maxThreshold;
             }
             else if (lowBalance.maxThreshold > 0 && lowBalance.minThreshold > 0)
             {

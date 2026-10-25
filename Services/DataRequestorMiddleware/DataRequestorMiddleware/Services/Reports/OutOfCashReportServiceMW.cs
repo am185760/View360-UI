@@ -33,7 +33,7 @@ namespace DataRequestorMiddleware.Services.Reports
             if (filter.SelectedRegionIds != null || filter.SelectedRegionIds?.Count > 0)
                 queryFilter += " and outerATM.region_id in (" + string.Join(",", filter.SelectedRegionIds) + ") and user_ATMs.user_id = " + filter.UserId + " and outerATM.is_active=1 ";
             else
-                queryFilter += " and outerATM.atm_id in (" + string.Join(",", filter.SelectedAtms) + ")";
+                queryFilter += " and outerATM.atm_id in (" + string.Join(",", filter.SelectedAtms) + ")  and user_ATMs.user_id = " + filter.UserId + " and outerATM.is_active=1 ";
 
             SqlParameter[] sqlParameters = new SqlParameter[]
             {
