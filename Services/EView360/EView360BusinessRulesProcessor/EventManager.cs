@@ -44,13 +44,15 @@ namespace View360BusinessRulesProcessor
                 ParserPostProcessingTask _parserPostProcessingTask = Utility.CreateParserPostProcessingTaskObjectFromDataRow(dr);
                 queue.Enqueue(_parserPostProcessingTask);
             }
-            listTask.Add(System.Threading.Tasks.Task.Factory.StartNew(() => withdrawalProcessor.Run(queue)));
+            withdrawalProcessor.Run(queue);
+            //listTask.Add(System.Threading.Tasks.Task.Factory.StartNew(() => withdrawalProcessor.Run(queue)));
             System.Threading.Tasks.Task.WaitAll(listTask.ToArray());
             isWithdrawalProcessed = true;
         }
         public void ExecuteTestCash(DataTable dtTestCash)
         {
-            System.Threading.Tasks.Task.Factory.StartNew(() => testCashProcessor.Run(dtTestCash));
+            testCashProcessor.Run(dtTestCash);
+            //System.Threading.Tasks.Task.Factory.StartNew(() => testCashProcessor.Run(dtTestCash));
         }
         public void ExecuteReplenishment(DataTable dtReplenishment)
         {
@@ -60,20 +62,24 @@ namespace View360BusinessRulesProcessor
                     Thread.Sleep(5000);
                     LogableTask.LogMonoActivityTask("", MethodBase.GetCurrentMethod(), System.Diagnostics.TraceLevel.Info, "waiting for withdrawal transactions to be processed:" + dtReplenishment.Rows[0]["atm_id"]);
                 }
-                System.Threading.Tasks.Task.Factory.StartNew(() => replenishmentProcessor.Run(dtReplenishment));
+                replenishmentProcessor.Run(dtReplenishment);
+                //System.Threading.Tasks.Task.Factory.StartNew(() => replenishmentProcessor.Run(dtReplenishment));
             }
         }
         public void ExecuteDepositSummary(DataTable dtDeposits)
         {
-            System.Threading.Tasks.Task.Factory.StartNew(() => depositProcessor.Run(dtDeposits));
+            depositProcessor.Run(dtDeposits);
+            //System.Threading.Tasks.Task.Factory.StartNew(() => depositProcessor.Run(dtDeposits));
         }
         public void ExecuteBNACountsCleared(DataTable dtBNACountsCleared)
         {
-            System.Threading.Tasks.Task.Factory.StartNew(() => BNACountsClearedProcessor.Run(dtBNACountsCleared));            
+            BNACountsClearedProcessor.Run(dtBNACountsCleared);
+            //System.Threading.Tasks.Task.Factory.StartNew(() => BNACountsClearedProcessor.Run(dtBNACountsCleared));            
         }
         public void ExecuteCPMCountsCleared(DataTable dtCPMCountsCleared)
         {
-            System.Threading.Tasks.Task.Factory.StartNew(() => cpmCountsClearedProcessor.Run(dtCPMCountsCleared));
+            cpmCountsClearedProcessor.Run(dtCPMCountsCleared);
+            //System.Threading.Tasks.Task.Factory.StartNew(() => cpmCountsClearedProcessor.Run(dtCPMCountsCleared));
         }
     }
 }

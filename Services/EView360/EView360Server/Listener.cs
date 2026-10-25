@@ -188,7 +188,8 @@ namespace Avanza.CCMS
 
                 else
                 {
-                    if (_reply.Length > 0)
+                    
+                    //if (_reply.Length > 0) this line is commented bcx Empty chunk were not able to get processed. - Guided by Izhar
                     {
                         //if (_reply.EndsWith("SENT"))
                         //{

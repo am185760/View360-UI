@@ -32,6 +32,8 @@ namespace ATM360
         public static string backupPath = AppDomain.CurrentDomain.BaseDirectory + "\\Backup\\";
         public static string tempFilePath = AppDomain.CurrentDomain.BaseDirectory + "\\temp\\";
 
+        private static readonly object uploadLock = new object();
+
         public static readonly bool isSSLEnabled = bool.Parse(System.Configuration.ConfigurationManager.AppSettings["isSSLEnabled"]);
 
         public static string hostname = null;
@@ -40,7 +42,7 @@ namespace ATM360
         int dataStreamingHeartBeatPort = 16329;
         static int uploadRefreshInterval = 5;
         static int cutOverIntervalDays = 5;
-        static int heartBeatRefreshInterval = 5;
+        static int heartBeatRefreshInterval = 10;
         Timer timerCutOver;
         Timer timerDoWork;
         Timer timerSchedular;
@@ -163,7 +165,7 @@ namespace ATM360
 
                 Task.Run(() => ReadCounterFile());
                 //timerDoWork = new Timer(DoWork, null, new TimeSpan(0, 0, 15), new TimeSpan(0, 0, 0, 0, -1));
-                //timerUploader = new Timer(DoUpload, null, new TimeSpan(0, 0, 16), new TimeSpan(0, 0, 0, 0, -1));
+                timerUploader = new Timer(DoUpload, null, new TimeSpan(0, 5, 0), new TimeSpan(0, 0, 0, 0, -1));
                 timerCutOver = new Timer(DoCutOver, null, new TimeSpan(0, 0, 40), new TimeSpan(0, 0, 0, 0, -1));
                 timerHeartBeat = new Timer(HeartBeat, null, new TimeSpan(0, 0, 40), new TimeSpan(0, 0, 0, 0, -1));
                 timerFileProcessor = new Timer(FileProcessor, null, new TimeSpan(0, 0, 16), new TimeSpan(0, 0, 0, 0, -1));
@@ -348,24 +350,31 @@ namespace ATM360
             }
             catch (Exception ex)
             {
-                LogableTask.LogMonoActivityTask("DoWork", System.Reflection.MethodBase.GetCurrentMethod(), TraceLevel.Error, ex);
-                timerUploader.Change(new TimeSpan(0, uploadRefreshInterval, 0), new TimeSpan(0, 1, 0));
+                LogableTask.LogMonoActivityTask("DoUpload", System.Reflection.MethodBase.GetCurrentMethod(), TraceLevel.Error, ex);
+             
 
             }
             finally
             {
+                timerUploader.Change(new TimeSpan(uploadRefreshInterval, 0, 0), new TimeSpan(0, 1, 0));
             }
         }
 
         private void PushPendingFiles()
         {
-            Communicator communicator = new Communicator();
-            communicator.Connect(serverIP, dataStreamingServerPort);
-            DirectoryInfo dirInfo = new DirectoryInfo(EView360ATMStreaming.processorPath);
-            FileInfo[] fileInfos = dirInfo.GetFiles().OrderBy(f => f.LastWriteTime).ToArray();
-            foreach (FileInfo fileInfo in fileInfos)
-                communicator.Upload(fileInfo.FullName);
-            communicator.Disconnect();
+            lock (uploadLock)
+            {
+                Communicator communicator = new Communicator();
+                communicator.Connect(serverIP, dataStreamingServerPort);
+                DirectoryInfo dirInfo = new DirectoryInfo(EView360ATMStreaming.processorPath);
+                FileInfo[] fileInfos = dirInfo.GetFiles().OrderBy(f => f.LastWriteTime).ToArray();
+                foreach (FileInfo fileInfo in fileInfos)
+                {
+                    communicator.Upload(fileInfo.FullName);
+                }
+
+                communicator.Disconnect();
+            }                
         }
 
         protected void FileProcessor(object state)
@@ -611,14 +620,14 @@ namespace ATM360
                     if (fileInfo.LastWriteTime < cutOverDate)
                     {
                         File.Delete(fileInfo.FullName);
-                        LogableTask.LogMonoActivityTask("DoWork", System.Reflection.MethodBase.GetCurrentMethod(), TraceLevel.Info, "File " + fileInfo.FullName + " having modified date " + fileInfo.LastWriteTime + " deleted successfully");
+                        LogableTask.LogMonoActivityTask("DoCutOver", System.Reflection.MethodBase.GetCurrentMethod(), TraceLevel.Info, "File " + fileInfo.FullName + " having modified date " + fileInfo.LastWriteTime + " deleted successfully");
                     }
                 }
-                LogableTask.LogMonoActivityTask("DoWork", System.Reflection.MethodBase.GetCurrentMethod(), TraceLevel.Info, "Going to sleep for " + cutOverIntervalDays + " days");
+                LogableTask.LogMonoActivityTask("DoCutOver", System.Reflection.MethodBase.GetCurrentMethod(), TraceLevel.Info, "Going to sleep for " + cutOverIntervalDays + " days");
             }
             catch (Exception ex)
             {
-                LogableTask.LogMonoActivityTask("DoWork", System.Reflection.MethodBase.GetCurrentMethod(), TraceLevel.Error, ex);
+                LogableTask.LogMonoActivityTask("DoCutOver", System.Reflection.MethodBase.GetCurrentMethod(), TraceLevel.Error, ex);
             }
             finally
             {

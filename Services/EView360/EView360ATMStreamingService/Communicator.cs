@@ -238,6 +238,8 @@ namespace ATM360
                 else
                 {
                     socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                    socket.ReceiveTimeout = 20 * 1000;
+                    socket.SendTimeout = 20 * 1000;
                     socket.Connect(ip, port);
                     LogableTask.LogMonoActivityTask("Talk", System.Reflection.MethodBase.GetCurrentMethod(), TraceLevel.Info, "Connection established");
 

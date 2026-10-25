@@ -1321,21 +1321,21 @@ namespace View360BusinessRulesProcessor
                 string query = "event_type ='" + eventType + "' and event_occured_at>#" + eventOccuredAt.Date.ToString("yyyy-MM-dd") + "# and event_occured_at<#" + eventOccuredAt.ToString("yyyy-MM-dd HH:mm:ss") + "#";
                 LogableTask.LogMonoActivityTask("ServiceStartUp", System.Reflection.MethodBase.GetCurrentMethod(), TraceLevel.Info, query + "query for atm:" + dr[0]["atm_id"]);
 
-                if (_dr["event_type"].ToString() == "CashWithdrawal")
+                if (_dr["event_type"].ToString().Contains("CashWithdrawal"))
                 {
                     RemoveIfEventWithPastDateTimeExists(ref dtWithdrawals, query);
                     DataRow newDataRow = DoClone(dtWithdrawals, _dr);
                     dtWithdrawals.Rows.Add(newDataRow);
                 }
 
-                else if (_dr["event_type"].ToString() == "TestCash")
+                else if (_dr["event_type"].ToString().Contains("TestCash"))
                 {
                     RemoveIfEventWithPastDateTimeExists(ref dtTestCash, query);
                     DataRow newDataRow = DoClone(dtTestCash, _dr);
                     dtTestCash.Rows.Add(newDataRow);
                 }
 
-                else if (_dr["event_type"].ToString() == "Replenishment")
+                else if (_dr["event_type"].ToString().Contains("Replenishment"))
                 {
                     RemoveIfEventWithPastDateTimeExists(ref dtReplenishment, query);
                     DataRow newDataRow = DoClone(dtReplenishment, _dr);
@@ -1423,7 +1423,7 @@ namespace View360BusinessRulesProcessor
                 dtResult.Rows.Remove(drArray[0]);
             }
             //else
-            //    ignoredTasks.Add(int.Parse(parserPostProcessingTaskID), new List<int>() { 1});
+            //    ignoredTasks.Add(int.Parse(parserPostProcessingTaskID), new List<int>() { 1 });
 
             //if (ignoredTasks.ContainsKey())
         }
@@ -1555,21 +1555,35 @@ namespace View360BusinessRulesProcessor
         }
         protected override async System.Threading.Tasks.Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            while (!stoppingToken.IsCancellationRequested)
+            try
             {
                 DoInit();
-               // ExecuteQueue();
-                //XmlLogWriter.InitXmlLogWriter(appSetting.LogFilePath + "\\View360BusinessRuleProcessor_" + DateTime.Now.ToString("yyyyMMdd") + ".txt");
-
-                //LogableTask.LogMonoActivityTask("DisplayVersion", System.Reflection.MethodBase.GetCurrentMethod(), TraceLevel.Info, "Version : View360 Business Rule Processor Build 2.1.1 Modified Date :5-Dec-2022");
-                //LogableTask.LogMonoActivityTask("Schedular", System.Reflection.MethodBase.GetCurrentMethod(), TraceLevel.Info, "Worker Threads begin execution after 15 seconds.");
-                ////timer = new System.Threading.Timer(new System.Threading.TimerCallback(DoWork), null, new TimeSpan(0, 0, 15), new TimeSpan(0, 0, 0, 0, -1));
                 System.Threading.Tasks.Task.Factory.StartNew(() => PurgingManager.PurgeManager.DoPurge());
 
-                DoWork();
-                //_logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                await System.Threading.Tasks.Task.Delay(5 * 60 * 1000, stoppingToken);//TODO: to be changed later
+                while (!stoppingToken.IsCancellationRequested)
+                {
+                    // ExecuteQueue();
+                    //XmlLogWriter.InitXmlLogWriter(appSetting.LogFilePath + "\\View360BusinessRuleProcessor_" + DateTime.Now.ToString("yyyyMMdd") + ".txt");
+
+                    //LogableTask.LogMonoActivityTask("DisplayVersion", System.Reflection.MethodBase.GetCurrentMethod(), TraceLevel.Info, "Version : View360 Business Rule Processor Build 2.1.1 Modified Date :5-Dec-2022");
+                    //LogableTask.LogMonoActivityTask("Schedular", System.Reflection.MethodBase.GetCurrentMethod(), TraceLevel.Info, "Worker Threads begin execution after 15 seconds.");
+                    ////timer = new System.Threading.Timer(new System.Threading.TimerCallback(DoWork), null, new TimeSpan(0, 0, 15), new TimeSpan(0, 0, 0, 0, -1));
+
+                    DoWork();
+
+                    int refreshIntervalMinutes = 1; // default 5 minutes
+                    if (appSetting != null && appSetting.CcmsParserRefreshInterval != null)
+                    {
+                        refreshIntervalMinutes = (int)appSetting.CcmsParserRefreshInterval;
+                    }
+                    //_logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+                    await System.Threading.Tasks.Task.Delay(refreshIntervalMinutes * 60 * 1000, stoppingToken);
+                }
             }
+            catch (Exception ex)
+            {
+                EventLog.WriteEntry("View360BusinessRulesProcessor", "DoInit failed: " + ex.Message + " " + ex.StackTrace, EventLogEntryType.Error);
+            }            
         }
         private void DoWork()
         {
