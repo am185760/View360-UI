@@ -26,10 +26,10 @@ namespace Services
             string filter = "";
             var response = new BaseModel();
             if (userReportRequestModel.UserId != string.Empty)
-                filter += " and user_id = " + userReportRequestModel.UserId;
+                filter += " and user_login = '" + userReportRequestModel.UserId + "'";
 
             if (userReportRequestModel.FullName != string.Empty)
-                filter += "and user_full_name like '%" + userReportRequestModel.FullName + "%'";
+                filter += " and user_full_name like '%" + userReportRequestModel.FullName + "%'";
 
             SqlParameter[] sqlParameters = new SqlParameter[]
             {
