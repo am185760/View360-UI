@@ -213,7 +213,7 @@ namespace EView360.Services
 
                     if (responseModel.IsSuccess && (dt is null || dt.Rows.Count == 0))
                     {
-                        await notificationService.Success("No record found", "Succes", (options) =>
+                        await notificationService.Success("No record found", "Info", (options) =>
                         {
                             options.IntervalBeforeClose = 4000;
                         });
@@ -261,13 +261,13 @@ namespace EView360.Services
                         return dt;
                     }
 
-                    if (responseModel.IsSuccess && (dt is null || dt.Rows.Count == 0))
-                    {
-                        await notificationService.Success("No record found", "Succes", (options) =>
-                        {
-                            options.IntervalBeforeClose = 4000;
-                        });
-                    }
+                    //if (responseModel.IsSuccess && (dt is null || dt.Rows.Count == 0))
+                    //{
+                    //    await notificationService.Success("No record found", "Info", (options) =>
+                    //    {
+                    //        options.IntervalBeforeClose = 4000;
+                    //    });
+                    //}
                 }
                 else
                 {

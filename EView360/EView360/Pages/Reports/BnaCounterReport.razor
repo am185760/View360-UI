@@ -334,7 +334,7 @@
             logger.LogWarning("[BnaCounterReportPage:GenerateReport] End convering serialized Datatable Sub Report into bytes ");
 
             logger.LogWarning($"BnaCounterReportPage: going to cache the  subreport data");
-            _distributedCache.Set(redisKey, SubReportbytes, new DistributedCacheEntryOptions()
+            _distributedCache.Set(redisKeySubReport, SubReportbytes, new DistributedCacheEntryOptions()
                 {
                     AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_configuration.GetValue<int>("RedisKeyExpirationTimeInMinutes"))
                 });

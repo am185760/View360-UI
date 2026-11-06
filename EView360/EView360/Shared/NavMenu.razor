@@ -185,10 +185,10 @@
                                             {
                                                 <li> <a class="dropdown-item" @onclick="@(() => HandleClick("BnaTransaction"))">BNA Transactions (History)</a></li>
                                             }
-                                            @if (CheckPermission((int)Permissions.ViewCPMTransactions))
+                                            @* @if (CheckPermission((int)Permissions.ViewCPMTransactions))
                                             {
                                                 <li> <a class="dropdown-item" href="#">CPM Transactions (History)</a></li>
-                                            }
+                                            } *@
                                             @if (CheckPermission((int)Permissions.ViewReplenishments))
                                             {
                                                 <li><a class="dropdown-item" @onclick="@(() => HandleClick("Replenishment"))">Replenishments</a></li>
@@ -238,7 +238,8 @@
                                             {
                                                 <li> <a class="dropdown-item" href="PurgeBinThresholdReport">Purge Bin Alert Report</a></li>
                                             }
-                                            <li> <a class="dropdown-item" @onclick="@(() => HandleClick("CashDepositDenomationReport"))">Cash Deposit Denomination Report</a></li>
+                                            
+                                            @* <li> <a class="dropdown-item" @onclick="@(() => HandleClick("CashDepositDenomationReport"))">Cash Deposit Denomination Report</a></li> *@
 
                                             <li> <a class="dropdown-item" href="UserReport">User List Report</a></li>
 
@@ -271,10 +272,10 @@
                                             {
                                                 <li> <a class="dropdown-item" @onclick="@(() => HandleClick("BnaCounterReport"))">BNA Counter Report</a></li>
                                             }
-                                            @if (CheckPermission((int)Permissions.CPMCounterReport))
+                                            @* @if (CheckPermission((int)Permissions.CPMCounterReport))
                                             {
                                                 <li> <a class="dropdown-item" href="CPMCounterReport">CPM Counter Report</a></li>
-                                            }
+                                            } *@
                                             @if (CheckPermission((int)Permissions.CashWithdrawalReport))
                                             {
                                                 <li> <a class="dropdown-item" @onclick="@(() => HandleClick("CashWithdrawalReport"))">Cash Withdrawal Report</a></li>
@@ -354,10 +355,10 @@
                                                     {
                                                         <li> <a class="dropdown-item" @onclick="@(() => HandleClick("BnaTransaction/Archive"))">BNA Transactions (History)</a></li>
                                                     }
-                                                    @if (CheckPermission((int)Permissions.ViewCPMTransactionHistoryArchive))
+                                                    @* @if (CheckPermission((int)Permissions.ViewCPMTransactionHistoryArchive))
                                                     {
                                                         <li> <a class="dropdown-item" href="#">CPM Transactions (History)</a></li>
-                                                    }
+                                                    } *@
                                                     @if (CheckPermission((int)Permissions.ViewReplenishmentHistoryArchive))
                                                     {
                                                         <li> <a class="dropdown-item" @onclick="@(() => HandleClick("Replenishment/Archive"))">Replenishments (History)</a></li>

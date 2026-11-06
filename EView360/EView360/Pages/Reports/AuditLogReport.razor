@@ -86,14 +86,14 @@
                             </select>
                         </div>
                         <div class="form-group col-md-4 text-right">
-                            <label>Status : </label>
+                            <label>Users : </label>
                         </div>
                         <div class="form-group col-md-2">
-                            <select @bind="filterRights" class="form-control">
+                            <select @bind="filterCreatedBy" class="form-control">
                                 <option value="">Any</option>
-                                @foreach (var right in rights.Select(x => new { x.RightId, x.Name }).Distinct())
+                                @foreach (var appUser in appUsers.Select(x => new { x.UserId, x.UserLogin }).Distinct())
                                 {
-                                    <option value="@right.RightId">@right.Name</option>
+                                    <option value="@appUser.UserId">@appUser.UserLogin</option>
                                 }
                             </select>
                         </div>
@@ -229,6 +229,17 @@
 
         logger.LogWarning($"AuditLogReportPage:GetAuditLogDetailReport] going in GetAuditLogDetailReport UI Service");
         var SubReportdata = await auditLogService.GetAuditLogDetailReport(fromDate, toDate, rightId, userId);
+        if (SubReportdata == null || SubReportdata.Rows.Count == 0){SubReportdata = new DataTable("DataTable1");
+
+            SubReportdata.Columns.Add("fieldName", typeof(string));
+            SubReportdata.Columns.Add("oldValue", typeof(string));
+            SubReportdata.Columns.Add("newValue", typeof(string));
+            SubReportdata.Columns.Add("auditLogId", typeof(long));
+
+            SubReportdata.Rows.Add("d", "d", "d", -1);
+
+        }
+ 
         logger.LogWarning($"AuditLogReportPage:GetAuditLogDetailReport] return from GetAuditLogDetailReport UI Service");
 
         logger.LogWarning("[AuditLogReportPage:GenerateReport] Start Serializing Datatable Sub Report ");
