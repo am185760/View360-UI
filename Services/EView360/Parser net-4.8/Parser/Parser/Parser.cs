@@ -1356,7 +1356,9 @@ namespace Avanza.CCMS.Parser
                         parsedBnaCounter.AtmId = ATMID;
                         parsedBnaCounter.TaskId = taskID;
                         //parsedBnaCounter.Save(trxn.Connection, trxn);
-                        if (notesDepositInCassette > 0)
+                        
+                        //this is commented - guided by Izhar, as deposit note when went to reject bin, not getting saved..
+                        //if (notesDepositInCassette > 0)
                         {
                             //Changes done by IK on 15-Nov-2023..
                             //On UAT parser crashing to parse the counter file on line 

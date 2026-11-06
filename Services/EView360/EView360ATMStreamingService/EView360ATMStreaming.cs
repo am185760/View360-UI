@@ -165,7 +165,7 @@ namespace ATM360
 
                 Task.Run(() => ReadCounterFile());
                 //timerDoWork = new Timer(DoWork, null, new TimeSpan(0, 0, 15), new TimeSpan(0, 0, 0, 0, -1));
-                timerUploader = new Timer(DoUpload, null, new TimeSpan(0, 5, 0), new TimeSpan(0, 0, 0, 0, -1));
+                timerUploader = new Timer(DoUpload, null, new TimeSpan(0, 1, 0), new TimeSpan(0, 0, 0, 0, -1));
                 timerCutOver = new Timer(DoCutOver, null, new TimeSpan(0, 0, 40), new TimeSpan(0, 0, 0, 0, -1));
                 timerHeartBeat = new Timer(HeartBeat, null, new TimeSpan(0, 0, 40), new TimeSpan(0, 0, 0, 0, -1));
                 timerFileProcessor = new Timer(FileProcessor, null, new TimeSpan(0, 0, 16), new TimeSpan(0, 0, 0, 0, -1));

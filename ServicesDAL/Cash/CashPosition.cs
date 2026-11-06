@@ -1047,11 +1047,16 @@ namespace ServicesDAL
                         qry.Append(",");
                     }
 
+                    if (last_trxn_atChanged)
+                    {
+                        qry.Append("last_trxn_at = CONVERT(datetime, '" + last_trxn_at.ToString("yyyy-MM-dd HH:mm:ss.fff") + "', 121)");
+                        qry.Append(",");
+                    }
 
                     qry.Replace(',', ' ', qry.Length - 1, 1);
                     qry.Append(" where ");
                     qry.Append("cash_position_id = " + cash_position_idDbString);
-                    qry.Append(" and last_trxn_at = " + last_trxn_atDbString);
+                    //qry.Append(" and last_trxn_at = " + last_trxn_atDbString);
                 }
 
                 cmd.CommandText = qry.ToString();
