@@ -61,9 +61,9 @@ namespace DataRequestorMiddleware.Services.Reports
                                      "heart_beat_received_at <=convert(datetime,'" + bnaCounterReportRequest.ToDate.ToString("dd/MM/yyyy") + " 23:59:59',103))";
 
             if (bnaCounterReportRequest.SelectedRegionIds != null || bnaCounterReportRequest.SelectedRegionIds?.Count > 0)
-                filter += "and region_id in (" + string.Join(",", bnaCounterReportRequest.SelectedRegionIds) + ") ";
+                filter += " and region_id in (" + string.Join(",", bnaCounterReportRequest.SelectedRegionIds) + ") ";
             else
-                filter += "and  deposited_notes.atm_id in (" + string.Join(",", bnaCounterReportRequest.SelectedAtms) + ")";
+                filter += " and  deposited_notes.atm_id in (" + string.Join(",", bnaCounterReportRequest.SelectedAtms) + ")";
 
             SqlParameter[] sqlParameters = new SqlParameter[]
                 {
@@ -256,9 +256,9 @@ namespace DataRequestorMiddleware.Services.Reports
                                      "heart_beat_received_at <=convert(datetime,'" + bnaCounterReportRequest.ToDate.ToString("dd/MM/yyyy") + " 23:59:59',103))";
 
             if (bnaCounterReportRequest.SelectedRegionIds != null || bnaCounterReportRequest.SelectedRegionIds?.Count > 0)
-                filter += "and atm.region_id in (" + string.Join(",", bnaCounterReportRequest.SelectedRegionIds) + ") ";
+                filter += " and atm.region_id in (" + string.Join(",", bnaCounterReportRequest.SelectedRegionIds) + ") ";
             else
-                filter += "and  atm.atm_id in (" + string.Join(",", bnaCounterReportRequest.SelectedAtms) + ")";
+                filter += " and  atm.atm_id in (" + string.Join(",", bnaCounterReportRequest.SelectedAtms) + ")";
 
             SqlParameter[] sqlParameters2 = new SqlParameter[]
             {

@@ -33,7 +33,7 @@ namespace DataRequestorMiddleware.Services.Reports
                 queryFilter += " and atm.creation_time <= convert(datetime, '" + filter.ToDate.Value.ToString("dd/MM/yyyy HH:mm:ss") + "',103) ";
 
             if (!filter.CreatedBy.Equals("*"))
-                queryFilter += " and atm.created_by = '" + filter.CreatedBy;
+                queryFilter += " and atm.created_by = " + filter.CreatedBy;
             
             if(!filter.AtmType.Equals("*"))
                 queryFilter += " and atm.atm_type = '" + filter.AtmType + "'";

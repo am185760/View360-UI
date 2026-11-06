@@ -22,7 +22,7 @@ namespace DataRequestorMiddleware.Services.Reports
             var response = new BaseModel();
 
             if (filter.GroupName != string.Empty)
-                queryFilter += "and group_name like '%" + filter.GroupName + "%'";
+                queryFilter += " and group_name like '%" + filter.GroupName + "%'";
 
             SqlParameter[] sqlParameters = new SqlParameter[]
                     {

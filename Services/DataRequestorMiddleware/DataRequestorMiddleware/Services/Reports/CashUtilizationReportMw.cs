@@ -52,9 +52,9 @@ namespace DataRequestorMiddleware.Services.Reports
             }
 
             if (cashUtilizationReport.SelectedRegionIds != null || cashUtilizationReport.SelectedRegionIds?.Count > 0)
-                filter += "and atm.region_id in (" + string.Join(",", cashUtilizationReport.SelectedRegionIds) + ") and atm.IS_ACTIVE = 1 ";
+                filter += " and atm.region_id in (" + string.Join(",", cashUtilizationReport.SelectedRegionIds) + ") and atm.IS_ACTIVE = 1 ";
             else
-                filter += "and  atm.atm_id in (" + string.Join(",", cashUtilizationReport.SelectedAtms) + ")";
+                filter += " and  atm.atm_id in (" + string.Join(",", cashUtilizationReport.SelectedAtms) + ")";
 
             SqlParameter[] sqlParameters = new SqlParameter[]
             {

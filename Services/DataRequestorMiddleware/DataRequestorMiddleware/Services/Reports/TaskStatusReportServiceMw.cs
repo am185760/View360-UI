@@ -62,7 +62,7 @@ namespace DataRequestorMiddleware.Services.Reports
                 filter += " and task_type.task_type_id  = " + taskStatusReportRequest.TaskType;
 
             if (taskStatusReportRequest.UserId > 0)
-                filter += " and created_by = " + taskStatusReportRequest.UserId;
+                filter += " and F.created_by = " + taskStatusReportRequest.UserId;
 
             if (taskStatusReportRequest.Status != null && taskStatusReportRequest.Status != string.Empty)
                 filter += " and status = '" + taskStatusReportRequest.Status + "'";
@@ -71,9 +71,9 @@ namespace DataRequestorMiddleware.Services.Reports
                 filter += " and atm_type = '" + taskStatusReportRequest.AtmType + "'";
 
             if (taskStatusReportRequest.SelectedRegionIds != null || taskStatusReportRequest.SelectedRegionIds?.Count > 0)
-                filter += "and atm.region_id in (" + string.Join(",", taskStatusReportRequest.SelectedRegionIds) + ") and atm.IS_ACTIVE = 1 ";
+                filter += " and atm.region_id in (" + string.Join(",", taskStatusReportRequest.SelectedRegionIds) + ") and atm.IS_ACTIVE = 1 ";
             else
-                filter += "and  atm.atm_id in (" + string.Join(",", taskStatusReportRequest.SelectedAtms) + ")";
+                filter += " and  atm.atm_id in (" + string.Join(",", taskStatusReportRequest.SelectedAtms) + ")";
 
 
             List<TaskStatusReportViewModel> taskStatusReports = new();

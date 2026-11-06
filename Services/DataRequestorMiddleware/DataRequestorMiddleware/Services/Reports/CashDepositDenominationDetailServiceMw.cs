@@ -54,9 +54,9 @@ namespace DataRequestorMiddleware.Services.Reports
             //    filter += " and atm_type = '" + taskStatusReportRequest.AtmType + "'";
 
             //if (taskStatusReportRequest.SelectedRegionIds != null || taskStatusReportRequest.SelectedRegionIds?.Count > 0)
-            //    filter += "and atm.region_id in (" + string.Join(",", taskStatusReportRequest.SelectedRegionIds) + ") and atm.IS_ACTIVE = 1 ";
+            //    filter += " and atm.region_id in (" + string.Join(",", taskStatusReportRequest.SelectedRegionIds) + ") and atm.IS_ACTIVE = 1 ";
             //else
-            //    filter += "and  atm.atm_id in (" + string.Join(",", taskStatusReportRequest.SelectedAtms) + ")";
+            //    filter += " and  atm.atm_id in (" + string.Join(",", taskStatusReportRequest.SelectedAtms) + ")";
 
 
 
