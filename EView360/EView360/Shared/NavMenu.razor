@@ -260,10 +260,10 @@
                                             {
                                                 <li> <a class="dropdown-item" href="CashPositionsReport">Cash Position Report</a></li>
                                             }
-                                            @* @if (CheckPermission((int)Permissions.ViewCashPositionReport))
+                                            @if (CheckPermission((int)Permissions.ViewCashPositionReport))
                                             {
                                                 <li> <a class="dropdown-item" href="CashPositionsReport/0/true">Recycler Cash Position Report</a></li>
-                                            } *@
+                                            }
                                             @if (CheckPermission((int)Permissions.CashUtilizationReport))
                                             {
                                                 <li> <a class="dropdown-item" @onclick="@(() => HandleClick("CashUtilizationReport"))">Cash Utilization Report</a></li>

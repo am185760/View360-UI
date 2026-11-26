@@ -250,6 +250,11 @@
     <Compile Include="Data.aspx.designer.cs">
       <DependentUpon>Data.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Datasets\dsRecyclerCashPosition.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>dsRecyclerCashPosition.xsd</DependentUpon>
+    </Compile>
     <Compile Include="RedisConnectorHelper.cs" />
     <Compile Include="Reports\ATMSummaryRpt.cs">
       <AutoGen>True</AutoGen>
@@ -353,6 +358,12 @@
       <DependentUpon>PurgeBinThresholdReport.rpt</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Reports\RecyclerCashPositionReport.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RecyclerCashPositionReport.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Reports\ReplenishmentReturned.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -441,6 +452,10 @@
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
       <LastGenOutput>PurgeBinThresholdReport.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="Reports\RecyclerCashPositionReport.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>RecyclerCashPositionReport.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Reports\ReplenishmentReturned.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
       <LastGenOutput>ReplenishmentReturned.cs</LastGenOutput>
@@ -463,6 +478,17 @@
     <Content Include="Reports\NoCashWithdrawals.rpt" />
     <Content Include="Reports\OutOfCash.rpt" />
     <Content Include="Reports\SuspiciousReplenishment.rpt" />
+    <Content Include="Datasets\dsRecyclerCashPosition.xsc">
+      <DependentUpon>dsRecyclerCashPosition.xsd</DependentUpon>
+    </Content>
+    <None Include="Datasets\dsRecyclerCashPosition.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>dsRecyclerCashPosition.Designer.cs</LastGenOutput>
+    </None>
+    <Content Include="Datasets\dsRecyclerCashPosition.xss">
+      <DependentUpon>dsRecyclerCashPosition.xsd</DependentUpon>
+    </Content>
     <None Include="Properties\PublishProfiles\Profile1.pubxml" />
     <Content Include="Reports\GroupList.rpt" />
   </ItemGroup>
@@ -492,7 +518,7 @@
           <AutoAssignPort>False</AutoAssignPort>
           <DevelopmentServerPort>1782</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>https://localhost/EView360Reporting</IISUrl>
+          <IISUrl>https://localhost/EView360Reporting2</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

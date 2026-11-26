@@ -1,4 +1,5 @@
 ﻿@page "/CashPositionsReport"
+@page "/CashPositionsReport/{IsRecycler:bool?}"
 @page "/CashPositionsReport/{mode}"
 @page "/CashPositionsReport/{mode}/{IsRecycler:bool?}"
 
@@ -103,15 +104,17 @@
                             <Check TValue="bool" @bind-Checked="@isCurrent"></Check>
                         </div>
                     </div>
-
-                    <div class="form-row">
-                        <div class="form-group col-md-1">
-                            <label>Suppress Detail: </label>
+                    @if (IsRecycler == null)
+                    {
+                        <div class="form-row">
+                            <div class="form-group col-md-1">
+                                <label>Suppress Detail: </label>
+                            </div>
+                            <div class="form-group col-md-2">
+                                <Check TValue="bool" @bind-Checked="@isSupress"></Check>
+                            </div>
                         </div>
-                        <div class="form-group col-md-2">
-                            <Check TValue="bool" @bind-Checked="@isSupress"></Check>
-                        </div>
-                    </div>
+                    }
 
                     <div class="form-row">
                         <div class="form-group col-md-7 text-right">
@@ -214,7 +217,7 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         try
-        {            
+        {
             if (firstRender)
             {
                 await jsRuntime.InvokeVoidAsync("handleDatePicker", objRef);
@@ -310,15 +313,15 @@
                 }
 
                 DeadAtmRptRequestModel requestModel = new()
-                    {
-                        FromDate = fromDate,
-                        ToDate = toDate,
-                        SelectedAtms = atms,
-                        SelectedNoteSetType = selectedNoteSetTypeIds,
-                        isCurrent = isCurrent,
-                        archiveYear = isArchive ? ArchiveYear : null,
-                        isRecycler = IsRecycler ?? false
-                    };
+                {
+                    FromDate = fromDate,
+                    ToDate = toDate,
+                    SelectedAtms = atms,
+                    SelectedNoteSetType = selectedNoteSetTypeIds,
+                    isCurrent = isCurrent,
+                    archiveYear = isArchive ? ArchiveYear : null,
+                    isRecycler = IsRecycler ?? false
+                };
 
                 logger.LogWarning($"CashPostRpt: going in GetCashPositionsRpt  : {DateTime.Now.ToString()}");
                 DataTableResult dataResult = reportService.GetCashPositionsRpt(requestModel);
@@ -354,17 +357,23 @@
                     logger.LogWarning($"CashPositionRpt: going to cache the data");
                     _distributedCache.Set(redisKey, bytes, new DistributedCacheEntryOptions()
                     {
-                            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_configuration.GetValue<int>("RedisKeyExpirationTimeInMinutes"))
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_configuration.GetValue<int>("RedisKeyExpirationTimeInMinutes"))
                     });
                     logger.LogWarning($"CashPositionRpt: return from cache the data");
 
 
                     var reports = new ReportsRequestModel()
-                        {
-                            redisKey = redisKey
-                        };
+                    {
+                        redisKey = redisKey
+                    };
                     string title = requestModel.isRecycler ? "Recycler%20Cash%20Position%20Report" : "Cash%20Position%20Report";
+
                     string url = $"{apiUrl.Value.ReportingProjectUrl}ReportPopup.aspx?Report=CashPositionsRpt.rpt&ReportTitle={title}&FromDate={fromDate.Date.ToString("MM/dd/yyyy")}&ToDate={toDate.Date.ToString("MM/dd/yyyy")}&GeneratedBy={appUser.UserLogin}&suppressDetail={(isSupress ? 1 : 0)}&userId={appUser.UserId}";
+                    if (requestModel.isRecycler)
+                    {
+                        url = $"{apiUrl.Value.ReportingProjectUrl}ReportPopup.aspx?Report=RecyclerCashPositionReport.rpt&ReportTitle={title}&FromDate={fromDate.Date.ToString("MM/dd/yyyy")}&ToDate={toDate.Date.ToString("MM/dd/yyyy")}&GeneratedBy={appUser.UserLogin}&suppressDetail={(isSupress ? 1 : 0)}&userId={appUser.UserId}";
+
+                    }
 
                     logger.LogWarning($"CashPostRpt: going in openWindowWithPost  : {DateTime.Now.ToString()}");
                     await jsRuntime.InvokeVoidAsync("openWindowWithPost", url, reports);
@@ -378,7 +387,7 @@
                 }
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             await NotificationService.Error("Exception came at Submit as: " + ex.Message, "Error", (options) =>
                     {

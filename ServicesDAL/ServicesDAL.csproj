@@ -63,6 +63,7 @@
     <Compile Include="Cash\BnaCountsCleared.cs" />
     <Compile Include="Cash\CashPosition.cs" />
     <Compile Include="Cash\CcmsAtmLog.cs" />
+    <Compile Include="Cash\ParsedTransactionCdmDetail.cs" />
     <Compile Include="Cash\RecyclerCashposition.cs" />
     <Compile Include="Cash\Dispensed.cs" />
     <Compile Include="Cash\DispenserEndOfDayBalance.cs" />

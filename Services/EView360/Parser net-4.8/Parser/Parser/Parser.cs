@@ -13,7 +13,41 @@ using System.Configuration;
 
 namespace Avanza.CCMS.Parser
 {
+    public class ParsedTransactionDetail
+    {
+        public long ParsedTransactionID { get; set; }
 
+        public string DeviceName { get; set; }
+
+        public int Denomination { get; set; }
+
+        public int LoadedCount { get; set; }
+
+        public int DispensedCount { get; set; }
+
+        public int RemainingCount { get; set; }
+
+        public int PurgedCount { get; set; }
+    }
+
+
+    public class Cdm2Info
+    {
+        public int Denomination;
+        public int Initial;
+        public int Dispensed;
+        public int Remaining;
+        public int Purged;
+        public string Raw;
+    }
+
+    public class Cdm1Info
+    {
+        public int Denomination;
+        public int Remaining;
+        public int Dispensed;
+        public string Raw;
+    }
     public class TestCash
     {
         public DateTime TestCashDateTime = new DateTime(1900, 1, 1);
@@ -431,9 +465,10 @@ namespace Avanza.CCMS.Parser
             bool isReplenishmentExpected = false;
             LogableTask task = LogableTask.NewTask("Parsing");
             ParsedTransaction parsedTransaction = null;
-            
+            ParsedTransactionCdmDetail parsedTransactionCDMDetail = null;
+
             Replenishment replenishment = null;
-            
+
             //CpmCountsCleared cpmCountsCleared = null;
             //ParsedCpmCounter parsedCpmCounter = null;
             BnaCountsCleared bnaCountsCleared = null;
@@ -441,7 +476,8 @@ namespace Avanza.CCMS.Parser
             TestCashPurgedNotes testCashPurgedNotes = null;
 
             List<ParsedTransaction> listParsedTrxns = new List<ParsedTransaction>();
-            
+            List<ParsedTransactionCdmDetail> listParsedCDMTrxns = new List<ParsedTransactionCdmDetail>();
+
             List<Replenishment> listReplenishment = new List<Replenishment>();
 
             //List<CpmCountsCleared> listCpmCountsCleared = new List<CpmCountsCleared>();
@@ -1347,6 +1383,7 @@ namespace Avanza.CCMS.Parser
                             parsedBnaCounter.DenominationType4Deposited = int.Parse(subParts[len - 6]);
                             parsedBnaCounter.DenominationType4Remaining = int.Parse(subParts[len - 7]);
 
+
                             // parsedBnaCounter.
                         }
                         catch (Exception ex)
@@ -1356,7 +1393,7 @@ namespace Avanza.CCMS.Parser
                         parsedBnaCounter.AtmId = ATMID;
                         parsedBnaCounter.TaskId = taskID;
                         //parsedBnaCounter.Save(trxn.Connection, trxn);
-                        
+
                         //this is commented - guided by Izhar, as deposit note when went to reject bin, not getting saved..
                         //if (notesDepositInCassette > 0)
                         {
@@ -1623,6 +1660,7 @@ namespace Avanza.CCMS.Parser
                     {
                         j = 0;
                         parsedTransaction = new ParsedTransaction();
+                        parsedTransactionCDMDetail = new ParsedTransactionCdmDetail();
                         parsedTransaction.TrxnDatetime = DateTime.ParseExact(subParts[j++], "MM/dd/yyyy HH:mm:ss", null);
                         j++; j++;
                         parsedTransaction.CashRemaining1 = int.Parse(subParts[j++]);
@@ -1650,6 +1688,472 @@ namespace Avanza.CCMS.Parser
                         parsedTransaction.CashPurged5 = int.Parse(subParts[j++]);
                         parsedTransaction.CashPurged6 = int.Parse(subParts[j++]);
                         parsedTransaction.CashPurged7 = int.Parse(subParts[j++]);
+                        List<ParsedTransactionDetail> denominationDetails = new List<ParsedTransactionDetail>();
+
+                        Dictionary<int, ParsedTransactionDetail> cdm2Lookup = new Dictionary<int, ParsedTransactionDetail>();
+                        Dictionary<int, Cdm2Info> cdm2 = new Dictionary<int, Cdm2Info>();
+
+                        Dictionary<int, Cdm1Info> cdm1 = new Dictionary<int, Cdm1Info>();
+                        HashSet<int> cdm1Denominations = new HashSet<int>();
+                        // Read denomination configuration
+                        //List<int> configuredDenoms = new List<int>();
+
+                        //for (int x = 0; x < 7 && j < subParts.Length; x++)
+                        //{
+                        //    int denom;
+
+                        //    if (int.TryParse(subParts[j], out denom) && denom > 0)
+                        //    {
+                        //        configuredDenoms.Add(denom);
+                        //    }
+
+                        //    j++;
+                        //}
+
+                        ///CDM2
+
+                        //for (int d = 0; d < configuredDenoms.Count; d++)
+                        //{
+                        //    if (j + 4 >= subParts.Length)
+                        //        break;
+
+                        //    int denomination;
+
+                        //    if (!int.TryParse(subParts[j], out denomination))
+                        //        break;
+
+                        //    ParsedTransactionDetail detail = new ParsedTransactionDetail();
+
+                        //    detail.DeviceName = "CDM2";
+
+                        //    detail.Denomination =
+                        //    int.Parse(subParts[j++]);
+
+                        //    detail.LoadedCount =
+                        //    int.Parse(subParts[j++]);
+
+                        //    detail.DispensedCount =
+                        //    int.Parse(subParts[j++]);
+
+                        //    detail.RemainingCount =
+                        //    int.Parse(subParts[j++]);
+
+                        //    detail.PurgedCount =
+                        //    int.Parse(subParts[j++]);
+
+                        //    denominationDetails.Add(detail);
+
+                        //    cdm2Lookup[detail.Denomination] = detail;
+                        //}
+                        //while (j < subParts.Length)
+                        //{
+                        //    int val;
+
+                        //    if (!int.TryParse(subParts[j], out val))
+                        //    {
+                        //        j++;
+                        //        continue;
+                        //    }
+
+                        //    if (configuredDenoms.Contains(val))
+                        //        break;
+
+                        //    j++;
+                        //}
+
+                        //while (j + 4 < subParts.Length)
+                        //{
+                        //    int denomination;
+
+                        //    if (!int.TryParse(subParts[j], out denomination))
+                        //        break;
+
+                        //    if (!configuredDenoms.Contains(denomination))
+                        //        break;
+
+                        //    ParsedTransactionDetail detail = new ParsedTransactionDetail();
+
+                        //    detail.DeviceName = "CDM1";
+
+                        //    detail.Denomination = int.Parse(subParts[j++]);
+
+                        //    detail.LoadedCount = int.Parse(subParts[j++]);
+
+                        //    detail.DispensedCount = int.Parse(subParts[j + 2]);
+
+                        //    detail.RemainingCount = int.Parse(subParts[j++]);
+
+                        //    detail.PurgedCount = int.Parse(subParts[j++]);
+
+                        //    cdm1Denominations.Add(detail.Denomination);
+
+                        //    denominationDetails.Add(detail);
+
+                        //    // skip any extra CDM1 columns
+                        //    while (j < subParts.Length)
+                        //    {
+                        //        int nextValue;
+
+                        //        if (!int.TryParse(subParts[j], out nextValue))
+                        //        {
+                        //            j++;
+                        //            continue;
+                        //        }
+
+                        //        if (configuredDenoms.Contains(nextValue))
+                        //            break;
+
+                        //        j++;
+                        //    }
+                        //}
+
+                        ////CDM1
+                        //foreach (int denom in configuredDenoms)
+                        //{
+                        //    if (!cdm1Denominations.Contains(denom) && denom != 0)
+                        //    {
+                        //        ParsedTransactionDetail missingRow =
+                        //            new ParsedTransactionDetail();
+
+                        //        missingRow.DeviceName = "CDM1";
+
+                        //        missingRow.Denomination = denom;
+
+                        //        if (cdm2Lookup.ContainsKey(denom))
+                        //        {
+                        //            missingRow.RemainingCount =
+                        //                cdm2Lookup[denom].RemainingCount;
+
+                        //            missingRow.LoadedCount =
+                        //                cdm2Lookup[denom].RemainingCount;
+                        //        }
+                        //        else
+                        //        {
+                        //            missingRow.LoadedCount = 0;
+                        //            missingRow.RemainingCount = 0;
+                        //        }
+
+                        //        missingRow.DispensedCount = 0;
+                        //        missingRow.PurgedCount = 0;
+
+                        //        denominationDetails.Add(missingRow);
+                        //    }
+                        //}
+                        if (ATM.IsRecycler == true)
+                        {
+                            try
+                            {
+                                #region oldlogic
+                                List<int> atmDenoms = new List<int>();
+
+                                for (int x = 0; x < 7; x++)
+                                {
+                                    int denom;
+
+                                    if (int.TryParse(subParts[j], out denom))
+                                    {
+                                        if (denom > 0)
+                                            atmDenoms.Add(denom);
+                                    }
+
+                                    j++;
+                                }
+                                //foreach (int expectedDenom in atmDenoms)
+                                //{
+                                //    if (j + 4 >= subParts.Length)
+                                //        break;
+
+                                //    int denomination = int.Parse(subParts[j++]);
+                                //    int initial = int.Parse(subParts[j++]);
+                                //    int dispensed = int.Parse(subParts[j++]);
+                                //    int remaining = int.Parse(subParts[j++]);
+                                //    int purged = int.Parse(subParts[j++]);
+
+
+                                //    if (denomination > 0)
+                                //    {
+                                //        cdm2[denomination] = new Cdm2Info
+                                //        {
+                                //            Denomination = denomination,
+                                //            Initial = initial,
+                                //            Dispensed = dispensed,
+                                //            Remaining = remaining,
+                                //            Purged = purged,
+                                //            Raw = string.Format(
+                                //                "{0}|{1}|{2}|{3}|{4}",
+                                //                denomination,
+                                //                initial,
+                                //                dispensed,
+                                //                remaining,
+                                //                purged)
+                                //        };
+                                //    }
+                                //}
+                                //while (j < subParts.Length)
+                                //{
+                                //    int value;
+
+                                //    if (!int.TryParse(subParts[j], out value))
+                                //    {
+                                //        j++;
+                                //        continue;
+                                //    }
+
+                                //    if (atmDenoms.Contains(value))
+                                //        break;
+
+                                //    j++;
+                                //}
+                                //while (j + 7 < subParts.Length)
+                                //{
+                                //    int denomination;
+
+                                //    if (!int.TryParse(subParts[j], out denomination))
+                                //        break;
+
+                                //    if (!atmDenoms.Contains(denomination))
+                                //        break;
+
+                                //    string raw =
+                                //        string.Join("|", subParts.Skip(j).Take(8).ToArray());
+
+                                //    denomination = int.Parse(subParts[j++]);
+
+                                //    int remaining = int.Parse(subParts[j++]);
+
+                                //    j++; // skip field3
+
+                                //    int dispensed = int.Parse(subParts[j++]);
+
+                                //    j += 4;                                    
+                                //    cdm1[denomination] = new Cdm1Info
+                                //    {
+                                //        Denomination = denomination,
+                                //        Remaining = remaining,
+                                //        Dispensed = dispensed,
+                                //        Raw = raw
+                                //    };
+                                //}
+
+                                //foreach (int denom in atmDenoms)
+                                //{
+                                //    //if (!cdm1.ContainsKey(denom))
+                                //    //{
+                                //    //    if (cdm2.ContainsKey(denom))
+                                //    //    {
+                                //    //        cdm1[denom] = new Cdm1Info
+                                //    //        {
+                                //    //            Denomination = denom,
+                                //    //            Remaining = cdm2[denom].Remaining,
+                                //    //            Dispensed = 0,
+                                //    //            //Raw =
+                                //    //            //    denom + "|" +
+                                //    //            //    cdm2[denom].Remaining +
+                                //    //            //    "|0|0|0|0|0|0"
+                                //    //        };
+                                //    //    }
+                                //    //}
+                                //    if (!cdm1.ContainsKey(denom))
+                                //    {
+                                //        if (cdm2.ContainsKey(denom))
+                                //        {
+                                //            task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Warning, string.Format("CDM1 denomination {0} missing. Copying from CDM2. ATM={1}", denom, ATMId));
+                                //            Cdm1Info info = new Cdm1Info();
+
+                                //            info.Denomination = cdm2[denom].Denomination;
+
+                                //            info.Remaining = cdm2[denom].Remaining;
+
+                                //            // Copy complete raw record
+                                //            info.Raw = cdm2[denom].Raw;
+
+                                //            // If your CDM1Info class contains Dispensed
+                                //            info.Dispensed = cdm2[denom].Dispensed;
+
+                                //            cdm1.Add(denom, info);
+                                //        }
+                                //        else if (!cdm1.ContainsKey(denom) && !cdm2.ContainsKey(denom))
+                                //        {
+                                //            task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Warning, string.Format("Denomination {0} missing in both CDM1 and CDM2. Creating default zero record. ATM={1}", denom, ATMId));
+                                //            Cdm1Info info = new Cdm1Info();
+
+                                //            info.Denomination = denom;
+                                //            info.Remaining = 0;
+                                //            info.Dispensed = 0;
+                                //            info.Raw = denom + "|0|0|0|0|0|0|0";
+
+
+                                //            Cdm2Info info2 = new Cdm2Info();
+
+                                //            info2.Denomination = denom;
+                                //            info2.Remaining = 0;
+                                //            info2.Dispensed = 0;
+                                //            info2.Raw = denom + "|0|0|0|0|0|0|0";
+
+                                //            cdm1.Add(denom, info);
+                                //            cdm2.Add(denom, info2);
+                                //        }
+                                //        else
+                                //        {
+                                //            Cdm1Info info = new Cdm1Info();
+
+                                //            info.Denomination = denom;
+                                //            info.Remaining = 0;
+                                //            info.Dispensed = 0;
+                                //            info.Raw = denom + "|0|0|0|0|0|0|0";
+
+                                //            cdm1.Add(denom, info);
+                                //        }
+
+                                //    }
+
+                                //}
+                                //parsedTransactionCDMDetail.TrxnDatetime = parsedTransaction.TrxnDatetime;
+                                //parsedTransactionCDMDetail.AtmId = ATMId;
+                                //parsedTransactionCDMDetail.TaskId = taskID;
+
+
+                                //var orderedCDM2 = cdm2.Values.OrderBy(x => x.Denomination).ToList();
+                                //if (orderedCDM2.Count > 0)
+                                //{
+                                //    parsedTransactionCDMDetail.Cdm2Raw1 = orderedCDM2[0].Raw;
+                                //    parsedTransactionCDMDetail.Cdm2Denom1 = orderedCDM2[0].Denomination;
+                                //    parsedTransactionCDMDetail.Cdm2Initial1 = orderedCDM2[0].Initial;
+                                //    parsedTransactionCDMDetail.Cdm2Dispensed1 = orderedCDM2[0].Dispensed;
+                                //    parsedTransactionCDMDetail.Cdm2Remaining1 = orderedCDM2[0].Remaining;
+                                //    parsedTransactionCDMDetail.Cdm2Purged1 = orderedCDM2[0].Purged;
+
+
+
+                                //    parsedTransactionCDMDetail.Cdm2Raw2 = orderedCDM2[1].Raw;
+                                //    parsedTransactionCDMDetail.Cdm2Denom2 = orderedCDM2[1].Denomination;
+                                //    parsedTransactionCDMDetail.Cdm2Initial2 = orderedCDM2[1].Initial;
+                                //    parsedTransactionCDMDetail.Cdm2Dispensed2 = orderedCDM2[1].Dispensed;
+                                //    parsedTransactionCDMDetail.Cdm2Remaining2 = orderedCDM2[1].Remaining;
+                                //    parsedTransactionCDMDetail.Cdm2Purged2 = orderedCDM2[1].Purged;
+
+
+                                //    parsedTransactionCDMDetail.Cdm2Raw3 = orderedCDM2[2].Raw;
+                                //    parsedTransactionCDMDetail.Cdm2Denom3 = orderedCDM2[2].Denomination;
+                                //    parsedTransactionCDMDetail.Cdm2Initial3 = orderedCDM2[2].Initial;
+                                //    parsedTransactionCDMDetail.Cdm2Dispensed3 = orderedCDM2[2].Dispensed;
+                                //    parsedTransactionCDMDetail.Cdm2Remaining3 = orderedCDM2[2].Remaining;
+                                //    parsedTransactionCDMDetail.Cdm2Purged3 = orderedCDM2[2].Purged;
+
+                                //    parsedTransactionCDMDetail.Cdm2Raw4 = orderedCDM2[3].Raw;
+                                //    parsedTransactionCDMDetail.Cdm2Denom4 = orderedCDM2[3].Denomination;
+                                //    parsedTransactionCDMDetail.Cdm2Initial4 = orderedCDM2[3].Initial;
+                                //    parsedTransactionCDMDetail.Cdm2Dispensed4 = orderedCDM2[3].Dispensed;
+                                //    parsedTransactionCDMDetail.Cdm2Remaining4 = orderedCDM2[3].Remaining;
+                                //    parsedTransactionCDMDetail.Cdm2Purged4 = orderedCDM2[3].Purged;
+                                //}
+
+
+                                //var orderedCDM1 = cdm1.Values.OrderBy(x => x.Denomination).ToList();
+                                //if (orderedCDM1.Count > 0)
+                                //{
+                                //    parsedTransactionCDMDetail.Cdm1Raw1 = orderedCDM1[0].Raw;
+                                //    parsedTransactionCDMDetail.Cdm1Denom1 = orderedCDM1[0].Denomination;
+                                //    parsedTransactionCDMDetail.Cdm1Dispensed1 = orderedCDM1[0].Dispensed;
+                                //    parsedTransactionCDMDetail.Cdm1Remaining1 = orderedCDM1[0].Remaining;
+
+
+
+                                //    parsedTransactionCDMDetail.Cdm1Raw2 = orderedCDM1[1].Raw;
+                                //    parsedTransactionCDMDetail.Cdm1Denom2 = orderedCDM1[1].Denomination;
+                                //    parsedTransactionCDMDetail.Cdm1Dispensed2 = orderedCDM1[1].Dispensed;
+                                //    parsedTransactionCDMDetail.Cdm1Remaining2 = orderedCDM1[1].Remaining;
+
+
+                                //    parsedTransactionCDMDetail.Cdm1Raw3 = orderedCDM1[2].Raw;
+                                //    parsedTransactionCDMDetail.Cdm1Denom3 = orderedCDM1[2].Denomination;
+                                //    parsedTransactionCDMDetail.Cdm1Dispensed3 = orderedCDM1[2].Dispensed;
+                                //    parsedTransactionCDMDetail.Cdm1Remaining3 = orderedCDM1[2].Remaining;
+
+                                //    parsedTransactionCDMDetail.Cdm1Raw4 = orderedCDM1[3].Raw;
+                                //    parsedTransactionCDMDetail.Cdm1Denom4 = orderedCDM1[3].Denomination;
+                                //    parsedTransactionCDMDetail.Cdm1Dispensed4 = orderedCDM1[3].Dispensed;
+                                //    parsedTransactionCDMDetail.Cdm1Remaining4 = orderedCDM1[3].Remaining;
+                                //}
+                                #endregion
+                                List<string> nonEmptyValues = subParts.Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
+                                int lastIndex = subParts.Length - 1;
+
+                                while (lastIndex >= 0 &&
+                                       string.IsNullOrWhiteSpace(subParts[lastIndex]))
+                                {
+                                    lastIndex--;
+                                }
+
+                                int[] cdm1Summary ={
+                                                        int.Parse(subParts[lastIndex - 6]),
+                                                        int.Parse(subParts[lastIndex - 5]),
+                                                        int.Parse(subParts[lastIndex - 4]),
+                                                        int.Parse(subParts[lastIndex - 3]),
+                                                        int.Parse(subParts[lastIndex - 2]),
+                                                        int.Parse(subParts[lastIndex - 1]),
+                                                        int.Parse(subParts[lastIndex])
+                                                    };
+                                int[] cdm2Summary ={
+                                                    int.Parse(subParts[lastIndex - 13]),
+                                                    int.Parse(subParts[lastIndex - 12]),
+                                                    int.Parse(subParts[lastIndex - 11]),
+                                                    int.Parse(subParts[lastIndex - 10]),
+                                                    int.Parse(subParts[lastIndex - 9]),
+                                                    int.Parse(subParts[lastIndex - 8]),
+                                                    int.Parse(subParts[lastIndex - 7])
+                                                };
+
+
+                                parsedTransactionCDMDetail.TrxnDatetime = parsedTransaction.TrxnDatetime;
+                                parsedTransactionCDMDetail.TaskId = taskID;
+                                parsedTransactionCDMDetail.AtmId = ATMId;
+
+                                parsedTransactionCDMDetail.Cdm2Denom1 = atmDenoms[0];
+                                parsedTransactionCDMDetail.Cdm2Remaining1 = cdm2Summary[0];
+
+                                parsedTransactionCDMDetail.Cdm2Denom2 = atmDenoms[1];
+                                parsedTransactionCDMDetail.Cdm2Remaining2 = cdm2Summary[1];
+
+                                parsedTransactionCDMDetail.Cdm2Denom3 = atmDenoms[2];
+                                parsedTransactionCDMDetail.Cdm2Remaining3 = cdm2Summary[2];
+
+                                parsedTransactionCDMDetail.Cdm2Denom4 = atmDenoms[3];
+                                parsedTransactionCDMDetail.Cdm2Remaining4 = cdm2Summary[3];
+
+                                parsedTransactionCDMDetail.Cdm1Denom1 = atmDenoms[0];
+                                parsedTransactionCDMDetail.Cdm1Remaining1 = cdm1Summary[0];
+
+                                parsedTransactionCDMDetail.Cdm1Denom2 = atmDenoms[1];
+                                parsedTransactionCDMDetail.Cdm1Remaining2 = cdm1Summary[1];
+
+                                parsedTransactionCDMDetail.Cdm1Denom3 = atmDenoms[2];
+                                parsedTransactionCDMDetail.Cdm1Remaining3 = cdm1Summary[2];
+
+                                parsedTransactionCDMDetail.Cdm2Denom4 = atmDenoms[3];
+                                parsedTransactionCDMDetail.Cdm1Remaining4 = cdm1Summary[3];
+
+                                if (subParts[1] == "CashWithdrawal")
+                                {
+                                    parsedTransactionCDMDetail.Cdm2Remaining1 = parsedTransactionCDMDetail.Cdm2Remaining1 - parsedTransaction.CashDispensed1;
+                                    parsedTransactionCDMDetail.Cdm2Remaining2 = parsedTransactionCDMDetail.Cdm2Remaining2 - parsedTransaction.CashDispensed2;
+                                    parsedTransactionCDMDetail.Cdm2Remaining3 = parsedTransactionCDMDetail.Cdm2Remaining3 - parsedTransaction.CashDispensed3;
+                                    parsedTransactionCDMDetail.Cdm2Remaining4 = parsedTransactionCDMDetail.Cdm2Remaining4 - parsedTransaction.CashDispensed4;
+                                }
+                                else
+                                {
+                                    parsedTransactionCDMDetail.Cdm1Remaining1 = parsedTransactionCDMDetail.Cdm1Remaining1 - parsedTransaction.CashDispensed1;
+                                    parsedTransactionCDMDetail.Cdm1Remaining2 = parsedTransactionCDMDetail.Cdm1Remaining2 - parsedTransaction.CashDispensed2;
+                                    parsedTransactionCDMDetail.Cdm1Remaining3 = parsedTransactionCDMDetail.Cdm1Remaining3 - parsedTransaction.CashDispensed3;
+                                    parsedTransactionCDMDetail.Cdm1Remaining4 = parsedTransactionCDMDetail.Cdm1Remaining4 - parsedTransaction.CashDispensed4;
+                                }
+
+                            }
+                            catch (Exception ex)
+                            {
+                                task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Error, string.Format("CDM parsing failed. ATM:{0}, TaskID:{1}, Error:{2}", ATMId, taskID, ex.ToString()));
+                            }
+                        }
                         if (subParts[subParts.Length - 1] == "Y")
                             parsedTransaction.IsAutoGenerated = true;
                         else
@@ -2023,6 +2527,7 @@ namespace Avanza.CCMS.Parser
 
 
                         listParsedTrxns.Add(parsedTransaction);
+                        listParsedCDMTrxns.Add(parsedTransactionCDMDetail);
 
                         currentCassetteStatus = parts[i];
 
@@ -2112,7 +2617,7 @@ namespace Avanza.CCMS.Parser
 
                         sumOfAlreadyExistingNotes = 0;
                         task.Log(MethodBase.GetCurrentMethod(), TraceLevel.Info, "counts cleared.So its a swap");
-                                                
+
 
                         if (subParts[1] == "CountsCleared")
                         {
@@ -2363,8 +2868,8 @@ namespace Avanza.CCMS.Parser
                         replenishment = new Replenishment();
                         replenishment.AtmId = ATMID;
                         replenishment.RepDatetime = DateTime.ParseExact(subParts[0], "MM/dd/yyyy HH:mm:ss", null);
-                        
-                        
+
+
                         if (subParts[1] == "Replenishment")
                         {
                             replenishment.CashAdded1 = int.Parse(subParts[j++]);
@@ -2441,7 +2946,7 @@ namespace Avanza.CCMS.Parser
                         replenishment.RepStatus = subParts[2];
                         replenishment.TaskId = taskID;
                         replenishment.CashOrderId = int.Parse(subParts[5]);
-                        
+
                         if (subParts[1] == "BillReplenishment")
                             replenishment.IsBillDispenser = true;
                         else
@@ -2632,7 +3137,7 @@ namespace Avanza.CCMS.Parser
                         replenishment.GeneratedBy = 1;
                         replenishment.IsUpdated = false;
                         //replenishment.Save(trxn.Connection, trxn);
-                        listReplenishment.Add(replenishment);                      
+                        listReplenishment.Add(replenishment);
                         //ATM.IsDffGenerationHalt = false;
                         //ATM.Save(trxn.Connection, trxn);
 
@@ -3162,7 +3667,7 @@ namespace Avanza.CCMS.Parser
                             isBillSwap = false;
                         else
                             isSwap = false;
-                        
+
 
                     }
                     #endregion
@@ -3172,6 +3677,8 @@ namespace Avanza.CCMS.Parser
 
                 if (parsedTransaction != null)
                 {
+                    //usama
+                    parsedTransactionCDMDetail.BulkSave(listParsedCDMTrxns);
                     dt = parsedTransaction.BulkSave(listParsedTrxns);
                     for (int i = 0; i < dt.Rows.Count; i++)
                     {

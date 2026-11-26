@@ -284,8 +284,7 @@ namespace CCMSUI.CCMS
                     }
 
                     Cache["data"] = Cache[$"AuditLogReportData_{UserId}"] = dt;
-
-
+              
                     DataSet ds = new DataSet();
                     ds.Tables.Add(dt);
                     ds.Tables[0].TableName = "DataTable1";
@@ -296,8 +295,7 @@ namespace CCMSUI.CCMS
                     {
                         dtSubReport = ((DataTable)Cache[$"AuditLogSubReport_{UserId}"]).Copy();
                     }
-
-
+                    
                     if (dtSubReport != null)
                     {
                         Cache[$"AuditLogSubReport_{UserId}"] = dtSubReport;
@@ -378,6 +376,20 @@ namespace CCMSUI.CCMS
                     }
 
                     Cache["data"] = Cache[$"LowBalanceReportData_{UserId}"] = dt;
+
+                    DataSet ds = new DataSet();
+                    ds.Tables.Add(dt);
+                    ds.Tables[0].TableName = "DataTable1";
+                    rptDoc.SetDataSource(ds);
+                }
+                else if (ReportName.Contains("RecyclerCashPositionReport"))
+                {
+                    if (dt.Rows.Count == 0 && Cache[$"RecyclerCashPositionReportData_{UserId}"] != null)
+                    {
+                        dt = ((DataTable)Cache[$"RecyclerCashPositionReportData_{UserId}"]).Copy();
+                    }
+
+                    Cache["data"] = Cache[$"RecyclerCashPositionReportData_{UserId}"] = dt;
 
                     DataSet ds = new DataSet();
                     ds.Tables.Add(dt);
