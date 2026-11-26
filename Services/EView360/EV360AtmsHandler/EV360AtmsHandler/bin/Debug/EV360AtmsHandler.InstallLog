@@ -1,0 +1,182 @@
+﻿Installing assembly 'C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.InstallLog
+   assemblypath = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe
+Installing service EV360AtmHandler...
+Service EV360AtmHandler has been successfully installed.
+Creating EventLog source EV360AtmHandler in log Application...
+Committing assembly 'C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.InstallLog
+   assemblypath = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe
+Uninstalling assembly 'C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.InstallLog
+   assemblypath = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe
+Removing EventLog source EV360AtmHandler.
+Service EV360AtmHandler is being removed from the system...
+Service EV360AtmHandler was successfully removed from the system.
+Uninstalling assembly 'C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.InstallLog
+   assemblypath = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe
+Removing EventLog source EV360AtmHandler.
+Warning: The source EV360AtmHandler is not registered on the local machine.
+Service EV360AtmHandler is being removed from the system...
+Service EV360AtmHandler was successfully removed from the system.
+Installing assembly 'C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.InstallLog
+   assemblypath = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe
+Installing service EV360AtmHandler...
+Service EV360AtmHandler has been successfully installed.
+Creating EventLog source EV360AtmHandler in log Application...
+Committing assembly 'C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.InstallLog
+   assemblypath = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe
+Uninstalling assembly 'C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.InstallLog
+   assemblypath = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe
+Removing EventLog source EV360AtmHandler.
+Service EV360AtmHandler is being removed from the system...
+Service EV360AtmHandler was successfully removed from the system.
+Installing assembly 'C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.InstallLog
+   assemblypath = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe
+Installing service EV360AtmHandler...
+Service EV360AtmHandler has been successfully installed.
+Creating EventLog source EV360AtmHandler in log Application...
+Committing assembly 'C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.InstallLog
+   assemblypath = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe
+Uninstalling assembly 'C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.InstallLog
+   assemblypath = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe
+Removing EventLog source EV360AtmHandler.
+Service EV360AtmHandler is being removed from the system...
+Service EV360AtmHandler was successfully removed from the system.
+Installing assembly 'C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.InstallLog
+   assemblypath = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe
+Installing service EV360AtmHandler...
+Service EV360AtmHandler has been successfully installed.
+Creating EventLog source EV360AtmHandler in log Application...
+Committing assembly 'C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.InstallLog
+   assemblypath = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe
+Uninstalling assembly 'C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.InstallLog
+   assemblypath = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe
+Removing EventLog source EV360AtmHandler.
+Service EV360AtmHandler is being removed from the system...
+Service EV360AtmHandler was successfully removed from the system.
+Installing assembly 'C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   assemblypath = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe
+   logfile = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.InstallLog
+Installing service EV360AtmHandler...
+Service EV360AtmHandler has been successfully installed.
+Creating EventLog source EV360AtmHandler in log Application...
+Committing assembly 'C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   assemblypath = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe
+   logfile = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.InstallLog
+Uninstalling assembly 'C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   assemblypath = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe
+   logfile = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.InstallLog
+Removing EventLog source EV360AtmHandler.
+Service EV360AtmHandler is being removed from the system...
+Service EV360AtmHandler was successfully removed from the system.
+Installing assembly 'C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   assemblypath = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe
+   logfile = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.InstallLog
+Installing service EV360AtmHandler...
+Service EV360AtmHandler has been successfully installed.
+Creating EventLog source EV360AtmHandler in log Application...
+Committing assembly 'C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   assemblypath = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe
+   logfile = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.InstallLog
+Uninstalling assembly 'C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   assemblypath = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe
+   logfile = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.InstallLog
+Removing EventLog source EV360AtmHandler.
+Service EV360AtmHandler is being removed from the system...
+Service EV360AtmHandler was successfully removed from the system.
+Installing assembly 'C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   assemblypath = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe
+   logfile = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.InstallLog
+Installing service EV360AtmHandler...
+Creating EventLog source EV360AtmHandler in log Application...
+Rolling back assembly 'C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   assemblypath = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe
+   logfile = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.InstallLog
+Restoring event log to previous state for source EV360AtmHandler.
+Installing assembly 'C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   assemblypath = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe
+   logfile = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.InstallLog
+Installing service EV360AtmHandler...
+Service EV360AtmHandler has been successfully installed.
+Creating EventLog source EV360AtmHandler in log Application...
+Committing assembly 'C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   assemblypath = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe
+   logfile = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.InstallLog
+Uninstalling assembly 'C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   assemblypath = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe
+   logfile = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.InstallLog
+Removing EventLog source EV360AtmHandler.
+Service EV360AtmHandler is being removed from the system...
+Service EV360AtmHandler was successfully removed from the system.
+Installing assembly 'C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.InstallLog
+   assemblypath = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe
+Installing service EV360AtmHandler...
+Service EV360AtmHandler has been successfully installed.
+Creating EventLog source EV360AtmHandler in log Application...
+Committing assembly 'C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.InstallLog
+   assemblypath = C:\Users\ea185113\OneDrive - NCR Corporation\Desktop\Solutions\New Arch\EV360AtmsHandler\EV360AtmsHandler\bin\Debug\EV360AtmsHandler.exe
